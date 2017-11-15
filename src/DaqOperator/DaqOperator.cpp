@@ -221,8 +221,7 @@ std::string DaqOperator::check_state(DAQLifeCycleState compState)
     case PAUSED:
         comp_state = "PAUSED";
         break;
-    default:
-        comp_state = "-RUNNING-";
+    case ERRORED:
         break;
     }
     return comp_state;
@@ -415,9 +414,9 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
                 std::cin >> srunNo;
                 m_runNumber = atoi(srunNo.c_str());
                 fix2_restart_procedure();
-                // std::cerr   << "\033[0;13H" << "\033[34m"
-                //             << "Send reboot command"
-                //             << "\033[39m" << std::endl;
+                std::cerr   << "\033[0;13H" << "\033[34m"
+                            << "Send reboot command"
+                            << "\033[39m" << std::endl;
 
                 /* comp_status check */
                 for (int i = (m_comp_num - 1); i >= 0; i--) {
@@ -460,7 +459,9 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
                 compname = myprof[0].name; //compname = "group*:*"
                 //std::cerr << "COMPNAME: " << compname << std::endl;
                 status = m_daqservices[i]->getStatus();
-                errStatus = m_daqservices[i]->getFatalStatus();
+                if (status->comp_status == COMP_FATAL) {
+                    m_state = ERRORED;
+                }
 
                 FatalErrorStatus_var errStatus;
                 errStatus = m_daqservices[i]->getFatalStatus();
@@ -469,31 +470,36 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
                           << myprof[0].name //group:comp_name
                           << '\t'
                           << std::setw(14) << std::right
-                          << status->event_size // data size(byte)
-                          << std::setw(12) << std::right
-                          << check_state(status->state);
+                          << status->event_size; // data size(byte)
 
+                if (m_state == ERRORED) {
+                    std::cerr << "\033[35m" 
+                              << std::setw(12) << std::right
+                              << "RUNNING_" << "\033[39m";
+                }
+                else {
+                    std::cerr << std::setw(12) << std::right
+                              << check_state(status->state);
+                }
                 if (status->comp_status == COMP_FATAL) {
-                    std::cerr << "\033[31m" << std::setw(14) << std::right
+                    std::cerr << "\033[31m" << std::setw(14) << std::right 
                               << check_compStatus(status->comp_status)
                               << "\033[39m" << std::endl;
-
                     /** Use error console display **/
                     d_compname[i] = compname;
                     d_message[i] = errStatus;
-                    m_state = ERRORED;
                 }///if Fatal
                 else if (status->comp_status == COMP_RESTART) {
-                    std::cerr << "\033[34m" << std::setw(14) << std::right
+                    std::cerr << "\033[33m" << std::setw(14) << std::right
                               << check_compStatus(status->comp_status)
                               << "\033[39m" << std::endl;
-
                     /** Use error console display **/
                     d_compname[i] = compname;
                     d_message[i] = errStatus;
                 }///if Restart Request
                 else {
-                    std::cerr << "\033[32m" << std::setw(14) << std::right
+                    std::cerr << "\033[32m"
+                              << std::setw(14) << std::right
                               << check_compStatus(status->comp_status)
                               << "\033[39m" << std::endl;
                 }
