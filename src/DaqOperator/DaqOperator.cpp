@@ -422,6 +422,7 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
                 for (int i = (m_comp_num - 1); i >= 0; i--) {
                     chkStatus = m_daqservices[i]->getStatus();
                     if(chkStatus->state == CONFIGURED) {
+                        m_state = ERRORED;
                         break;
                     }
                     else {
