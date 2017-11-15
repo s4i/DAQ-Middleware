@@ -82,11 +82,6 @@ int Dispatcher::daq_dummy()
     return 0;
 }
 
-int Dispatcher::daq_errored()
-{
-    return 0;
-}
-
 int Dispatcher::daq_configure()
 {
     std::cerr << "*** Dispatcher::configure" << std::endl;
@@ -149,13 +144,6 @@ int Dispatcher::daq_resume()
 {
     std::cerr << "*** Dispatcher::resume" << std::endl;
 
-    return 0;
-}
-
-int Dispatcher::daq_reboot()
-{
-    std::cerr << "*** Dispatcher::reboot" << std::endl;
-    
     return 0;
 }
 

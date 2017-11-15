@@ -72,11 +72,6 @@ RTC::ReturnCode_t SampleMonitor::onExecute(RTC::UniqueId ec_id)
 {
     daq_do();
 
-    // Errored state
-    if (error_flag == true) {
-        daq_errored();
-    }
-
     return RTC::RTC_OK;
 }
 
@@ -89,11 +84,6 @@ int SampleMonitor::daq_dummy()
         sleep(1);
     }
 
-    return 0;
-}
-
-int SampleMonitor::daq_errored()
-{
     return 0;
 }
 
@@ -211,17 +201,6 @@ int SampleMonitor::daq_resume()
     return 0;
 }
 
-int Skeleton::daq_reboot()
-{
-    std::cerr << "*** Skeleton::errored" << std::endl;
-    /* *********************************** */
-    /* Write recovery identification logic */
-    /* *********************************** */
-    std::cerr << "*** Reboot request => To Operator" << std::endl;
-    error_flag = false;
-    return 0;
-}
-
 int SampleMonitor::reset_InPort()
 {
     int ret = true;
@@ -326,12 +305,6 @@ int SampleMonitor::daq_run()
         m_canvas->Update();
     }
     /////////////////////////////////////////////////////////////
-
-    /* Write error determination logic */
-    if (false) {
-        error_flag = true;
-    }
-
     inc_sequence_num();                      // increase sequence num.
     inc_total_data_size(m_event_byte_size);  // increase total data byte size
 
