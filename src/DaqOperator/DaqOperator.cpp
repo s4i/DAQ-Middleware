@@ -299,6 +299,10 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
     FatalErrorStatus_var d_message[m_comp_num];
     Status_var chkStatus;
 
+    /* Fatal error component */
+    char err_comp_num[m_comp_num];
+    memset(err_comp_num, 0, m_comp_num); 
+
     m_tout.tv_sec =  2;
     m_tout.tv_usec = 0;
 
@@ -406,7 +410,7 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
             case CMD_RESTART:
                 fix0_comp_stop_procedure();
                 sleep(1);
-                fix1_configure_procedure();
+                fix1_configure_procedure(err_comp_num);
                 sleep(2);
                 std::cerr << "\033[5;20H"; // default:3;20H
                 std::cerr << "input RUN NO(same run no is prohibited):   ";
@@ -422,6 +426,7 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
                 for (int i = (m_comp_num - 1); i >= 0; i--) {
                     chkStatus = m_daqservices[i]->getStatus();
                     if(chkStatus->state == CONFIGURED) {
+                        m_state = ERRORED;
                         break;
                     }
                     else {
@@ -451,7 +456,9 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
         std::string compname;
         Status_var status;
         FatalErrorStatus_var errStatus;
+        int big_endian = -1;
         for (int i = (m_comp_num - 1); i >= 0; i--) {
+            big_endian++;
             try {
                 RTC::ConnectorProfileList_var myprof
                     = m_DaqServicePorts[i]->get_connector_profiles();
@@ -461,6 +468,7 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
                 status = m_daqservices[i]->getStatus();
                 if (status->comp_status == COMP_FATAL) {
                     m_state = ERRORED;
+                    err_comp_num[big_endian] = '1';
                 }
 
                 FatalErrorStatus_var errStatus;
@@ -680,7 +688,7 @@ int DaqOperator::fix0_comp_stop_procedure()
     return 0;
 }
 
-int DaqOperator::fix1_configure_procedure()
+int DaqOperator::fix1_configure_procedure(char *err_comp)
 {
     Status_var status;
     m_com_completed = false;
@@ -705,20 +713,22 @@ int DaqOperator::fix1_configure_procedure()
 
     try {
         for (int i = 0; i < (int)m_daqservices.size(); i++) {
-            RTC::ConnectorProfileList_var myprof
-                = m_DaqServicePorts[i]->get_connector_profiles();
+            if (err_comp[i] == '1') {
+                RTC::ConnectorProfileList_var myprof
+                    = m_DaqServicePorts[i]->get_connector_profiles();
 
-            char * id = CORBA::string_dup(myprof[0].name);
+                char * id = CORBA::string_dup(myprof[0].name);
 
-            for (int j = 0; j < (int)paramList.size(); j++) {
-                if (paramList[j].getId() == id) {
-					int len = paramList[j].getList().length();	
-					::NVList mylist(len);
-					mylist = paramList[j].getList();
-					m_daqservices[i]->setCompParams( paramList[j].getList() );
+                for (int j = 0; j < (int)paramList.size(); j++) {
+                    if (paramList[j].getId() == id) {
+                        int len = paramList[j].getList().length();	
+                        ::NVList mylist(len);
+                        mylist = paramList[j].getList();
+                        m_daqservices[i]->setCompParams( paramList[j].getList() );
+                    }
                 }
+                CORBA::string_free(id);
             }
-            CORBA::string_free(id);
         }
                 
         for (int i = 0; i < m_comp_num; i++) {
