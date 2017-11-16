@@ -107,8 +107,6 @@ public:
     int command_save();
     int command_confirmconnection();
     int command_dummy();
-    // New command(fix)
-    //int command_fix(); 
     
     void set_console_flag(bool console);
     void set_port_no(int port);
@@ -132,7 +130,7 @@ private:
     int set_service_list();
 
     int fix0_comp_stop_procedure();
-    int fix1_configure_procedure();
+    int fix1_configure_procedure(char *err_comp);
     int fix2_restart_procedure();
     int configure_procedure();
     int unconfigure_procedure();
