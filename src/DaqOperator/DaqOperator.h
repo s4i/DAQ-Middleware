@@ -130,7 +130,7 @@ private:
     int set_service_list();
 
     int fix0_comp_stop_procedure();
-    int fix1_configure_procedure(char *err_comp);
+    int fix1_configure_procedure();
     int fix2_restart_procedure();
     int configure_procedure();
     int unconfigure_procedure();
@@ -138,11 +138,10 @@ private:
     int stop_procedure();
     int pause_procedure();
     int resume_procedure();
-    int errored_procedure(int comp_num);
     int abort_procedure();
     int putstatus_procedure();
     int log_procedure();
-    
+
     RTC::ReturnCode_t run_console_mode();
     RTC::ReturnCode_t run_http_mode();
     ///std::string check_fatal(FatalErrorStatus errStatus);
@@ -184,10 +183,6 @@ private:
 
     std::string m_config_file;
     std::string m_config_file_tmp;
-    
-    // New variables
-    bool errFlag;
-    bool resFlag;
     
     bool m_debug;
 };

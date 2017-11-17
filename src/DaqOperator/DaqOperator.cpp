@@ -299,10 +299,6 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
     FatalErrorStatus_var d_message[m_comp_num];
     Status_var chkStatus;
 
-    /* Fatal error component */
-    char err_comp_num[m_comp_num];
-    memset(err_comp_num, 0, m_comp_num); 
-
     m_tout.tv_sec =  2;
     m_tout.tv_usec = 0;
 
@@ -410,7 +406,7 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
             case CMD_RESTART:
                 fix0_comp_stop_procedure();
                 sleep(1);
-                fix1_configure_procedure(err_comp_num);
+                fix1_configure_procedure();
                 sleep(2);
                 std::cerr << "\033[5;20H"; // default:3;20H
                 std::cerr << "input RUN NO(same run no is prohibited):   ";
@@ -425,7 +421,7 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
                 /* comp_status check */
                 for (int i = (m_comp_num - 1); i >= 0; i--) {
                     chkStatus = m_daqservices[i]->getStatus();
-                    if(chkStatus->state == CONFIGURED) {
+                    if(chkStatus->comp_status == COMP_FATAL) {
                         m_state = ERRORED;
                         break;
                     }
@@ -468,7 +464,6 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
                 status = m_daqservices[i]->getStatus();
                 if (status->comp_status == COMP_FATAL) {
                     m_state = ERRORED;
-                    err_comp_num[big_endian] = '1';
                 }
 
                 FatalErrorStatus_var errStatus;
@@ -489,6 +484,7 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
                     std::cerr << std::setw(12) << std::right
                               << check_state(status->state);
                 }
+
                 if (status->comp_status == COMP_FATAL) {
                     std::cerr << "\033[31m" << std::setw(14) << std::right 
                               << check_compStatus(status->comp_status)
@@ -688,7 +684,7 @@ int DaqOperator::fix0_comp_stop_procedure()
     return 0;
 }
 
-int DaqOperator::fix1_configure_procedure(char *err_comp)
+int DaqOperator::fix1_configure_procedure()
 {
     Status_var status;
     m_com_completed = false;
@@ -705,31 +701,29 @@ int DaqOperator::fix1_configure_procedure(char *err_comp)
         return 1;
     }
 
-    ParamList paramList;
-    ::NVList systemParamList;
-    ::NVList groupParamList;
-    m_start_date = "";
-    m_stop_date  = "";
+    // ParamList paramList;
+    // ::NVList systemParamList;
+    // ::NVList groupParamList;
+    // m_start_date = "";
+    // m_stop_date  = "";
 
     try {
-        for (int i = 0; i < (int)m_daqservices.size(); i++) {
-            if (err_comp[i] == '1') {
-                RTC::ConnectorProfileList_var myprof
-                    = m_DaqServicePorts[i]->get_connector_profiles();
+        // for (int i = 0; i < (int)m_daqservices.size(); i++) {
+        //     RTC::ConnectorProfileList_var myprof
+        //         = m_DaqServicePorts[i]->get_connector_profiles();
 
-                char * id = CORBA::string_dup(myprof[0].name);
+        //     char * id = CORBA::string_dup(myprof[0].name);
 
-                for (int j = 0; j < (int)paramList.size(); j++) {
-                    if (paramList[j].getId() == id) {
-                        int len = paramList[j].getList().length();	
-                        ::NVList mylist(len);
-                        mylist = paramList[j].getList();
-                        m_daqservices[i]->setCompParams( paramList[j].getList() );
-                    }
-                }
-                CORBA::string_free(id);
-            }
-        }
+        //     for (int j = 0; j < (int)paramList.size(); j++) {
+        //         if (paramList[j].getId() == id) {
+        //             int len = paramList[j].getList().length();	
+        //             ::NVList mylist(len);
+        //             mylist = paramList[j].getList();
+        //             m_daqservices[i]->setCompParams( paramList[j].getList() );
+        //         }
+        //     }
+        //     CORBA::string_free(id);
+        // }
                 
         for (int i = 0; i < m_comp_num; i++) {
 			status = m_daqservices[i]->getStatus();
