@@ -305,7 +305,7 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
     FD_ZERO(&m_rset);
     FD_SET(0, &m_rset);
 
-    std::cerr << "\033[;0H" << " Command:\t" << std::endl;
+    std::cerr << "\033[0;0H" << " Command:\t" << std::endl;
     std::cerr << " " 
               << CMD_CONFIGURE   << ":configure\t"
               << CMD_START       << ":start   "
@@ -318,8 +318,9 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 
     std::cerr << std::endl << " RUN NO: " << m_runNumber;
     std::cerr << std::endl << " start at: "  << m_start_date
-              << "\tstop at: " << m_stop_date << std::endl;
-    std::cerr << "\033[;11H";
+              << "\tstop at: " << m_stop_date 
+              << std::endl << std::endl;
+    std::cerr << "\033[0;11H";
 
     select(1, &m_rset, NULL, NULL, &m_tout);
     if (m_com_completed == false) {
@@ -343,7 +344,7 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
                 m_state = RUNNING;
                 break;
             default:
-                std::cerr << "\033[;13H" 
+                std::cerr << "\033[0;13H" 
                           << "   Bad Command:" << command << std::endl;
                 break;
             }
@@ -355,7 +356,7 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
                 m_state = CONFIGURED;
                 break;
             default:
-                std::cerr << "\033[;13H"
+                std::cerr << "\033[0;13H"
                           << " Bad Command:" << std::endl;
                 break;
             }
@@ -376,7 +377,7 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
                 m_state = LOADED;
                 break;
             default:
-                std::cerr << "\033[;13H" 
+                std::cerr << "\033[0;13H" 
                           << "   Bad Command:" << command << std::endl;
                 break;
             }
@@ -392,7 +393,7 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
                 m_state = PAUSED;
                 break;
             default:
-                std::cerr << "\033[;13H"
+                std::cerr << "\033[0;13H"
                           << "   Bad Command: " << command << std::endl;
                 break;
             }
@@ -431,7 +432,7 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
                 }
                 break;
             default:
-                std::cerr << "\033[;13H" 
+                std::cerr << "\033[0;13H" 
                           << " 2:stop or 6:reboot" << std::endl;
                 break;
             }
@@ -440,8 +441,8 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
     }
     else {
         std::cerr << " " << std::endl;
-        std::cerr << "\033[;H\033[2J";
-        std::cerr << "\033[7;0H"; //default = 5
+        std::cerr << "\033[0;0H\033[2J";
+        std::cerr << "\033[8;0H"; //default = 5
         std::cerr << std::setw(16) << std::right << "GROUP:COMP_NAME"
                   << std::setw(22) << std::right << "EVENT_SIZE"
                   << std::setw(12) << std::right << "STATE"

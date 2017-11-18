@@ -226,22 +226,34 @@ namespace
                     // first we convert the semantic action class methods to functors with the 
                     // parameter signature expected by spirit
 
-                    typedef function< void( Char_t )         > Char_action;
-                    typedef function< void( Iter_t, Iter_t ) > Str_action;
-                    typedef function< void( double )         > Real_action;
-                    typedef function< void( int64_t )        > Int_action;
-
-                    Char_action begin_obj  ( bind( &Semantic_actions::begin_obj,   &self.actions_, _1 ) );
-                    Char_action end_obj    ( bind( &Semantic_actions::end_obj,     &self.actions_, _1 ) );
-                    Char_action begin_array( bind( &Semantic_actions::begin_array, &self.actions_, _1 ) );
-                    Char_action end_array  ( bind( &Semantic_actions::end_array,   &self.actions_, _1 ) );
-                    Str_action  new_name   ( bind( &Semantic_actions::new_name,    &self.actions_, _1, _2 ) );
-                    Str_action  new_str    ( bind( &Semantic_actions::new_str,     &self.actions_, _1, _2 ) );
-                    Str_action  new_true   ( bind( &Semantic_actions::new_true,    &self.actions_, _1, _2 ) );
-                    Str_action  new_false  ( bind( &Semantic_actions::new_false,   &self.actions_, _1, _2 ) );
-                    Str_action  new_null   ( bind( &Semantic_actions::new_null,    &self.actions_, _1, _2 ) );
-                    Real_action new_real   ( bind( &Semantic_actions::new_real,    &self.actions_, _1 ) );
-                    Int_action  new_int    ( bind( &Semantic_actions::new_int,     &self.actions_, _1 ) );
+                    //typedef function< void( Char_t )         > Char_action;
+                    //typedef function< void( Iter_t, Iter_t ) > Str_action;
+                    //typedef function< void( double )         > Real_action;
+                    //typedef function< void( int64_t )        > Int_action;
+                    
+                    //Char_action begin_obj  ( bind( &Semantic_actions::begin_obj,   &self.actions_, _1 ) );
+                    //Char_action end_obj    ( bind( &Semantic_actions::end_obj,     &self.actions_, _1 ) );
+                    //Char_action begin_array( bind( &Semantic_actions::begin_array, &self.actions_, _1 ) );
+                    //Char_action end_array  ( bind( &Semantic_actions::end_array,   &self.actions_, _1 ) );
+                    //Str_action  new_name   ( bind( &Semantic_actions::new_name,    &self.actions_, _1, _2 ) );
+                    //Str_action  new_str    ( bind( &Semantic_actions::new_str,     &self.actions_, _1, _2 ) );
+                    //Str_action  new_true   ( bind( &Semantic_actions::new_true,    &self.actions_, _1, _2 ) );
+                    //Str_action  new_false  ( bind( &Semantic_actions::new_false,   &self.actions_, _1, _2 ) );
+                    //Str_action  new_null   ( bind( &Semantic_actions::new_null,    &self.actions_, _1, _2 ) );
+                    //Real_action new_real   ( bind( &Semantic_actions::new_real,    &self.actions_, _1 ) );
+                    //Int_action  new_int    ( bind( &Semantic_actions::new_int,     &self.actions_, _1 ) );
+                    
+                    auto begin_obj  ( bind( &Semantic_actions::begin_obj,   &self.actions_, _1 ) );
+                    auto end_obj    ( bind( &Semantic_actions::end_obj,     &self.actions_, _1 ) );
+                    auto begin_array( bind( &Semantic_actions::begin_array, &self.actions_, _1 ) );
+                    auto end_array  ( bind( &Semantic_actions::end_array,   &self.actions_, _1 ) );
+                    auto new_name   ( bind( &Semantic_actions::new_name,    &self.actions_, _1, _2 ) );
+                    auto new_str    ( bind( &Semantic_actions::new_str,     &self.actions_, _1, _2 ) );
+                    auto new_true   ( bind( &Semantic_actions::new_true,    &self.actions_, _1, _2 ) );
+                    auto new_false  ( bind( &Semantic_actions::new_false,   &self.actions_, _1, _2 ) );
+                    auto new_null   ( bind( &Semantic_actions::new_null,    &self.actions_, _1, _2 ) );
+                    auto new_real   ( bind( &Semantic_actions::new_real,    &self.actions_, _1 ) );
+                    auto new_int    ( bind( &Semantic_actions::new_int,     &self.actions_, _1 ) );
 
                     // actual grammer
 

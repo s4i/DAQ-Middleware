@@ -12,7 +12,7 @@ if [ $os = "Linux" ]; then
     conf_file=${install_dir}/daqmw.conf
     if [ -d ${destdir}/etc/ld.so.conf.d ]; then
         if [ $arch = "i686" ]; then
-            echo /usr/lib/daqmw > $conf_file
+			echo /usr/lib/daqmw > $conf_file
         fi
         if [ $arch = "x86_64" ]; then
             if [ -d /usr/lib64 ]; then
