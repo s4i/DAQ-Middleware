@@ -421,11 +421,7 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
                 /* comp_status check */
                 for (int i = (m_comp_num - 1); i >= 0; i--) {
                     chkStatus = m_daqservices[i]->getStatus();
-<<<<<<< HEAD
-                    if(chkStatus->state == CONFIGURED) {
-=======
                     if(chkStatus->comp_status == COMP_FATAL) {
->>>>>>> 46fa07d1c94f657277a9d403b462ae4eed270a51
                         m_state = ERRORED;
                         break;
                     }
@@ -708,8 +704,6 @@ int DaqOperator::fix1_configure_procedure()
     // ParamList paramList;
     // ::NVList systemParamList;
     // ::NVList groupParamList;
-    // m_start_date = "";
-    // m_stop_date  = "";
 
     try {
         // for (int i = 0; i < (int)m_daqservices.size(); i++) {
