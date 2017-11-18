@@ -107,8 +107,6 @@ public:
     int command_save();
     int command_confirmconnection();
     int command_dummy();
-    // New command(fix)
-    //int command_fix(); 
     
     void set_console_flag(bool console);
     void set_port_no(int port);
@@ -140,11 +138,10 @@ private:
     int stop_procedure();
     int pause_procedure();
     int resume_procedure();
-    int errored_procedure(int comp_num);
     int abort_procedure();
     int putstatus_procedure();
     int log_procedure();
-    
+
     RTC::ReturnCode_t run_console_mode();
     RTC::ReturnCode_t run_http_mode();
     ///std::string check_fatal(FatalErrorStatus errStatus);
@@ -186,10 +183,6 @@ private:
 
     std::string m_config_file;
     std::string m_config_file_tmp;
-    
-    // New variables
-    bool errFlag;
-    bool resFlag;
     
     bool m_debug;
 };

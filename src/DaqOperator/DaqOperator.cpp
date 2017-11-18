@@ -421,7 +421,11 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
                 /* comp_status check */
                 for (int i = (m_comp_num - 1); i >= 0; i--) {
                     chkStatus = m_daqservices[i]->getStatus();
+<<<<<<< HEAD
                     if(chkStatus->state == CONFIGURED) {
+=======
+                    if(chkStatus->comp_status == COMP_FATAL) {
+>>>>>>> 46fa07d1c94f657277a9d403b462ae4eed270a51
                         m_state = ERRORED;
                         break;
                     }
@@ -452,7 +456,9 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
         std::string compname;
         Status_var status;
         FatalErrorStatus_var errStatus;
+        int big_endian = -1;
         for (int i = (m_comp_num - 1); i >= 0; i--) {
+            big_endian++;
             try {
                 RTC::ConnectorProfileList_var myprof
                     = m_DaqServicePorts[i]->get_connector_profiles();
@@ -482,6 +488,7 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
                     std::cerr << std::setw(12) << std::right
                               << check_state(status->state);
                 }
+
                 if (status->comp_status == COMP_FATAL) {
                     std::cerr << "\033[31m" << std::setw(14) << std::right 
                               << check_compStatus(status->comp_status)
@@ -698,29 +705,29 @@ int DaqOperator::fix1_configure_procedure()
         return 1;
     }
 
-    ParamList paramList;
-    ::NVList systemParamList;
-    ::NVList groupParamList;
-    m_start_date = "";
-    m_stop_date  = "";
+    // ParamList paramList;
+    // ::NVList systemParamList;
+    // ::NVList groupParamList;
+    // m_start_date = "";
+    // m_stop_date  = "";
 
     try {
-        for (int i = 0; i < (int)m_daqservices.size(); i++) {
-            RTC::ConnectorProfileList_var myprof
-                = m_DaqServicePorts[i]->get_connector_profiles();
+        // for (int i = 0; i < (int)m_daqservices.size(); i++) {
+        //     RTC::ConnectorProfileList_var myprof
+        //         = m_DaqServicePorts[i]->get_connector_profiles();
 
-            char * id = CORBA::string_dup(myprof[0].name);
+        //     char * id = CORBA::string_dup(myprof[0].name);
 
-            for (int j = 0; j < (int)paramList.size(); j++) {
-                if (paramList[j].getId() == id) {
-					int len = paramList[j].getList().length();	
-					::NVList mylist(len);
-					mylist = paramList[j].getList();
-					m_daqservices[i]->setCompParams( paramList[j].getList() );
-                }
-            }
-            CORBA::string_free(id);
-        }
+        //     for (int j = 0; j < (int)paramList.size(); j++) {
+        //         if (paramList[j].getId() == id) {
+        //             int len = paramList[j].getList().length();	
+        //             ::NVList mylist(len);
+        //             mylist = paramList[j].getList();
+        //             m_daqservices[i]->setCompParams( paramList[j].getList() );
+        //         }
+        //     }
+        //     CORBA::string_free(id);
+        // }
                 
         for (int i = 0; i < m_comp_num; i++) {
 			status = m_daqservices[i]->getStatus();
