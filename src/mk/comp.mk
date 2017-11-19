@@ -24,8 +24,8 @@ CPPFLAGS += -I.
 CPPFLAGS += -I$(AUTO_GEN_DIR)
 CPPFLAGS += -std=c++11
 
-SKEL_OBJ  = $(AUTO_GEN_DIR)/DAQServiceSkel.o  	
-IMPL_OBJ  = $(AUTO_GEN_DIR)/DAQServiceSVC_impl.o 
+SKEL_OBJ  = $(AUTO_GEN_DIR)/DAQServiceSkel.o
+IMPL_OBJ  = $(AUTO_GEN_DIR)/DAQServiceSVC_impl.o
 OBJS     += $(SKEL_OBJ) $(IMPL_OBJ)
 OBJS     += $(subst .cpp,.o, $(SRCS))
 

@@ -9,7 +9,7 @@ LIBRARY_SO_API            = $(LIBRARY_SO).$(API_VERSION)
 LIBRARY_SO_API_PATCHLEVEL = $(LIBRARY_SO).$(API_VERSION).$(PATCHLEVEL)
 
 CFLAGS   = -g -pipe -O2 -Wall
-CXXFLAGS = $(CFLAGS)
+CXXFLAGS = $(CFLAGS) -std=c++11
 CPPFLAGS = $(addprefix -I, $(INC_DIRS))
 ARFLAGS  = r
 PIC_OPT  = -fPIC
@@ -34,10 +34,10 @@ $(LIBRARY_SO): $(SHOBJS) $(CPPSHOBJS)
 .SUFFIXES: .so
 .c.so:
 	rm -f $@
-	$(CC) $(CPPFLAGS) -c ${CFLAGS} $(PIC_OPT) -o $*.so $< 
+	$(CC) $(CPPFLAGS) -c ${CFLAGS} $(PIC_OPT) -o $*.so $<
 .cpp.so:
 	rm -f $@
-	$(CXX) $(CPPFLAGS) -c ${CXXFLAGS} $(PIC_OPT) -o $*.so $< 
+	$(CXX) $(CPPFLAGS) -c ${CXXFLAGS} $(PIC_OPT) -o $*.so $<
 
 clean:
 	rm -f $(LIBRARY) $(OBJS) $(LIBRARY_SO)* $(SHOBJS) $(CPPOBJS) $(CPPSHOBJS)
@@ -71,7 +71,7 @@ install:
 # 1. for ld
 # ln -s libfoo.so.1 libfoo.so
 # 2. for ld.so
-# ln -s libfoo.so.1.0 libfoo.so.1 
+# ln -s libfoo.so.1.0 libfoo.so.1
 
 echo:
 	@echo $(OBJS)

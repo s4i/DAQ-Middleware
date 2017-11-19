@@ -56,7 +56,7 @@ namespace
         // this class's methods get called by the spirit parse resulting
         // in the creation of a JSON object or array
         //
-        class Semantic_actions 
+        class Semantic_actions
         {
         public:
 
@@ -83,7 +83,7 @@ namespace
             void begin_array( Char_t c )
             {
                 assert( c == '[' );
-         
+
                 begin_compound< Array_t >();
            }
 
@@ -164,11 +164,11 @@ namespace
 
                     if( current_p_->type() == array_type )
                     {
-                        current_p_ = &current_p_->get_array().back(); 
+                        current_p_ = &current_p_->get_array().back();
                     }
                     else
                     {
-                        current_p_ = &current_p_->get_obj().back().value_; 
+                        current_p_ = &current_p_->get_obj().back().value_;
                     }
                 }
             }
@@ -178,9 +178,9 @@ namespace
                 if( current_p_ != &value_ )
                 {
                     current_p_ = stack_.back();
-                    
+
                     stack_.pop_back();
-                }    
+                }
             }
 
             void add_to_current( const Value_t& value )
@@ -207,7 +207,7 @@ namespace
             String_t name_;              // of current name/value pair
         };
 
-        // the spirit grammer 
+        // the spirit grammer
         //
         class Json_grammer : public grammar< Json_grammer >
         {
@@ -223,38 +223,38 @@ namespace
             {
                 definition( const Json_grammer& self )
                 {
-                    // first we convert the semantic action class methods to functors with the 
+                    // first we convert the semantic action class methods to functors with the
                     // parameter signature expected by spirit
 
-                    typedef function< void( Char_t )         > Char_action;
-                    typedef function< void( Iter_t, Iter_t ) > Str_action;
-                    typedef function< void( double )         > Real_action;
-                    typedef function< void( int64_t )        > Int_action;
-                    
-                    Char_action begin_obj  ( bind( &Semantic_actions::begin_obj,   &self.actions_, _1 ) );
-                    Char_action end_obj    ( bind( &Semantic_actions::end_obj,     &self.actions_, _1 ) );
-                    Char_action begin_array( bind( &Semantic_actions::begin_array, &self.actions_, _1 ) );
-                    Char_action end_array  ( bind( &Semantic_actions::end_array,   &self.actions_, _1 ) );
-                    Str_action  new_name   ( bind( &Semantic_actions::new_name,    &self.actions_, _1, _2 ) );
-                    Str_action  new_str    ( bind( &Semantic_actions::new_str,     &self.actions_, _1, _2 ) );
-                    Str_action  new_true   ( bind( &Semantic_actions::new_true,    &self.actions_, _1, _2 ) );
-                    Str_action  new_false  ( bind( &Semantic_actions::new_false,   &self.actions_, _1, _2 ) );
-                    Str_action  new_null   ( bind( &Semantic_actions::new_null,    &self.actions_, _1, _2 ) );
-                    Real_action new_real   ( bind( &Semantic_actions::new_real,    &self.actions_, _1 ) );
-                    Int_action  new_int    ( bind( &Semantic_actions::new_int,     &self.actions_, _1 ) );
-                    
+                    // typedef function< void( Char_t )         > Char_action;
+                    // typedef function< void( Iter_t, Iter_t ) > Str_action;
+                    // typedef function< void( double )         > Real_action;
+                    // typedef function< void( int64_t )        > Int_action;
+
+                    // Char_action begin_obj  ( bind( &Semantic_actions::begin_obj,   &self.actions_, _1 ) );
+                    // Char_action end_obj    ( bind( &Semantic_actions::end_obj,     &self.actions_, _1 ) );
+                    // Char_action begin_array( bind( &Semantic_actions::begin_array, &self.actions_, _1 ) );
+                    // Char_action end_array  ( bind( &Semantic_actions::end_array,   &self.actions_, _1 ) );
+                    // Str_action  new_name   ( bind( &Semantic_actions::new_name,    &self.actions_, _1, _2 ) );
+                    // Str_action  new_str    ( bind( &Semantic_actions::new_str,     &self.actions_, _1, _2 ) );
+                    // Str_action  new_true   ( bind( &Semantic_actions::new_true,    &self.actions_, _1, _2 ) );
+                    // Str_action  new_false  ( bind( &Semantic_actions::new_false,   &self.actions_, _1, _2 ) );
+                    // Str_action  new_null   ( bind( &Semantic_actions::new_null,    &self.actions_, _1, _2 ) );
+                    // Real_action new_real   ( bind( &Semantic_actions::new_real,    &self.actions_, _1 ) );
+                    // Int_action  new_int    ( bind( &Semantic_actions::new_int,     &self.actions_, _1 ) );
+
                     /* raspberry pi3 Rasbian 9 stretch */
-                    // auto begin_obj  ( bind( &Semantic_actions::begin_obj,   &self.actions_, _1 ) );
-                    // auto end_obj    ( bind( &Semantic_actions::end_obj,     &self.actions_, _1 ) );
-                    // auto begin_array( bind( &Semantic_actions::begin_array, &self.actions_, _1 ) );
-                    // auto end_array  ( bind( &Semantic_actions::end_array,   &self.actions_, _1 ) );
-                    // auto new_name   ( bind( &Semantic_actions::new_name,    &self.actions_, _1, _2 ) );
-                    // auto new_str    ( bind( &Semantic_actions::new_str,     &self.actions_, _1, _2 ) );
-                    // auto new_true   ( bind( &Semantic_actions::new_true,    &self.actions_, _1, _2 ) );
-                    // auto new_false  ( bind( &Semantic_actions::new_false,   &self.actions_, _1, _2 ) );
-                    // auto new_null   ( bind( &Semantic_actions::new_null,    &self.actions_, _1, _2 ) );
-                    // auto new_real   ( bind( &Semantic_actions::new_real,    &self.actions_, _1 ) );
-                    // auto new_int    ( bind( &Semantic_actions::new_int,     &self.actions_, _1 ) );
+                    auto begin_obj  ( bind( &Semantic_actions::begin_obj,   &self.actions_, _1 ) );
+                    auto end_obj    ( bind( &Semantic_actions::end_obj,     &self.actions_, _1 ) );
+                    auto begin_array( bind( &Semantic_actions::begin_array, &self.actions_, _1 ) );
+                    auto end_array  ( bind( &Semantic_actions::end_array,   &self.actions_, _1 ) );
+                    auto new_name   ( bind( &Semantic_actions::new_name,    &self.actions_, _1, _2 ) );
+                    auto new_str    ( bind( &Semantic_actions::new_str,     &self.actions_, _1, _2 ) );
+                    auto new_true   ( bind( &Semantic_actions::new_true,    &self.actions_, _1, _2 ) );
+                    auto new_false  ( bind( &Semantic_actions::new_false,   &self.actions_, _1, _2 ) );
+                    auto new_null   ( bind( &Semantic_actions::new_null,    &self.actions_, _1, _2 ) );
+                    auto new_real   ( bind( &Semantic_actions::new_real,    &self.actions_, _1 ) );
+                    auto new_int    ( bind( &Semantic_actions::new_int,     &self.actions_, _1 ) );
 
                     // actual grammer
 
@@ -262,12 +262,12 @@ namespace
                         = value_ >> end_p
                         ;
 
-                    object_ 
+                    object_
                         = confix_p
-                          ( 
-                              ch_p('{')[ begin_obj ], 
-                              !members_, 
-                              ch_p('}')[ end_obj ] 
+                          (
+                              ch_p('{')[ begin_obj ],
+                              !members_,
+                              ch_p('}')[ end_obj ]
                           )
                         ;
 
@@ -276,27 +276,27 @@ namespace
                         ;
 
                     pair_
-                        = string_[ new_name ] 
-                        >> ':' 
+                        = string_[ new_name ]
+                        >> ':'
                         >> value_
                         ;
 
                     value_
-                        = string_[ new_str ] 
-                        | number_ 
-                        | object_ 
-                        | array_ 
-                        | str_p( "true" ) [ new_true  ] 
-                        | str_p( "false" )[ new_false ] 
+                        = string_[ new_str ]
+                        | number_
+                        | object_
+                        | array_
+                        | str_p( "true" ) [ new_true  ]
+                        | str_p( "false" )[ new_false ]
                         | str_p( "null" ) [ new_null  ]
                         ;
 
                     array_
                         = confix_p
-                          ( 
-                              ch_p('[')[ begin_array ], 
-                              !elements_, 
-                              ch_p(']')[ end_array ] 
+                          (
+                              ch_p('[')[ begin_array ],
+                              !elements_,
+                              ch_p(']')[ end_array ]
                           )
                         ;
 
@@ -308,16 +308,16 @@ namespace
                         = lexeme_d // this causes white space inside a string to be retained
                           [
                               confix_p
-                              ( 
-                                  '"', 
+                              (
+                                  '"',
                                   *lex_escape_ch_p,
                                   '"'
-                              ) 
+                              )
                           ]
                         ;
 
                     number_
-                        = strict_real_p[ new_real ] 
+                        = strict_real_p[ new_real ]
                         | int64_p      [ new_int  ]
                         ;
                 }
@@ -359,7 +359,7 @@ namespace
             const Char_t c2( *( ++str ) );
 
             return hex_to_num( c1 ) * 0x10 + hex_to_num( c2 );
-        }       
+        }
 
         static Char_t unicode_str_to_char( Iter_t& str )
         {
@@ -386,7 +386,7 @@ namespace
                 if( ( c1 == '\\' ) && ( i != end_minus_1 ) )
                 {
                     ++i;
-                 
+
                     const Char_t c2( *i );
 
                     switch( c2 )
@@ -399,19 +399,19 @@ namespace
                         case '\\': result += '\\'; break;
                         case '/':  result += '/';  break;
                         case '"':  result += '"';  break;
-                        case 'x':  
+                        case 'x':
                         {
                             if( end - i >= 3 )  //  expecting "xHH..."
                             {
-                                result += hex_str_to_char( i );  
+                                result += hex_str_to_char( i );
                             }
                             break;
                         }
-                        case 'u':  
+                        case 'u':
                         {
                             if( end - i >= 5 )  //  expecting "uHHHH..."
                             {
-                                result += unicode_str_to_char( i );  
+                                result += unicode_str_to_char( i );
                             }
                             break;
                         }
@@ -448,9 +448,9 @@ namespace
         static bool read_string( const String_t& s, Value_t& value )
         {
             Semantic_actions semantic_actions( value );
-         
-            parse_info< Iter_t > info = parse( s.begin(), s.end(), 
-                                               Json_grammer( semantic_actions ), 
+
+            parse_info< Iter_t > info = parse( s.begin(), s.end(),
+                                               Json_grammer( semantic_actions ),
                                                space_p );
 
             return info.full;
@@ -461,7 +461,7 @@ namespace
             String_t s;
 
             stream_to_string( is, s );
-          
+
             return read_string( s, value );
         }
     };

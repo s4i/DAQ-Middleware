@@ -64,7 +64,7 @@ class MyProcUtil:
 
     def get_all_pids(self):
         return [ int(x) for x in os.listdir('/proc') if x.isdigit() ]
-    
+
     def get_cmdline(self, pid):
         filename = '/proc/%s/cmdline' % (pid)
         try:
@@ -186,7 +186,7 @@ def opt():
     daqmw_log_dir            = options.daqmw_log_dir
     append_datetime_to_log   = options.append_datetime_to_log
     append_ip_address_to_log = options.append_ip_address_to_log
-    
+
     # XXX
     # We have to sleep some seconds not to cause core file
     # when running on RHEL derived OS (SL, CentOS etc)
@@ -508,7 +508,7 @@ def start_comp(command_line, log='', foreground='no', no_stdin = 'yes', myenv = 
     Execute component binary.
 
     The program is executed in background if we don't specify
-    foreground = 'yes'.  If foreground = 'yes' is specified, 
+    foreground = 'yes'.  If foreground = 'yes' is specified,
     the process will be wait()'ed in this function.
 
     command_line is string that is a command and options to the command.
@@ -697,7 +697,7 @@ def run_omniNames(operatorAddr, omni_log_dir = '', omni_port=nsport):
     omni_command_line = "%s -start %s -logdir %s" % (command, omni_port, omni_log_dir)
     #print 'omni_command_line: ', omni_command_line
     prev_handler = signal.signal(signal.SIGINT, signal.SIG_IGN)
-    start_comp(omni_command_line, 
+    start_comp(omni_command_line,
                log = '/dev/null',
                myenv = {'OMNIORB_USEHOSTNAME': operatorAddr})
     next_handler = signal.signal(signal.SIGINT, prev_handler)
@@ -942,7 +942,7 @@ def main():
     #
     # Boot omni naming service
     #
-    print('start new naming service...',)
+    print('start new naming service...'),
     remove_omni_logs()
     run_omniNames(operatorAddr)
     print('done')
@@ -953,12 +953,12 @@ def main():
 
     # local DAQ-Components booting
     if localBoot:
-        print('Local Comps booting...',)
+        print('Local Comps booting...'),
         localCompsBooting()
         print('done')
     # remote DAQ-Components booting
     else:
-        print('Remote Comps booting...',)
+        print('Remote Comps booting...'),
         ret = remoteCompsBooting()
         if ret != True:
             print('Remote Comps booting failed. Check remote hosts')
@@ -972,7 +972,7 @@ def main():
     if console == False:
         if operator_log != '/dev/null':
             print('DAQ-Opearot Log: %s' % operator_log)
-        print('Now booting the DAQ-Operator...',)
+        print('Now booting the DAQ-Operator...'),
     ret = DaqOperatorBooting()
     if ret != True:
         print('DaqOperator booting failed')
