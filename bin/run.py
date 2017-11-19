@@ -15,10 +15,10 @@ import sys
 import time
 from optparse import OptionParser
 
-# Python interpreter is at least version 2.5.0 or 3.0.0
-if sys.hexversion >= 0x030000F0:
+# Python interpreter is at least version 2.5.0
+if sys.hexversion >= 0x020500F0:
     import xml.etree.ElementTree as Etree
-# Python interpreter is before version 2.5.0 or 3.0.0
+# Python interpreter is before version 3.0.0 etc.
 else:
     import elementtree.ElementTree as Etree
 
