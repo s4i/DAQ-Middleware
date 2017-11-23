@@ -288,7 +288,7 @@ void DaqOperator::run_data()
 }
 
 RTC::ReturnCode_t DaqOperator::run_console_mode()
-{ 
+{
     ///char* state[] = {"LOADED", "CONFIGURED", "RUNNING", "PAUSED"};
     std::string srunNo = "0";
 
@@ -306,7 +306,7 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
     FD_SET(0, &m_rset);
 
     std::cerr << "\033[0;0H" << " Command:\t" << std::endl;
-    std::cerr << " " 
+    std::cerr << " "
               << CMD_CONFIGURE   << ":configure\t"
               << CMD_START       << ":start   "
               << CMD_STOP        << ":stop" << std::endl << " "
@@ -318,7 +318,7 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 
     std::cerr << std::endl << " RUN NO: " << m_runNumber;
     std::cerr << std::endl << " start at: "  << m_start_date
-              << "\tstop at: " << m_stop_date 
+              << "\tstop at: " << m_stop_date
               << std::endl << std::endl;
     std::cerr << "\033[0;11H";
 
@@ -326,7 +326,7 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
     if (m_com_completed == false) {
         return RTC::RTC_OK;
     }
-    
+
     // command check
     if (FD_ISSET(0, &m_rset)) {
         char comm[2];
@@ -344,7 +344,7 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
                 m_state = RUNNING;
                 break;
             default:
-                std::cerr << "\033[0;13H" 
+                std::cerr << "\033[0;13H"
                           << "   Bad Command:" << command << std::endl;
                 break;
             }
@@ -377,7 +377,7 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
                 m_state = LOADED;
                 break;
             default:
-                std::cerr << "\033[0;13H" 
+                std::cerr << "\033[0;13H"
                           << "   Bad Command:" << command << std::endl;
                 break;
             }
@@ -432,7 +432,7 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
                 }
                 break;
             default:
-                std::cerr << "\033[0;13H" 
+                std::cerr << "\033[0;13H"
                           << " 2:stop or 6:reboot" << std::endl;
                 break;
             }
@@ -459,7 +459,7 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
             try {
                 RTC::ConnectorProfileList_var myprof
                     = m_DaqServicePorts[i]->get_connector_profiles();
-                
+
                 compname = myprof[0].name; //compname = "group*:*"
                 //std::cerr << "COMPNAME: " << compname << std::endl;
                 status = m_daqservices[i]->getStatus();
@@ -477,9 +477,9 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
                           << status->event_size; // data size(byte)
 
                 if (m_state == ERRORED) {
-                    std::cerr << "\033[35m" 
+                    std::cerr << "\033[35m"
                               << std::setw(12) << std::right
-                              << "RUNNING_" << "\033[39m";
+                              << "_RUNNING" << "\033[39m";
                 }
                 else {
                     std::cerr << std::setw(12) << std::right
@@ -487,7 +487,7 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
                 }
 
                 if (status->comp_status == COMP_FATAL) {
-                    std::cerr << "\033[31m" << std::setw(14) << std::right 
+                    std::cerr << "\033[31m" << std::setw(14) << std::right
                               << check_compStatus(status->comp_status)
                               << "\033[39m" << std::endl;
                     /** Use error console display **/
@@ -675,13 +675,13 @@ int DaqOperator::fix0_comp_stop_procedure()
         std::cerr << "### ERROR: DaqOperator: Failed to stop Component.\n";
         return 1;
     }
-    
+
     time_t now = time(0);
     m_stop_date = asctime(localtime(&now));
     m_stop_date[m_stop_date.length()-1] = ' ';
     m_stop_date.erase(0, 4);
-    
-    m_com_completed = true;  
+
+    m_com_completed = true;
     return 0;
 }
 
@@ -715,7 +715,7 @@ int DaqOperator::fix1_configure_procedure()
 
         //     for (int j = 0; j < (int)paramList.size(); j++) {
         //         if (paramList[j].getId() == id) {
-        //             int len = paramList[j].getList().length();	
+        //             int len = paramList[j].getList().length();
         //             ::NVList mylist(len);
         //             mylist = paramList[j].getList();
         //             m_daqservices[i]->setCompParams( paramList[j].getList() );
@@ -723,7 +723,7 @@ int DaqOperator::fix1_configure_procedure()
         //     }
         //     CORBA::string_free(id);
         // }
-                
+
         for (int i = 0; i < m_comp_num; i++) {
 			status = m_daqservices[i]->getStatus();
 			if (status->state == LOADED) {
@@ -735,7 +735,7 @@ int DaqOperator::fix1_configure_procedure()
         std::cerr << "### ERROR: DaqOperator: Failed to configure Components.\n";
         return 1;
     }
-    
+
     m_com_completed = true;
     return 0;
 }
