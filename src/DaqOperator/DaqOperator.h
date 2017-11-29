@@ -58,8 +58,8 @@ typedef std::vector< serviceInfo > DaqServiceList;
 /*!
  * @class DaqOperator
  * @brief DaqOperator class
- * 
- * 
+ *
+ *
  *
  */
 class DaqOperator
@@ -72,7 +72,7 @@ public:
     ~DaqOperator();
 
     // The initialize action (on CREATED->ALIVE transition)
-    // formaer rtc_init_entry() 
+    // formaer rtc_init_entry()
     virtual RTC::ReturnCode_t onInitialize();
 
     // The startup action when ExecutionContext startup
@@ -107,7 +107,7 @@ public:
     int command_save();
     int command_confirmconnection();
     int command_dummy();
-    
+
     void set_console_flag(bool console);
     void set_port_no(int port);
     std::string getConfFilePath();
@@ -160,7 +160,7 @@ private:
     CORBA::Long m_status;
     CompInfoList m_compInfoList;
     DaqServiceList  m_daqServiceList;
-    
+
     fd_set    m_allset;
     fd_set    m_rset;
     int       m_maxfd;
@@ -183,7 +183,9 @@ private:
 
     std::string m_config_file;
     std::string m_config_file_tmp;
-    
+
+    bool resFlag;
+
     bool m_debug;
 };
 

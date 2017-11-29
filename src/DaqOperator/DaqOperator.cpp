@@ -298,6 +298,7 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
     std::string d_compname[m_comp_num];
     FatalErrorStatus_var d_message[m_comp_num];
     Status_var chkStatus;
+    resFlag = false;
 
     m_tout.tv_sec =  2;
     m_tout.tv_usec = 0;
@@ -453,9 +454,7 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
         std::string compname;
         Status_var status;
         FatalErrorStatus_var errStatus;
-        int big_endian = -1;
         for (int i = (m_comp_num - 1); i >= 0; i--) {
-            big_endian++;
             try {
                 RTC::ConnectorProfileList_var myprof
                     = m_DaqServicePorts[i]->get_connector_profiles();
@@ -501,6 +500,7 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
                     /** Use error console display **/
                     d_compname[i] = compname;
                     d_message[i] = errStatus;
+                    resFlag = true;
                 }///if Restart Request
                 else {
                     std::cerr << "\033[32m"
@@ -522,9 +522,15 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
             for (int i = (m_comp_num - 1); i >= 0; i--) {
                 if (d_compname[i].length() != 0) {
                     std::cerr << " [ERROR" << ++cnt  << "] ";
-                    std::cerr << d_compname[i] << '\t' << "<= " << "\033[31m"
-                              << d_message[i]->description << "\033[39m"
-                              << std::endl;
+                    std::cerr << d_compname[i] << '\t' << "<= ";
+                    if (resFlag == true) {
+                        std::cerr << "\033[36m" << " << RESTRT OK >>"
+                                  << "\033[39m" << std::endl;
+                    }
+                    else {
+                    std::cerr << "\033[31m" << d_message[i]->description
+                              << "\033[39m" << std::endl;
+                    }
                 }
             }///for
         }///if
