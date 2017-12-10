@@ -416,9 +416,9 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
                 std::cin >> srunNo;
                 m_runNumber = atoi(srunNo.c_str());
                 restart_procedure();
-                std::cerr   << "\033[0;13H" << "\033[34m"
-                            << "Send reboot command"
-                            << "\033[39m" << std::endl;
+                std::cerr << "\033[0;13H" << "\033[34m"
+                          << "Send reboot command"
+                          << "\033[39m" << std::endl;
 
                 /* comp_status check */
                 for (int i = (m_comp_num - 1); i >= 0; i--) {
@@ -475,11 +475,11 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
                           << std::setw(14) << std::right
                           << status->event_size; // data size(byte)
 
-                if (status->comp_status == COMP_FATAL
-                    || status->comp_status == COMP_RESTART) {
+                if (status->comp_status == COMP_FATAL ||
+                    status->comp_status == COMP_RESTART) {
                     std::cerr << "\033[35m"
                               << std::setw(12) << std::right
-                              << "_RUNNING_" << "\033[39m";
+                              << "__RUNNING__" << "\033[39m";
                 }
                 else {
                     std::cerr << std::setw(12) << std::right
@@ -672,7 +672,7 @@ int DaqOperator::error_stop_procedure()
     try {
         for (int i = (m_comp_num - 1); i >= 0; i--) {
             status = m_daqservices[i]->getStatus();
-            if (status->comp_status == COMP_RESTART) {
+            if (status->comp_status == COMP_FATAL) { // RESTART
                 set_command(m_daqservices[i], CMD_STOP);
                 check_done(m_daqservices[i]);
             }
@@ -681,6 +681,11 @@ int DaqOperator::error_stop_procedure()
         std::cerr << "### ERROR: Failed to restart(stop) Component.\n";
         return 1;
     }
+
+    time_t now = time(0);
+    m_stop_date = asctime(localtime(&now));
+    m_stop_date[m_stop_date.length()-1] = ' ';
+    m_stop_date.erase(0, 4);
 
     try {
         for (int i = 0; i < m_comp_num; i++) {
