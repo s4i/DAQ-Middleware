@@ -524,7 +524,7 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
                     std::cerr << " [ERROR" << ++cnt  << "] ";
                     std::cerr << d_compname[i] << '\t' << "<= ";
                     if (resFlag == true) {
-                        std::cerr << "\033[36m" << " << RESTRT OK >>"
+                        std::cerr << "\033[36m" << " << Restart Ready >>"
                                   << "\033[39m" << std::endl;
                     }
                     else {
