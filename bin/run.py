@@ -166,6 +166,7 @@ def opt():
 
     (options, args) = parser.parse_args()
     if len(args) != 1:
+		print(usage)
         parser.error("ERROR: not specified config file")
 
     confFile                 = args[0]
@@ -899,7 +900,7 @@ def DaqOperatorBooting():
     return True
 
 def main():
-    if not sys.argv[1:] == 'clean':
+    if re.search('clean', sys.argv[1]) != None:
         files = [str]
         files = glob.glob('omninames-*.bak')
         files += glob.glob('omninames-*.log')
@@ -907,8 +908,9 @@ def main():
         files += glob.glob('.confFilePath')
         for f in files:
             os.remove(f)
+        print("file clean")
         sys.exit(0)
-    elif not sys.argv[1:] == 'refresh':
+    elif re.search('refresh', sys.argv[1]) != None:
         current = os.getcwd()
         path = ''
         for root, dirs, files in os.walk('./'):
@@ -921,12 +923,11 @@ def main():
                     os.chdir(current)
         if len(path) == 0:
             print('not found autogen')
-
+            sys.exit(0)
     #
     # get command line options
     #
     opt()
-
     #
     # validation of configuration file using XML schema config.xsd
     #
