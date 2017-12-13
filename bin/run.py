@@ -167,7 +167,7 @@ def opt():
     (options, args) = parser.parse_args()
     if len(args) != 1:
 		print(usage)
-        parser.error("ERROR: not specified config file")
+		parser.error("ERROR: not specified config file")
 
     confFile                 = args[0]
     schemaFile               = options.schema
@@ -900,20 +900,20 @@ def DaqOperatorBooting():
     return True
 
 def main():
+    delFiles = [str]
     if re.search('clean', sys.argv[1]) != None:
-        files = [str]
-        files = glob.glob('omninames-*.bak')
-        files += glob.glob('omninames-*.log')
-        files += glob.glob('rtc.conf')
-        files += glob.glob('.confFilePath')
-        for f in files:
+	delFiles += glob.glob('omninames-*.bak')
+        delFiles += glob.glob('omninames-*.log')
+        delFiles += glob.glob('rtc.conf')
+        delFiles += glob.glob('.confFilePath')
+        for f in delFiles:
             os.remove(f)
         print("file clean")
         sys.exit(0)
     elif re.search('refresh', sys.argv[1]) != None:
-        current = os.getcwd()
-        path = ''
-        for root, dirs, files in os.walk('./'):
+	current = os.getcwd()
+	path = ''
+	for root, dirs, files in os.walk('./'):
             for dir in dirs:
                 if dir == "autogen":
                     path = os.path.join(root)
@@ -921,6 +921,15 @@ def main():
                     print(os.getcwd())
                     os.system("make clean")
                     os.chdir(current)
+                for file in files:   
+                    if file == ".confFilePath":
+                        delFiles += glob.glob('omninames-*.bak')
+                        delFiles += glob.glob('omninames-*.log')
+                        delFiles += glob.glob('rtc.conf')
+                        delFiles += glob.glob('.confFilePath')
+                        for f in delFiles:
+                            os.remove(f)
+	print("file clean")
         if len(path) == 0:
             print('not found autogen')
             sys.exit(0)

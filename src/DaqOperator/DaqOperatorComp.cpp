@@ -414,9 +414,9 @@ int connect_service_ports()
         std::cerr << "service_list.size() = " << service_list.size() << std::endl;
         std::cerr << "operator_port.size() = " << operator_service_list.size() << std::endl;
     }
-    int index_operator = 0;
 
     ///connect DAQ-Componets servicePorts to DaqOperators respectively
+    int start_order_fix = 0;
     for(int index=0; index < (int)service_list.size(); index++) {
         if (debug) {
             std::cerr << "service_list[" << index << "]:" << service_list[index].comp_id << std::endl;
@@ -430,6 +430,13 @@ int connect_service_ports()
             prof.ports.length(2);
 
             int startOrder = service_list[index].startup_order - 1; /// startup order begins 1
+            
+            // startup_order_fix
+            if (start_order_fix != startOrder) {
+				startOrder = start_order_fix;
+			}
+			start_order_fix++;
+			
             prof.ports[0] = service_list[index].service_ptr;
             prof.ports[1] = operator_service_list[startOrder].service_ptr;
 
@@ -443,8 +450,6 @@ int connect_service_ports()
                 std::cerr << "connenct: Exception occured\n";
             }
             assert(ret == RTC::RTC_OK);
-
-            index_operator++;
         }
     }
     return 0;
@@ -564,14 +569,14 @@ void MyModuleInit(RTC::Manager* manager)
         PortService_ptr port;
         port = (*portlist)[i];
 
-#ifdef DEBUG
+//#ifdef DEBUG
        std::cout << "================================================="
                  << std::endl;
        std::cout << "Port" << i << " (name): ";
        std::cout << port->get_port_profile()->name << std::endl;
        std::cout << "-------------------------------------------------"
                  << std::endl;
-#endif
+//#endif
 
        RTC::PortInterfaceProfileList iflist;
        iflist = port->get_port_profile()->interfaces;
