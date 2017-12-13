@@ -14,6 +14,7 @@ import socket
 import re
 from optparse import OptionParser
 import datetime
+import glob
 
 # Python interpreter is at least version 2.5.0
 if sys.hexversion >= 0x020500F0:
@@ -122,7 +123,7 @@ def opt():
     global append_datetime_to_log
     global append_ip_address_to_log
 
-    usage = "run.py [OPTIONS] [CONFIG_FILE]"
+    usage = "%prog [OPTIONS] [CONFIG_FILE]"
     parser = OptionParser(usage)
     parser.set_defaults(console=False)
     parser.set_defaults(local=False)
@@ -898,6 +899,29 @@ def DaqOperatorBooting():
     return True
 
 def main():
+    if not sys.argv[1:] == 'clean':
+        files = [str]
+        files = glob.glob('omninames-*.bak')
+        files += glob.glob('omninames-*.log')
+        files += glob.glob('rtc.conf')
+        files += glob.glob('.confFilePath')
+        for f in files:
+            os.remove(f)
+        sys.exit(0)
+    elif not sys.argv[1:] == 'refresh':
+        current = os.getcwd()
+        path = ''
+        for root, dirs, files in os.walk('./'):
+            for dir in dirs:
+                if dir == "autogen":
+                    path = os.path.join(root)
+                    os.chdir(path)
+                    print(os.getcwd())
+                    os.system("make clean")
+                    os.chdir(current)
+        if len(path) == 0:
+            print('not found autogen')
+
     #
     # get command line options
     #
