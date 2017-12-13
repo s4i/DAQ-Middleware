@@ -569,14 +569,14 @@ void MyModuleInit(RTC::Manager* manager)
         PortService_ptr port;
         port = (*portlist)[i];
 
-//#ifdef DEBUG
+#ifdef DEBUG
        std::cout << "================================================="
                  << std::endl;
        std::cout << "Port" << i << " (name): ";
        std::cout << port->get_port_profile()->name << std::endl;
        std::cout << "-------------------------------------------------"
                  << std::endl;
-//#endif
+#endif
 
        RTC::PortInterfaceProfileList iflist;
        iflist = port->get_port_profile()->interfaces;
