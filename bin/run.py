@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 # run.py: Start up script for DAQ-Components.
 #         This script parses config.xml file, gets IP addrese of CPU DAQs and
@@ -900,39 +901,45 @@ def DaqOperatorBooting():
     return True
 
 def main():
-    delFiles = [str]
+    filePath = [str]
+    cmd = "rm -f omninames-*.bak omninames-*.log omninames-*.ckp rtc.conf confFilePath"
     if re.search('clean', sys.argv[1]) != None:
-	delFiles += glob.glob('omninames-*.bak')
-        delFiles += glob.glob('omninames-*.log')
-        delFiles += glob.glob('rtc.conf')
-        delFiles += glob.glob('.confFilePath')
-        for f in delFiles:
-            os.remove(f)
+        subprocess.call(cmd, shell=True)
         print("file clean")
         sys.exit(0)
     elif re.search('refresh', sys.argv[1]) != None:
 	current = os.getcwd()
-	path = ''
+	make_path = ''
+	file_path = ''
 	for root, dirs, files in os.walk('./'):
             for dir in dirs:
                 if dir == "autogen":
-                    path = os.path.join(root)
-                    os.chdir(path)
+                    make_path = os.path.join(root)
+                    os.chdir(make_path)
                     print(os.getcwd())
                     os.system("make clean")
                     os.chdir(current)
-                for file in files:   
-                    if file == ".confFilePath":
-                        delFiles += glob.glob('omninames-*.bak')
-                        delFiles += glob.glob('omninames-*.log')
-                        delFiles += glob.glob('rtc.conf')
-                        delFiles += glob.glob('.confFilePath')
-                        for f in delFiles:
-                            os.remove(f)
-	print("file clean")
-        if len(path) == 0:
-            print('not found autogen')
-            sys.exit(0)
+        if len(make_path) == 0:
+            print('メイククリーンを実行できるディレクトリはありません')
+        else: print('メイククリーンを実行しました')
+        flag = False
+        for root, dirs, files in os.walk('./'):
+            for dir in dirs:
+                for file in files:
+                    if re.match('omniname-*', str(file)) != None:
+                        file_path = os.path.join(root)
+                        os.chdir(file_path)
+                        print(os.getcwd())
+                        subprocess.call(cmd, shell=True)
+                        os.chdir(current)
+                        flag = True
+                        break
+                if flag:
+                    break
+        if len(file_path) == 0:
+            print('ファイルクリーンを実行できるディレクトリはありません')
+        else: print('ファイルクリーンを実行しました')
+        sys.exit(0)
     #
     # get command line options
     #

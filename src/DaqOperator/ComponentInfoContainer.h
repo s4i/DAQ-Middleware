@@ -145,7 +145,7 @@ class ComponentInfoContainer
 
     void setStartupOrder(std::string startup_order) 	
     {
-      m_startup_order = startup_order;
+	  m_startup_order = startup_order;
     }
     std::string getStartupOrder()			
     {

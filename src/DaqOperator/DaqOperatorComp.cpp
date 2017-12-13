@@ -416,7 +416,7 @@ int connect_service_ports()
     }
 
     ///connect DAQ-Componets servicePorts to DaqOperators respectively
-    int start_order_fix = 0;
+    int start_order_fix = (int)service_list.size() - 1;
     for(int index=0; index < (int)service_list.size(); index++) {
         if (debug) {
             std::cerr << "service_list[" << index << "]:" << service_list[index].comp_id << std::endl;
@@ -431,26 +431,27 @@ int connect_service_ports()
 
             int startOrder = service_list[index].startup_order - 1; /// startup order begins 1
             
-            // startup_order_fix
-            if (start_order_fix != startOrder) {
+			// startup_order_fix
+			if (start_order_fix != startOrder) {
 				startOrder = start_order_fix;
 			}
-			start_order_fix++;
 			
-            prof.ports[0] = service_list[index].service_ptr;
-            prof.ports[1] = operator_service_list[startOrder].service_ptr;
+			start_order_fix--;
+			
+			prof.ports[0] = service_list[index].service_ptr;
+			prof.ports[1] = operator_service_list[startOrder].service_ptr;
 
-            operator_service_list[startOrder].comp_id = service_list[index].comp_id;
+			operator_service_list[startOrder].comp_id = service_list[index].comp_id;
 
-            ReturnCode_t ret = RTC::RTC_OK;
-            try {
-                ret = prof.ports[0]->connect(prof);
-            }
-            catch(...) {
-                std::cerr << "connenct: Exception occured\n";
-            }
-            assert(ret == RTC::RTC_OK);
-        }
+			ReturnCode_t ret = RTC::RTC_OK;
+			try {
+				ret = prof.ports[0]->connect(prof);
+			}
+			catch(...) {
+				std::cerr << "connenct: Exception occured\n";
+			}
+			assert(ret == RTC::RTC_OK);
+		}
     }
     return 0;
 }
