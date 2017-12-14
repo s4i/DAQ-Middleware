@@ -232,7 +232,7 @@ def file_clean(path):
         while True:
             choice = raw_input('[y/N]: ').lower()
             if choice in ['y', 'ye', 'yes', '']:
-                subprocess.call(cmd, shell=True)
+                subprocess.call(cmd)
                 print('Finish')
                 break
             elif choice in ['n', 'no']:
@@ -271,7 +271,7 @@ def file_clean(path):
                         while True:
                             choice = raw_input('[y/N]: ').lower()
                             if choice in ['y', 'ye', 'yes', '']:
-                                subprocess.call(cmd, shell=True)
+                                subprocess.call(cmd)
                                 break
                             elif choice in ['n', 'no']:
                                 break
