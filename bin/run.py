@@ -5,10 +5,9 @@
 #   This script parses config.xml file, gets IP addrese of CPU DAQs and
 #   CPU UI, and starts DAQ-Components on remote/local PCs via network.
 
-import errno, sys, os, re, glob
+import errno, sys, os, re, socket
 import time, datetime
-import subprocess, signal, threading
-import socket
+import subprocess, signal
 from optparse import OptionParser
 
 # Python interpreter is at least version 2.5.0
@@ -154,8 +153,8 @@ def opt():
 
     (options, args) = parser.parse_args()
     if len(args) != 1:
-		print(usage)
-		parser.error("ERROR: not specified config file")
+        print(usage)
+        parser.error("ERROR: not specified config file")
 
     confFile                 = args[0]
     schemaFile               = options.schema
@@ -196,41 +195,40 @@ def opt():
     if comps_invoke_interval > 0:
         print "Comps invoke interval: %4.1f sec" % (comps_invoke_interval)
 
+def find_all_files(directory, target_file):
+    for root, dirs, files in os.walk(directory):
+        for file in files:
+            if (file == target_file):
+                yield os.path.join(root, file)
+
 def file_clean(path):
     file_path = []
-    cmd = "rm omninames-*.bak omninames-*.log \
+    target = 'Makefile'
+    cmd = "rm -r omninames-*.bak omninames-*.log \
              omninames-*.ckp rtc.conf .confFilePath __pycache__ .pyc"
     flag = False
     current = os.getcwd()
     if re.match('make', path) != None:
         print('Exec make')
-        for root, dirs, files in os.walk(current):
-            for dir in dirs:
-                for file in files:
-                    if file == 'Makefile':
-                        file_path = os.path.join(root)
-                        os.chdir(file_path)
-                        print(os.getcwd()),
-                        while True:
-                            choice = raw_input('[y/N]: ').lower()
-                            if choice in ['y', 'ye', 'yes', '']:
-                                os.system('make')
-                                break
-                            if choice in ['n', 'no']:
-                                break
-                            else:
-                                print(os.getcwd()),
-                        os.chdir(current)
-                        flag = True
-                        break
-                if flag:
+        for file in find_all_files(current, target):
+            os.chdir(file.strip(target))
+            print(os.getcwd()),
+            while True:
+                choice = raw_input('[y/N]: ').lower()
+                if choice in ['y', 'ye', 'yes', '']:
+                    os.system('make')
                     break
-        if len(file_path) == 0:
+                elif choice in ['n', 'no']:
+                    break
+                else:
+                    print(os.getcwd()),
+                os.chdir(current)
+        if len(file) == 0:
             print('Not found Makefile')
-        else: print('Finish')
+        else: print('Finished')
         sys.exit(0)
-    elif re.match('clean', path) != None:
-        print('File clean')
+    elif re.match('rm', path) != None:
+        print('File clean'),
         while True:
             choice = raw_input('[y/N]: ').lower()
             if choice in ['y', 'ye', 'yes', '']:
@@ -241,7 +239,7 @@ def file_clean(path):
                 print('Stopped')
                 break
         sys.exit(0)
-    elif re.match('refresh', path) != None:
+    elif re.match('clean', path) != None:
         print('Make clean')
         for root, dirs, files in os.walk(current):
             for dir in dirs:
