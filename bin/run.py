@@ -2,20 +2,14 @@
 # -*- coding: utf-8 -*-
 
 # run.py: Start up script for DAQ-Components.
-#         This script parses config.xml file, gets IP addrese of CPU DAQs and
-#         CPU UI, and starts DAQ-Components on remote/local PCs via network.
+#   This script parses config.xml file, gets IP addrese of CPU DAQs and
+#   CPU UI, and starts DAQ-Components on remote/local PCs via network.
 
-import errno
-import sys
-import os
-import time
-import subprocess
-import signal
+import errno, sys, os, re, glob
+import time, datetime
+import subprocess, signal, threading
 import socket
-import re
 from optparse import OptionParser
-import datetime
-import glob
 
 # Python interpreter is at least version 2.5.0
 if sys.hexversion >= 0x020500F0:
@@ -44,18 +38,12 @@ class MyProcUtil:
 
     def __init__(self):
         self.script_langs = [
-            'python',
-            'python2',
-            'python2.4',
-            'python2.5',
-            'python2.6',
-            'python2.7',
+            'python', 'python2',
+            'python2.4', 'python2.5',
+            'python2.6', 'python2.7',
             'perl',
             'ruby',
-            'sh',
-            'bash',
-            'tcsh',
-            'zsh'
+            'sh', 'bash', 'tcsh', 'zsh'
         ]
 
     def get_all_pids(self):
@@ -72,7 +60,6 @@ class MyProcUtil:
                 sys.exit(e)
         rv =  [ x for x in f.read().split('\x00') if x ]
         f.close()
-
         return rv
 
     def get_pids_by_proc_name(self, proc_name):
@@ -208,6 +195,101 @@ def opt():
         sys.exit(-1)
     if comps_invoke_interval > 0:
         print "Comps invoke interval: %4.1f sec" % (comps_invoke_interval)
+
+def file_clean(path):
+    file_path = []
+    cmd = "rm -f omninames-*.bak omninames-*.log omninames-*.ckp rtc.conf confFilePath __pycache__ .pyc"
+    flag = False
+    current = os.getcwd()
+    if re.match('make', path) != None:
+        print('Exec make')
+        for root, dirs, files in os.walk('*'):
+            for dir in dirs:
+                for file in files:
+                    file_path = os.path.join(root, file)
+                    for i in range(len(path)):
+                        if path[-8:] == 'Makefile':
+                            fp = "".join(file_path)
+                            print(file_path)
+                            os.chdir(file_path.strip('Makefile'))
+                            print(os.getcwd()),
+                            while True:
+                                choice = raw_input("[y/N]: ").lower()
+                                if choice in ['y', 'ye', 'yes', '']:
+                                    os.system('make')
+                                    break
+                                if choice in ['n', 'no']:
+                                    print("Stop")
+                                    break
+                                else:
+                                    print(os.getcwd()),
+                            os.chdir(current)
+                            break
+        if len(file_path) == 0:
+            print('Not found Makefile')
+        else: print('Finish')
+        sys.exit(0)
+    elif re.match('clean', path) != None:
+        print('File clean')
+        while True:
+            choice = raw_input("[y/N]: ").lower()
+            if choice in ['y', 'ye', 'yes', '']:
+                subprocess.call(cmd, shell=True)
+                print("Finish")
+                break
+            elif choice in ['n', 'no']:
+                print('Stop')
+                break
+        sys.exit(0)
+    elif re.match('refresh', path) != None:
+        print('Make clean')
+        for root, dirs, files in os.walk('./'):
+            for dir in dirs:
+                if dir == "autogen":
+                    file_path = os.path.join(root)
+                    os.chdir(file_path)
+                    print(os.getcwd()),
+                    while True:
+                        choice = raw_input("[y/N]: ").lower()
+                        if choice in ['y', 'ye', 'yes', '']:
+                            os.system("make clean")
+                            break
+                        elif choice in ['n', 'no']:
+                            print('Stop')
+                            break
+                        else:
+                            print(os.getcwd()),
+                    os.chdir(current)
+        if len(file_path) == 0:
+            print('Not found Makefile')
+        else: print('Finished')
+        print('File clean')
+        for root, dirs, files in os.walk('./'):
+            for dir in dirs:
+                for file in files:
+                    if re.match('omniname-*', str(file)) != None:
+                        file_path = os.path.join(root)
+                        os.chdir(file_path)
+                        print(os.getcwd()),
+                        while True:
+                            choice = raw_input("[y/N]: ").lower()
+                            if choice in ['y', 'ye', 'yes', '']:
+                                subprocess.call(cmd, shell=True)
+                                break
+                            elif choice in ['n', 'no']:
+                                print("Stop")
+                                break
+                            else:
+                                print(os.getcwd()),
+                        os.chdir(current)
+                        flag = True
+                        break
+                if flag:
+                    break
+        if len(file_path) == 0:
+            print('Not found target files')
+        else: print('Finished')
+        sys.exit(0)
 
 def getVal(confile, path):
     dom = Etree.parse(confile)
@@ -901,45 +983,7 @@ def DaqOperatorBooting():
     return True
 
 def main():
-    filePath = [str]
-    cmd = "rm -f omninames-*.bak omninames-*.log omninames-*.ckp rtc.conf confFilePath"
-    if re.search('clean', sys.argv[1]) != None:
-        subprocess.call(cmd, shell=True)
-        print("file clean")
-        sys.exit(0)
-    elif re.search('refresh', sys.argv[1]) != None:
-	current = os.getcwd()
-	make_path = ''
-	file_path = ''
-	for root, dirs, files in os.walk('./'):
-            for dir in dirs:
-                if dir == "autogen":
-                    make_path = os.path.join(root)
-                    os.chdir(make_path)
-                    print(os.getcwd())
-                    os.system("make clean")
-                    os.chdir(current)
-        if len(make_path) == 0:
-            print('メイククリーンを実行できるディレクトリはありません')
-        else: print('メイククリーンを実行しました')
-        flag = False
-        for root, dirs, files in os.walk('./'):
-            for dir in dirs:
-                for file in files:
-                    if re.match('omniname-*', str(file)) != None:
-                        file_path = os.path.join(root)
-                        os.chdir(file_path)
-                        print(os.getcwd())
-                        subprocess.call(cmd, shell=True)
-                        os.chdir(current)
-                        flag = True
-                        break
-                if flag:
-                    break
-        if len(file_path) == 0:
-            print('ファイルクリーンを実行できるディレクトリはありません')
-        else: print('ファイルクリーンを実行しました')
-        sys.exit(0)
+    file_clean(sys.argv[1])
     #
     # get command line options
     #

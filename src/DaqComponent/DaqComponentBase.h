@@ -40,7 +40,7 @@ namespace DAQMW
   /*!
    * @class DaqComponentBase
    * @brief DaqComponentBase class
-   * 
+   *
    * This is default condition class. User uses the class as base class.
    *
    */
@@ -348,7 +348,7 @@ namespace DAQMW
             m_daq_trans_func[CMD_RESUME]      = &DAQMW::DaqComponentBase::daq_resume;
             m_daq_trans_func[CMD_STOP]        = &DAQMW::DaqComponentBase::daq_base_stop;
             m_daq_trans_func[CMD_UNCONFIGURE] = &DAQMW::DaqComponentBase::daq_base_unconfigure;
-			
+
             m_daq_do_func[LOADED]     = &DAQMW::DaqComponentBase::daq_base_dummy;
             m_daq_do_func[CONFIGURED] = &DAQMW::DaqComponentBase::daq_base_dummy;
             m_daq_do_func[RUNNING]    = &DAQMW::DaqComponentBase::daq_run;
@@ -403,7 +403,7 @@ namespace DAQMW
             case RTC::DataPortStatus::PRECONDITION_NOT_MET:
             case RTC::DataPortStatus::CONNECTION_LOST:
                 std::cerr << "OutPort status: "
-                     << RTC::DataPortStatus::toString(out_status) 
+                     << RTC::DataPortStatus::toString(out_status)
                      << std::endl;
                 ret = BUF_FATAL;
                 break;
@@ -416,7 +416,7 @@ namespace DAQMW
             case RTC::DataPortStatus::BUFFER_ERROR:
             case RTC::DataPortStatus::INVALID_ARGS:
                 std::cerr << "Impossible OutPort status: "
-                     << RTC::DataPortStatus::toString(out_status) 
+                     << RTC::DataPortStatus::toString(out_status)
                      << std::endl;
                 ret = BUF_FATAL;
                 break;
@@ -470,8 +470,8 @@ namespace DAQMW
             case RTC::DataPortStatus::INVALID_ARGS:
             case RTC::DataPortStatus::CONNECTION_LOST:
             case RTC::DataPortStatus::UNKNOWN_ERROR:
-                std::cerr << "Impossible InPort status: " 
-                    << RTC::DataPortStatus::toString(in_status) 
+                std::cerr << "Impossible InPort status: "
+                    << RTC::DataPortStatus::toString(in_status)
                     << std::endl;
                 ret = BUF_FATAL;
                 break;
@@ -733,7 +733,7 @@ namespace DAQMW
             daq_pause();
             return 0;
         }
-        
+
         int get_command()
         {
             m_command = m_daq_service0.getCommand();
