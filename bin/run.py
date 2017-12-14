@@ -198,33 +198,33 @@ def opt():
 
 def file_clean(path):
     file_path = []
-    cmd = "rm -f omninames-*.bak omninames-*.log omninames-*.ckp rtc.conf confFilePath __pycache__ .pyc"
+    cmd = "rm omninames-*.bak omninames-*.log \
+             omninames-*.ckp rtc.conf .confFilePath __pycache__ .pyc"
     flag = False
     current = os.getcwd()
     if re.match('make', path) != None:
         print('Exec make')
-        for root, dirs, files in os.walk('*'):
+        for root, dirs, files in os.walk(current):
             for dir in dirs:
                 for file in files:
-                    file_path = os.path.join(root, file)
-                    for i in range(len(path)):
-                        if path[-8:] == 'Makefile':
-                            fp = "".join(file_path)
-                            print(file_path)
-                            os.chdir(file_path.strip('Makefile'))
-                            print(os.getcwd()),
-                            while True:
-                                choice = raw_input("[y/N]: ").lower()
-                                if choice in ['y', 'ye', 'yes', '']:
-                                    os.system('make')
-                                    break
-                                if choice in ['n', 'no']:
-                                    print("Stop")
-                                    break
-                                else:
-                                    print(os.getcwd()),
-                            os.chdir(current)
-                            break
+                    if file == 'Makefile':
+                        file_path = os.path.join(root)
+                        os.chdir(file_path)
+                        print(os.getcwd()),
+                        while True:
+                            choice = raw_input('[y/N]: ').lower()
+                            if choice in ['y', 'ye', 'yes', '']:
+                                os.system('make')
+                                break
+                            if choice in ['n', 'no']:
+                                break
+                            else:
+                                print(os.getcwd()),
+                        os.chdir(current)
+                        flag = True
+                        break
+                if flag:
+                    break
         if len(file_path) == 0:
             print('Not found Makefile')
         else: print('Finish')
@@ -232,30 +232,29 @@ def file_clean(path):
     elif re.match('clean', path) != None:
         print('File clean')
         while True:
-            choice = raw_input("[y/N]: ").lower()
+            choice = raw_input('[y/N]: ').lower()
             if choice in ['y', 'ye', 'yes', '']:
                 subprocess.call(cmd, shell=True)
-                print("Finish")
+                print('Finish')
                 break
             elif choice in ['n', 'no']:
-                print('Stop')
+                print('Stopped')
                 break
         sys.exit(0)
     elif re.match('refresh', path) != None:
         print('Make clean')
-        for root, dirs, files in os.walk('./'):
+        for root, dirs, files in os.walk(current):
             for dir in dirs:
-                if dir == "autogen":
+                if dir == 'autogen':
                     file_path = os.path.join(root)
                     os.chdir(file_path)
                     print(os.getcwd()),
                     while True:
-                        choice = raw_input("[y/N]: ").lower()
+                        choice = raw_input('[y/N]: ').lower()
                         if choice in ['y', 'ye', 'yes', '']:
-                            os.system("make clean")
+                            os.system('make clean')
                             break
                         elif choice in ['n', 'no']:
-                            print('Stop')
                             break
                         else:
                             print(os.getcwd()),
@@ -264,7 +263,7 @@ def file_clean(path):
             print('Not found Makefile')
         else: print('Finished')
         print('File clean')
-        for root, dirs, files in os.walk('./'):
+        for root, dirs, files in os.walk(current):
             for dir in dirs:
                 for file in files:
                     if re.match('omniname-*', str(file)) != None:
@@ -272,12 +271,11 @@ def file_clean(path):
                         os.chdir(file_path)
                         print(os.getcwd()),
                         while True:
-                            choice = raw_input("[y/N]: ").lower()
+                            choice = raw_input('[y/N]: ').lower()
                             if choice in ['y', 'ye', 'yes', '']:
                                 subprocess.call(cmd, shell=True)
                                 break
                             elif choice in ['n', 'no']:
-                                print("Stop")
                                 break
                             else:
                                 print(os.getcwd()),
