@@ -44,9 +44,18 @@ class MyProcUtil:
 
     def __init__(self):
         self.script_langs = [
-            'python', 'python2', 'python2.4', 'python2.5', 'python2.6', 'python2.7',
-            'perl', 'ruby',
-            'sh', 'bash', 'tcsh', 'zsh'
+            'python',
+            'python2',
+            'python2.4',
+            'python2.5',
+            'python2.6',
+            'python2.7',
+            'perl',
+            'ruby',
+            'sh',
+            'bash',
+            'tcsh',
+            'zsh'
         ]
 
     def get_all_pids(self):
