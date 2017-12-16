@@ -165,7 +165,7 @@ int find_comps(CorbaNaming* naming, CompGroupList* daq_group_list)
             bool found_comp = false;
             while (retry_counts) {
                 try {
-                    bool ret 
+                    bool ret
                         = comp.setObject(naming->resolve((const char*)instName.c_str() ));
                     if (ret == true) {
                         found_comp = true;
@@ -416,7 +416,6 @@ int connect_service_ports()
     }
 
     ///connect DAQ-Componets servicePorts to DaqOperators respectively
-    int start_order_fix = (int)service_list.size() - 1;
     for(int index=0; index < (int)service_list.size(); index++) {
         if (debug) {
             std::cerr << "service_list[" << index << "]:" << service_list[index].comp_id << std::endl;
@@ -430,14 +429,6 @@ int connect_service_ports()
             prof.ports.length(2);
 
             int startOrder = service_list[index].startup_order - 1; /// startup order begins 1
-            
-			// startup_order_fix
-			if (start_order_fix != startOrder) {
-				startOrder = start_order_fix;
-			}
-			
-			start_order_fix--;
-			
 			prof.ports[0] = service_list[index].service_ptr;
 			prof.ports[1] = operator_service_list[startOrder].service_ptr;
 
@@ -508,7 +499,7 @@ bool find_connect_comps()
     }
     catch(std::exception& e)
     {
-        std::cerr << "### DaqOperator: find_connect_comps: Exception occured: " 
+        std::cerr << "### DaqOperator: find_connect_comps: Exception occured: "
                   << e.what() << std::endl;
         std::cerr << "### NO omniNames?" << std::endl;
         throw;
@@ -548,9 +539,9 @@ void MyModuleInit(RTC::Manager* manager)
     prof = comp->get_component_profile();
 
 #ifdef DEBUG
-    std::cout << "=================================================" << std::endl;  
+    std::cout << "=================================================" << std::endl;
     std::cout << " Component Profile" << std::endl;
-    std::cout << "-------------------------------------------------" << std::endl;  
+    std::cout << "-------------------------------------------------" << std::endl;
     std::cout << "InstanceID:     " << prof->instance_name << std::endl;
     std::cout << "Implementation: " << prof->type_name << std::endl;
     std::cout << "Description:    " << prof->description << std::endl;
