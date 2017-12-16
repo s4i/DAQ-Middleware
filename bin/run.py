@@ -221,30 +221,41 @@ def find_all_files(directory, target_file):
 
 def file_clean(path):
     file_path = []
+    make_result = []
     target = 'Makefile'
     command = "rm -r omninames-*.bak omninames-*.log \
              omninames-*.ckp rtc.conf .confFilePath __pycache__ .pyc"
     flag = False
+    automake_flag = False
     current = os.getcwd()
     if re.match('make', path) != None:
         print('Exec make')
+        while True:
+            automake = raw_input('Automake[y/N]: ').lower()
+            if automake in ['y', 'ye', 'yes', '']:
+                automake_flag = True
+                break
+            elif automake in ['n', 'no']:
+                break
         for file in find_all_files(current, target):
             os.chdir(file.strip(target))
-            print(os.getcwd()),
-            while True:
-                choice = raw_input('[y/N]: ').lower()
-                if choice in ['y', 'ye', 'yes', '']:
-                    os.system('make')
-                    break
-                elif choice in ['n', 'no']:
-                    break
-                else:
-                    print(os.getcwd()),
-                os.chdir(current)
-        if len(file) == 0:
-            print('Not found Makefile')
-        else:
-            print('Finished')
+            make_result += file + '\n'
+            if not automake_flag:
+                print(os.getcwd()),
+                while True:
+                    choice = raw_input('[y/N]: ').lower()
+                    if choice in ['y', 'ye', 'yes', '']:
+                        os.system('make')
+                        break
+                    elif choice in ['n', 'no']:
+                        break
+                    else:
+                        print(os.getcwd()),
+            else:
+                os.system('make')
+            os.chdir(current)
+        print(''.join(make_result)),
+        print('File clean finished')
         sys.exit(0)
     elif re.match('rm', path) != None:
         print('File clean'),
@@ -278,8 +289,7 @@ def file_clean(path):
                     os.chdir(current)
         if len(file_path) == 0:
             print('Not found Makefile')
-        else:
-            print('Finished')
+        print('Make clean finished')
         print('File clean')
         for root, dirs, files in os.walk(current):
             for dir in dirs:
