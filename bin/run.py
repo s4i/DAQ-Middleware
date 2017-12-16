@@ -224,7 +224,7 @@ def file_clean(path):
     make_result = []
     target = 'Makefile'
     command = "rm -r omninames-*.bak omninames-*.log \
-             omninames-*.ckp rtc.conf .confFilePath __pycache__ .pyc"
+             rtc.conf .confFilePath __pycache__ *.pyc"
     flag = False
     automake_flag = False
     current = os.getcwd()
