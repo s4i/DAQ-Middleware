@@ -30,6 +30,7 @@
 #include "DAQService.hh"
 #include "DaqComponentException.h"
 #include "Timer.h"
+#include "HeartBeat.h"
 
 /*!
  * @namespace DAQMW
@@ -351,7 +352,7 @@ namespace DAQMW
 
             m_daq_do_func[LOADED]     = &DAQMW::DaqComponentBase::daq_base_dummy;
             m_daq_do_func[CONFIGURED] = &DAQMW::DaqComponentBase::daq_base_dummy;
-            m_daq_do_func[RUNNING]    = &DAQMW::DaqComponentBase::daq_run;
+            m_daq_do_func[RUNNING]    = &DAQMW::DaqComponentBase::daq_base_run;
             m_daq_do_func[PAUSED]     = &DAQMW::DaqComponentBase::daq_base_dummy;
         }
 
@@ -710,6 +711,13 @@ namespace DAQMW
             set_status(COMP_WORKING);
             m_has_printed_error_log = false;
             daq_start();
+            return 0;
+        }
+
+        int daq_base_run()
+        {
+            heart_beat();
+            daq_run();
             return 0;
         }
 
