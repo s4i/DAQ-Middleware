@@ -15,6 +15,7 @@
 #define TIMER_H
 
 #include <iostream>
+#include <cstdio>
 #include <sys/time.h>
 
 /*!
@@ -25,17 +26,17 @@ namespace DAQMW {
   /*!
    * @class Timer
    * @brief Timer class
-   * 
-   * 
+   *
+   *
    *
    */
 class Timer
 {
 public:
-    Timer(unsigned int alarmInSec) 
+    Timer(unsigned int alarmInSec)
     {
 	std::cerr << "Timer constructor\n";
-	m_alarm_time_usec = alarmInSec*1000000;
+	m_alarm_time_usec = alarmInSec * 10^6;
 	gettimeofday(&m_previous_time, 0);
     }
 
@@ -51,7 +52,7 @@ public:
 	    perror("gettimeofday:");
 	}
 
-	suseconds_t elapsed_utime = (m_current_time.tv_sec - m_previous_time.tv_sec) * 1000000 
+	suseconds_t elapsed_utime = (m_current_time.tv_sec - m_previous_time.tv_sec) * 10^6
 	  + (m_current_time.tv_usec - m_previous_time.tv_usec);
 
 	if(elapsed_utime > m_alarm_time_usec) {
@@ -78,7 +79,7 @@ public:
         mydate[mydate.length()-1] = ' ';
         mydate.erase(0, 4);
 	return mydate;
-    }   
+    }
 
 private:
     suseconds_t m_alarm_time_usec;

@@ -300,6 +300,9 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
     Status_var chkStatus;
     resFlag = false;
 
+    /* Heart Beat */
+
+
     m_tout.tv_sec =  2;
     m_tout.tv_usec = 0;
 
@@ -1067,6 +1070,9 @@ std::string DaqOperator::getConfFilePath()
     return mypath;
 }
 
+/***************************************************/
+// Web page functions
+/***************************************************/
 std::string DaqOperator::getMsg()
 {
     return m_msg;
@@ -1337,7 +1343,9 @@ int DaqOperator::command_dummy()
     //std::cout << "command_dummy: enter" << std::endl;
     return 0;
 }
-
+/********************************************************/
+// Web page function end
+/********************************************************/
 void DaqOperator::createDom_ok(std::string name)
 {
     DAQMW::CreateDom createDom;
