@@ -90,3 +90,10 @@ interface DAQService
     FatalErrorStatus getFatalStatus();
 };
 
+interface HeartBeat
+{
+	int Operator_send();
+	int Operator_recv();
+	int Component_send();
+	int Component_recv();
+}
