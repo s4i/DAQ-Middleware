@@ -255,7 +255,7 @@ def file_clean(path):
                 os.system('make')
             os.chdir(current)
         print(''.join(make_result)),
-        print('File clean finished')
+        print('Make finished')
         sys.exit(0)
     elif re.match('rm', path) != None:
         print('File clean execution'),
