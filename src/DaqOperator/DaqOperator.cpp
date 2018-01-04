@@ -48,7 +48,6 @@ DaqOperator* DaqOperator::Instance()
 
 DaqOperator::DaqOperator(RTC::Manager* manager)
   : RTC::DataFlowComponentBase(manager),
-    m_comp_num(0),
     m_service_num(0),
     m_state(LOADED),
     m_runNumber(0),
@@ -124,7 +123,7 @@ DaqOperator::DaqOperator(RTC::Manager* manager)
 
    m_tout.tv_sec =  3;
    m_tout.tv_usec = 0;
-}
+};
 
 DaqOperator::~DaqOperator()
 {
@@ -158,6 +157,17 @@ RTC::ReturnCode_t DaqOperator::onActivated(RTC::UniqueId ec_id)
     return RTC::RTC_OK;
 }
 
+int DaqOperator::set_heart_beat()
+{
+    HeartBeat* hb = new HeartBeat;
+    hb->hb_word = "HB";
+    for (int i = 0; i < m_comp_num; i++) {
+        set_hb(m_daqservices[i], *hb);
+        //hb_check_done(m_daqservices[i]);
+    }
+    delete hb;
+    return 0;
+}
 
 RTC::ReturnCode_t DaqOperator::onExecute(RTC::UniqueId ec_id)
 {
@@ -167,6 +177,16 @@ RTC::ReturnCode_t DaqOperator::onExecute(RTC::UniqueId ec_id)
         ret = run_console_mode();
     else
         ret = run_http_mode();
+
+    // HeartBeat
+    if (!first_flag) {
+        reset_send_count();
+        first_flag = true;
+    }
+
+    int send_count = inc_send_count();
+    if (send_count % 1200 == 0)
+        set_heart_beat();
 
     return ret;
 }
@@ -299,9 +319,6 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
     FatalErrorStatus_var d_message[m_comp_num];
     Status_var chkStatus;
     resFlag = false;
-
-    /* Heart Beat */
-
 
     m_tout.tv_sec =  2;
     m_tout.tv_usec = 0;
@@ -532,8 +549,8 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
                                   << "\033[39m" << std::endl;
                     }
                     else {
-                    std::cerr << "\033[31m" << d_message[i]->description
-                              << "\033[39m" << std::endl;
+                        std::cerr << "\033[31m" << d_message[i]->description
+                                  << "\033[39m" << std::endl;
                     }
                 }
             }///for
@@ -618,6 +635,39 @@ int DaqOperator::set_command(RTC::CorbaConsumer<DAQService> daqservice,
         std::cerr << "### ERROR: set command: exception occured\n ";
     }
 
+    return 0;
+}
+
+int DaqOperator::set_hb(RTC::CorbaConsumer<DAQService> daqservice,
+                             HeartBeat hb)
+{
+    int status = 0;
+
+    try {
+        status = daqservice->setHB(hb);
+    }
+    catch(...) {
+        std::cerr << "### ERROR: set heartbeat: exception occured\n ";
+    }
+
+    return 0;
+}
+
+int DaqOperator::hb_check_done(RTC::CorbaConsumer<DAQService> daqservice)
+{
+    int status = 0;
+
+    try {
+
+        while (status == 0) {
+            status = daqservice->HBcheckDone();
+            if (status == 0) {
+                usleep(0);
+            }
+        }
+    } catch(...) {
+        std::cerr << "### HBcheckDone: failed" << std::endl;
+    }
     return 0;
 }
 
@@ -787,9 +837,9 @@ int DaqOperator::restart_procedure()
 			// }
         }
 
-      for (int i = 0; i < m_comp_num; i++) {
-        // status = m_daqservices[i]->getStatus();
-	  	// 	if (status->state == CONFIGURED) {
+        for (int i = 0; i < m_comp_num; i++) {
+            // status = m_daqservices[i]->getStatus();
+            // 	if (status->state == CONFIGURED) {
             set_command(m_daqservices[i], CMD_START);
             check_done(m_daqservices[i]);
             // }

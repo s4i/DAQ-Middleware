@@ -125,6 +125,22 @@ private:
     int m_service_num;
     int set_runno(RTC::CorbaConsumer<DAQService> daqservice, unsigned runno);
     int set_command(RTC::CorbaConsumer<DAQService> daqservice,DAQCommand daqcom);
+
+    /* HeartBeat */
+    int set_hb(RTC::CorbaConsumer<DAQService> daqservice, HeartBeat hb);
+    int hb_check_done(RTC::CorbaConsumer<DAQService> daqservice);
+    int set_heart_beat();
+    int m_send_count;
+    bool first_flag;
+    int reset_send_count()
+    {
+        m_send_count = 0;
+        return 0;
+    }
+    int inc_send_count() {
+        return m_send_count++;
+    }
+
     int check_done(RTC::CorbaConsumer<DAQService> daqservice);
     int set_sitcp_num(int sitcp_num);
     int set_service_list();

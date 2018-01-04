@@ -17,7 +17,7 @@
 
 #ifndef DAQSERVICESVC_IMPL_H
 #define DAQSERVICESVC_IMPL_H
- 
+
 /*
  * Example class implementing IDL interface DAQService
  */
@@ -51,6 +51,12 @@ public:
 
     FatalErrorStatus* getFatalStatus();
 
+    /* HeartBeat */
+    RTC::ReturnCode_t setHB(const HeartBeat& hb);
+	HeartBeat* getHB();
+    HBDAQDone HBcheckDone();
+    void HBsetDone();
+
 private:
     DAQCommand m_command;
     int m_new;
@@ -60,6 +66,8 @@ private:
     FatalErrorStatus m_fatalStatus;
     NVList m_comp_params;
     CORBA::Long   m_run_no;
+    HeartBeat m_hb;
+    HBDAQDone m_hbdone;
 };
 
 #endif // DAQSERVICESVC_IMPL_H

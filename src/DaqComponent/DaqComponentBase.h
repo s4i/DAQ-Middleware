@@ -6,7 +6,7 @@
  * @author Kazuo Nakayoshi (kazuo.nakayoshi@kek.jp)
  * @author Yoshiji Yasu (yoshiji.yasu@kek.jp)
  *
- * Copyright (C) 2008-2001
+ * Copyright (C) 2008-2011
  *     Kazuo Nakayoshi and Yoshiji Yasu
  *     High Energy Accelerator Research Organization (KEK), Japan.
  *     All rights reserved.
@@ -59,7 +59,6 @@ namespace DAQMW
               m_totalDataSize(0),
               m_trans_lock(false),
               m_DAQServicePort("DAQService"),
-              m_command(CMD_NOP),
               m_state(LOADED),
               m_state_prev(LOADED),
               m_isOnError(false),
@@ -503,6 +502,7 @@ namespace DAQMW
         {
             int ret = 0;
             get_command();
+            get_heart_beat();
 
             bool status = true;
 
@@ -570,6 +570,7 @@ namespace DAQMW
                               << std::endl;
                 }
                 set_done();
+                hb_set_done();
             }
             else {
                 ///same command as previous, stay same state, do same action
@@ -602,6 +603,8 @@ namespace DAQMW
                 }
             }
             /* Heart Beat */
+            //recv_heart_beat();
+
             return ret;
         } /// daq_do()
 
@@ -653,6 +656,7 @@ namespace DAQMW
         Timer* mytimer;
 
         DAQCommand m_command;
+        HeartBeat *m_hb;
         DAQLifeCycleState m_state;
         DAQLifeCycleState m_state_prev;
 
@@ -668,6 +672,11 @@ namespace DAQMW
 
         DAQFunc m_daq_trans_func[DAQ_CMD_SIZE];
         DAQFunc m_daq_do_func[DAQ_STATE_SIZE];
+
+        int recv_heart_beat() {
+            HeartBeat_var hb;
+            return 0;
+        }
 
         int transAction(int command) {
             return (this->*m_daq_trans_func[command])();
@@ -744,6 +753,25 @@ namespace DAQMW
             return 0;
         }
 
+        int get_heart_beat()
+        {
+            m_hb = m_daq_service0.getHB();
+            if (1) {
+                std::cerr << "m_hb=" << m_hb->hb_word << std::endl;
+            }
+            if (m_hb->hb_word == "") {
+
+            }
+            return 0;
+        }
+        int hb_set_done()
+        {
+            m_daq_service0.HBsetDone();
+            if (m_debug) {
+                std::cerr << "hb_set_done()\n";
+            }
+            return 0;
+        }
         int set_done()
         {
             m_daq_service0.setDone();

@@ -21,10 +21,10 @@
  * Example implementational code for IDL interface DAQService
  */
 DAQServiceSVC_impl::DAQServiceSVC_impl()
-    : m_command(CMD_NOP), 
-      m_new(0), 
-      m_done(DONE), 
-      m_state(LOADED), 
+    : m_command(CMD_NOP),
+      m_new(0),
+      m_done(DONE),
+      m_state(LOADED),
       m_run_no(0)
 {
     // Please add extra constructor code here.
@@ -76,8 +76,8 @@ DAQCommand DAQServiceSVC_impl::getCommand()
 	///std::cerr << "new command\n";
 	m_new = 0;
 	return m_command;
-    } 
-    else 
+    }
+    else
 	return CMD_NOP;
 
 }
@@ -102,8 +102,31 @@ Status* DAQServiceSVC_impl::getStatus()
 {
     Status* mystatus = new Status;
     *mystatus = m_status;
-    
+
     return mystatus;
+}
+
+RTC::ReturnCode_t DAQServiceSVC_impl::setHB(const HeartBeat& hb)
+{
+    m_hb = hb;
+    m_hbdone = HBUNDONE;
+    return RTC::RTC_OK;
+}
+
+HeartBeat* DAQServiceSVC_impl::getHB()
+{
+    HeartBeat* hb = new HeartBeat;
+    *hb = m_hb;
+    return hb;
+}
+HBDAQDone DAQServiceSVC_impl::HBcheckDone()
+{
+    return m_hbdone;
+}
+void DAQServiceSVC_impl::HBsetDone()
+{
+    m_hbdone = HBDONE;
+    ///std::cerr << "set DONE\n";///
 }
 
 void DAQServiceSVC_impl::setCompParams(const NVList& comp_params)
@@ -116,7 +139,7 @@ NVList* DAQServiceSVC_impl::getCompParams()
     return &m_comp_params;
 }
 
-void DAQServiceSVC_impl::setRunNo(const CORBA::Long run_no) 
+void DAQServiceSVC_impl::setRunNo(const CORBA::Long run_no)
 {
     m_run_no = run_no;
 }
@@ -126,13 +149,13 @@ CORBA::Long DAQServiceSVC_impl::getRunNo()
     return m_run_no;
 }
 
-void DAQServiceSVC_impl::setFatalStatus(const FatalErrorStatus& fatalStatus) 
+void DAQServiceSVC_impl::setFatalStatus(const FatalErrorStatus& fatalStatus)
 {
     std::cerr << "### setFatalStatus:" << fatalStatus.fatalTypes << std::endl;
     m_fatalStatus = fatalStatus;
 }
 
-FatalErrorStatus* DAQServiceSVC_impl::getFatalStatus() 
+FatalErrorStatus* DAQServiceSVC_impl::getFatalStatus()
 {
     FatalErrorStatus* myfatal = new FatalErrorStatus;
     *myfatal = m_fatalStatus;

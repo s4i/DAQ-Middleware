@@ -52,7 +52,7 @@ public:
 	    perror("gettimeofday:");
 	}
 
-	suseconds_t elapsed_utime = (m_current_time.tv_sec - m_previous_time.tv_sec) * 10^6
+	suseconds_t elapsed_utime = ((m_current_time.tv_sec - m_previous_time.tv_sec) * 10^6)
 	  + (m_current_time.tv_usec - m_previous_time.tv_usec);
 
 	if(elapsed_utime > m_alarm_time_usec) {
