@@ -656,7 +656,6 @@ namespace DAQMW
         Timer* mytimer;
 
         DAQCommand m_command;
-        HeartBeat *m_hb;
         DAQLifeCycleState m_state;
         DAQLifeCycleState m_state_prev;
 
@@ -755,12 +754,10 @@ namespace DAQMW
 
         int get_heart_beat()
         {
+            HeartBeat *m_hb;
             m_hb = m_daq_service0.getHB();
             if (1) {
                 std::cerr << "m_hb=" << m_hb->hb_word << std::endl;
-            }
-            if (m_hb->hb_word == "") {
-
             }
             return 0;
         }

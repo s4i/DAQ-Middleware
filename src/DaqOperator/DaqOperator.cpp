@@ -184,9 +184,8 @@ RTC::ReturnCode_t DaqOperator::onExecute(RTC::UniqueId ec_id)
         first_flag = true;
     }
 
-    int send_count = inc_send_count();
-    if (send_count % 1200 == 0)
-        set_heart_beat();
+    //int send_count = inc_send_count();
+    set_heart_beat();
 
     return ret;
 }

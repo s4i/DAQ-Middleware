@@ -30,7 +30,8 @@
 #include <sstream>
 #include <vector>
 #include <map>
-#include <stdlib.h>
+#include <thread>
+#include <cstdlib>
 #include <sys/select.h>
 
 #include "DAQServiceStub.h"
