@@ -129,7 +129,10 @@ private:
 
     /* HeartBeat */
     int set_hb(RTC::CorbaConsumer<DAQService> daqservice, HeartBeat hb);
-    int hb_check_done(RTC::CorbaConsumer<DAQService> daqservice);
+
+    /* StartTime */
+    int set_time(RTC::CorbaConsumer<DAQService> daqservice);
+
     int set_heart_beat();
     int m_send_count;
     bool first_flag;

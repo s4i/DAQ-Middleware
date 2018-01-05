@@ -54,8 +54,10 @@ public:
     /* HeartBeat */
     RTC::ReturnCode_t setHB(const HeartBeat& hb);
 	HeartBeat* getHB();
-    HBDAQDone HBcheckDone();
-    void HBsetDone();
+
+    /* TimeSend */
+    RTC::ReturnCode_t setTimeOfDay();
+    GetTime* getTimeOfDay();
 
 private:
     DAQCommand m_command;
@@ -67,9 +69,7 @@ private:
     NVList m_comp_params;
     CORBA::Long   m_run_no;
     HeartBeat m_hb;
-    HBDAQDone m_hbdone;
+    GetTime m_start;
 };
 
 #endif // DAQSERVICESVC_IMPL_H
-
-

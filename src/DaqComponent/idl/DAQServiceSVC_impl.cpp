@@ -106,29 +106,6 @@ Status* DAQServiceSVC_impl::getStatus()
     return mystatus;
 }
 
-RTC::ReturnCode_t DAQServiceSVC_impl::setHB(const HeartBeat& hb)
-{
-    m_hb = hb;
-    m_hbdone = HBUNDONE;
-    return RTC::RTC_OK;
-}
-
-HeartBeat* DAQServiceSVC_impl::getHB()
-{
-    HeartBeat* hb = new HeartBeat;
-    *hb = m_hb;
-    return hb;
-}
-HBDAQDone DAQServiceSVC_impl::HBcheckDone()
-{
-    return m_hbdone;
-}
-void DAQServiceSVC_impl::HBsetDone()
-{
-    m_hbdone = HBDONE;
-    ///std::cerr << "set DONE\n";///
-}
-
 void DAQServiceSVC_impl::setCompParams(const NVList& comp_params)
 {
     m_comp_params = comp_params;
@@ -160,6 +137,38 @@ FatalErrorStatus* DAQServiceSVC_impl::getFatalStatus()
     FatalErrorStatus* myfatal = new FatalErrorStatus;
     *myfatal = m_fatalStatus;
     return myfatal;
+}
+
+RTC::ReturnCode_t DAQServiceSVC_impl::setHB(const HeartBeat& hb)
+{
+    m_hb = hb;
+    return RTC::RTC_OK;
+}
+
+HeartBeat* DAQServiceSVC_impl::getHB()
+{
+    HeartBeat* hb = new HeartBeat;
+    *hb = m_hb;
+    return hb;
+}
+
+RTC::ReturnCode_t DAQServiceSVC_impl::setTimeOfDay()
+{
+    time_t time_now = time(0);
+    struct tm *time_p = gmtime(&time_now);
+
+    m_start.hour = time_p->tm_hour;
+    m_start.minute = time_p->tm_min;
+    m_start.second = time_p->tm_sec;
+
+    return RTC::RTC_OK;
+}
+
+GetTime* DAQServiceSVC_impl::getTimeOfDay()
+{
+    GetTime* st = new GetTime;
+    *st = m_start;
+    return st;
 }
 
 /*

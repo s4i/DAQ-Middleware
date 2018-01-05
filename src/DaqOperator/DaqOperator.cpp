@@ -160,10 +160,9 @@ RTC::ReturnCode_t DaqOperator::onActivated(RTC::UniqueId ec_id)
 int DaqOperator::set_heart_beat()
 {
     HeartBeat* hb = new HeartBeat;
-    hb->hb_word = "HB";
+    hb->hb_word = '0';
     for (int i = 0; i < m_comp_num; i++) {
         set_hb(m_daqservices[i], *hb);
-        //hb_check_done(m_daqservices[i]);
     }
     delete hb;
     return 0;
@@ -184,7 +183,6 @@ RTC::ReturnCode_t DaqOperator::onExecute(RTC::UniqueId ec_id)
         first_flag = true;
     }
 
-    //int send_count = inc_send_count();
     set_heart_beat();
 
     return ret;
@@ -349,6 +347,11 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 
     // command check
     if (FD_ISSET(0, &m_rset)) {
+        /* Start time set */
+        for (int i = (m_comp_num - 1); i >= 0; i--) {
+            set_time(m_daqservices[i]);
+        }
+
         char comm[2];
         if (read(0, comm, sizeof(comm)) == -1) { //read(0:stdin))
             return RTC::RTC_OK;
@@ -640,10 +643,8 @@ int DaqOperator::set_command(RTC::CorbaConsumer<DAQService> daqservice,
 int DaqOperator::set_hb(RTC::CorbaConsumer<DAQService> daqservice,
                              HeartBeat hb)
 {
-    int status = 0;
-
     try {
-        status = daqservice->setHB(hb);
+        daqservice->setHB(hb);
     }
     catch(...) {
         std::cerr << "### ERROR: set heartbeat: exception occured\n ";
@@ -652,21 +653,15 @@ int DaqOperator::set_hb(RTC::CorbaConsumer<DAQService> daqservice,
     return 0;
 }
 
-int DaqOperator::hb_check_done(RTC::CorbaConsumer<DAQService> daqservice)
+int DaqOperator::set_time(RTC::CorbaConsumer<DAQService> daqservice)
 {
-    int status = 0;
-
     try {
-
-        while (status == 0) {
-            status = daqservice->HBcheckDone();
-            if (status == 0) {
-                usleep(0);
-            }
-        }
-    } catch(...) {
-        std::cerr << "### HBcheckDone: failed" << std::endl;
+        daqservice->setTimeOfDay();
     }
+    catch(...) {
+        std::cerr << "### ERROR: set starttime: exception occured\n ";
+    }
+
     return 0;
 }
 

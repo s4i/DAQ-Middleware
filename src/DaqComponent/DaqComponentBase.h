@@ -570,7 +570,7 @@ namespace DAQMW
                               << std::endl;
                 }
                 set_done();
-                hb_set_done();
+                get_start_time();
             }
             else {
                 ///same command as previous, stay same state, do same action
@@ -761,11 +761,12 @@ namespace DAQMW
             }
             return 0;
         }
-        int hb_set_done()
+        int get_start_time()
         {
-            m_daq_service0.HBsetDone();
-            if (m_debug) {
-                std::cerr << "hb_set_done()\n";
+            GetTime *m_st;
+            m_st = m_daq_service0.TimeOfDay();
+            if (1) {
+                std::cerr << "m_hb=" << m_st->hour << std::endl;
             }
             return 0;
         }
