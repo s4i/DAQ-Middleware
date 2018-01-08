@@ -14,6 +14,7 @@
  */
 
 #include <iostream>
+#include <time.h>
 #include "DAQServiceSVC_impl.h"
 #include <rtm/CORBA_SeqUtil.h>
 
@@ -139,10 +140,9 @@ FatalErrorStatus* DAQServiceSVC_impl::getFatalStatus()
     return myfatal;
 }
 
-RTC::ReturnCode_t DAQServiceSVC_impl::setHB(const HeartBeat& hb)
+void DAQServiceSVC_impl::setHB(const HeartBeat& hb)
 {
     m_hb = hb;
-    return RTC::RTC_OK;
 }
 
 HeartBeat* DAQServiceSVC_impl::getHB()
@@ -152,21 +152,19 @@ HeartBeat* DAQServiceSVC_impl::getHB()
     return hb;
 }
 
-RTC::ReturnCode_t DAQServiceSVC_impl::setTimeOfDay()
+void DAQServiceSVC_impl::setTimeOfDay()
 {
-    time_t time_now = time(0);
-    struct tm *time_p = gmtime(&time_now);
+    time_t now = time(NULL);
+    struct tm *time_jpn = localtime(&now);
 
-    m_start.hour = time_p->tm_hour;
-    m_start.minute = time_p->tm_min;
-    m_start.second = time_p->tm_sec;
-
-    return RTC::RTC_OK;
+    m_start.hour = time_jpn->tm_hour;
+    m_start.minute = time_jpn->tm_min;
+    m_start.second = time_jpn->tm_sec;
 }
 
-GetTime* DAQServiceSVC_impl::getTimeOfDay()
+TimeOfDay* DAQServiceSVC_impl::getTimeOfDay()
 {
-    GetTime* st = new GetTime;
+    TimeOfDay* st = new TimeOfDay;
     *st = m_start;
     return st;
 }

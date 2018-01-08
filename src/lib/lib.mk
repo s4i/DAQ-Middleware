@@ -9,7 +9,7 @@ LIBRARY_SO_API            = $(LIBRARY_SO).$(API_VERSION)
 LIBRARY_SO_API_PATCHLEVEL = $(LIBRARY_SO).$(API_VERSION).$(PATCHLEVEL)
 
 CFLAGS   = -g -pipe -O2 -Wall
-CXXFLAGS = $(CFLAGS) -std=c++11 -pthread
+CXXFLAGS = $(CFLAGS) -std=c++11
 CPPFLAGS = $(addprefix -I, $(INC_DIRS))
 ARFLAGS  = r
 PIC_OPT  = -fPIC

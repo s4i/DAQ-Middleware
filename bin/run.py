@@ -1051,7 +1051,12 @@ def DaqOperatorBooting():
 
 
 def main():
-    file_clean(sys.argv[1])
+    try:
+        file_clean(sys.argv[1])
+    except KeyboardInterrupt:
+        print('Bye')
+        sys.exit(0)
+
     #
     # get command line options
     #

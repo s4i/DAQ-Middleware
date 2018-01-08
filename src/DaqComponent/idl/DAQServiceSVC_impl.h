@@ -51,13 +51,10 @@ public:
 
     FatalErrorStatus* getFatalStatus();
 
-    /* HeartBeat */
-    RTC::ReturnCode_t setHB(const HeartBeat& hb);
 	HeartBeat* getHB();
-
-    /* TimeSend */
-    RTC::ReturnCode_t setTimeOfDay();
-    GetTime* getTimeOfDay();
+    TimeOfDay* getTimeOfDay();
+    void setHB(const HeartBeat& hb);
+    void setTimeOfDay();
 
 private:
     DAQCommand m_command;
@@ -69,7 +66,7 @@ private:
     NVList m_comp_params;
     CORBA::Long   m_run_no;
     HeartBeat m_hb;
-    GetTime m_start;
+    TimeOfDay m_start;
 };
 
 #endif // DAQSERVICESVC_IMPL_H

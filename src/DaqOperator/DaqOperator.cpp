@@ -89,7 +89,11 @@ DaqOperator::DaqOperator(RTC::Manager* manager)
     /// create CorbaConsumer for the number of components
     for (int i = 0; i < m_comp_num; i++) {
        RTC::CorbaConsumer<DAQService> daqservice;
+       RTC::CorbaConsumer<HeartBeatService> hbs;
+       RTC::CorbaConsumer<TimeOfDayService> tods;
        m_daqservices.push_back(daqservice);
+       m_hbs.push_back(hbs);
+       m_tods.push_back(tods);
     }
     if (m_debug) {
         std::cerr << "*** m_daqservices.size():" << m_daqservices.size() << std::endl;
@@ -162,7 +166,7 @@ int DaqOperator::set_heart_beat()
     HeartBeat* hb = new HeartBeat;
     hb->hb_word = '0';
     for (int i = 0; i < m_comp_num; i++) {
-        set_hb(m_daqservices[i], *hb);
+        set_hb(m_hbs[i], *hb);
     }
     delete hb;
     return 0;
@@ -349,7 +353,7 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
     if (FD_ISSET(0, &m_rset)) {
         /* Start time set */
         for (int i = (m_comp_num - 1); i >= 0; i--) {
-            set_time(m_daqservices[i]);
+            set_time(m_tods[i]);
         }
 
         char comm[2];
@@ -628,10 +632,8 @@ int DaqOperator::set_runno(RTC::CorbaConsumer<DAQService> daqservice, unsigned r
 int DaqOperator::set_command(RTC::CorbaConsumer<DAQService> daqservice,
                              DAQCommand daqcom)
 {
-    int status = 0;
-
     try {
-        status = daqservice->setCommand(daqcom);
+        daqservice->setCommand(daqcom);
     }
     catch(...) {
         std::cerr << "### ERROR: set command: exception occured\n ";
@@ -640,28 +642,16 @@ int DaqOperator::set_command(RTC::CorbaConsumer<DAQService> daqservice,
     return 0;
 }
 
-int DaqOperator::set_hb(RTC::CorbaConsumer<DAQService> daqservice,
+int DaqOperator::set_hb(RTC::CorbaConsumer<HeartBeatService> hbs,
                              HeartBeat hb)
 {
-    try {
-        daqservice->setHB(hb);
-    }
-    catch(...) {
-        std::cerr << "### ERROR: set heartbeat: exception occured\n ";
-    }
-
+    hbs->setHB(hb);
     return 0;
 }
 
-int DaqOperator::set_time(RTC::CorbaConsumer<DAQService> daqservice)
+int DaqOperator::set_time(RTC::CorbaConsumer<TimeOfDayService> tods)
 {
-    try {
-        daqservice->setTimeOfDay();
-    }
-    catch(...) {
-        std::cerr << "### ERROR: set starttime: exception occured\n ";
-    }
-
+    tods->setTimeOfDay();
     return 0;
 }
 

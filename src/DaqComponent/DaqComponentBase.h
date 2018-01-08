@@ -570,7 +570,7 @@ namespace DAQMW
                               << std::endl;
                 }
                 set_done();
-                get_start_time();
+                get_time();
             }
             else {
                 ///same command as previous, stay same state, do same action
@@ -659,6 +659,9 @@ namespace DAQMW
         DAQLifeCycleState m_state;
         DAQLifeCycleState m_state_prev;
 
+        HeartBeat *m_hb;
+        TimeOfDay *m_tods;
+
         std::string m_err_message;
 
         bool m_isOnError;
@@ -673,7 +676,6 @@ namespace DAQMW
         DAQFunc m_daq_do_func[DAQ_STATE_SIZE];
 
         int recv_heart_beat() {
-            HeartBeat_var hb;
             return 0;
         }
 
@@ -754,19 +756,19 @@ namespace DAQMW
 
         int get_heart_beat()
         {
-            HeartBeat *m_hb;
             m_hb = m_daq_service0.getHB();
             if (1) {
                 std::cerr << "m_hb=" << m_hb->hb_word << std::endl;
             }
             return 0;
         }
-        int get_start_time()
+        int get_time()
         {
-            GetTime *m_st;
-            m_st = m_daq_service0.TimeOfDay();
+            m_tods = m_daq_service0.getTimeOfDay();
             if (1) {
-                std::cerr << "m_hb=" << m_st->hour << std::endl;
+                std::cerr << "hour=" << m_tods->hour << std::endl;
+                std::cerr << "minute=" << m_tods->minute << std::endl;
+                std::cerr << "second=" << m_tods->second << std::endl;
             }
             return 0;
         }

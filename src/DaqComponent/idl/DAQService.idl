@@ -75,10 +75,10 @@ struct Status
 
 struct HeartBeat
 {
-	string hb_word;
+	char hb_word;
 };
 
-struct GetTime
+struct TimeOfDay
 {
 	short hour;
 	short minute;
@@ -100,10 +100,16 @@ interface DAQService
 	long getRunNo();
 	void setFatalStatus(in FatalErrorStatus fatalStaus);
 	FatalErrorStatus getFatalStatus();
-    /* HeartBeat */
-	RTC::ReturnCode_t setHB(in HeartBeat hb);
+};
+
+interface HeartBeatService
+{
+	void setHB(in HeartBeat hb);
 	HeartBeat getHB();
-    /* SetTime */
-	RTC::ReturnCode_t setTimeOfDay();
-	GetTime getTimeOfDay();
+};
+
+interface TimeOfDayService
+{
+	void setTimeOfDay();
+	TimeOfDay getTimeOfDay();
 };

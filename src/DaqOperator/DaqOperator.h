@@ -116,6 +116,8 @@ public:
 protected:
     std::vector<RTC::CorbaPort *> m_DaqServicePorts;
     std::vector<RTC::CorbaConsumer<DAQService> > m_daqservices;
+    std::vector<RTC::CorbaConsumer<HeartBeatService> > m_hbs;
+    std::vector<RTC::CorbaConsumer<TimeOfDayService> > m_tods;
     ///std::list<RTC::CorbaConsumer<DAQService> > m_daqservices;
 
 private:
@@ -128,10 +130,10 @@ private:
     int set_command(RTC::CorbaConsumer<DAQService> daqservice,DAQCommand daqcom);
 
     /* HeartBeat */
-    int set_hb(RTC::CorbaConsumer<DAQService> daqservice, HeartBeat hb);
+    int set_hb(RTC::CorbaConsumer<HeartBeatService> hbs, HeartBeat hb);
 
-    /* StartTime */
-    int set_time(RTC::CorbaConsumer<DAQService> daqservice);
+    /* Time */
+    int set_time(RTC::CorbaConsumer<TimeOfDayService> tods);
 
     int set_heart_beat();
     int m_send_count;
