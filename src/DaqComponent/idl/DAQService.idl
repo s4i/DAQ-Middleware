@@ -75,7 +75,7 @@ struct Status
 
 struct HeartBeat
 {
-	char hb_word;
+	string hb_word;
 };
 
 struct TimeOfDay
@@ -104,12 +104,12 @@ interface DAQService
 
 interface HeartBeatService
 {
-	void setHB(in HeartBeat hb);
+	RTC::ReturnCode_t setHB(in HeartBeat hb);
 	HeartBeat getHB();
 };
 
 interface TimeOfDayService
 {
-	void setTimeOfDay();
+	RTC::ReturnCode_t setTimeOfDay();
 	TimeOfDay getTimeOfDay();
 };

@@ -59,6 +59,8 @@ namespace DAQMW
               m_totalDataSize(0),
               m_trans_lock(false),
               m_DAQServicePort("DAQService"),
+              m_HeartBeatServicePort("HeartBeatService"),
+              m_TimeOfDayServicePort("TimeOfDayService"),
               m_state(LOADED),
               m_state_prev(LOADED),
               m_isOnError(false),
@@ -79,6 +81,9 @@ namespace DAQMW
     protected:
 
         DAQServiceSVC_impl m_daq_service0;
+        DAQServiceSVC_impl m_hbs0;
+        DAQServiceSVC_impl m_tods0;
+
         Status m_status;
 
         static const unsigned int  HEADER_BYTE_SIZE = 8;
@@ -218,6 +223,20 @@ namespace DAQMW
 
             // Set CORBA Service Ports
             registerPort(m_DAQServicePort);
+            return 0;
+        }
+
+        int init_hbs_port()
+        {
+            m_HeartBeatServicePort.registerProvider("hbs_svc", "HeartBeatService", m_hbs0);
+            registerPort(m_HeartBeatServicePort);
+            return 0;
+        }
+
+        int init_tods_port()
+        {
+            m_TimeOfDayServicePort.registerProvider("tods_svc", "TimeOfDayService", m_tods0);
+            registerPort(m_TimeOfDayServicePort);
             return 0;
         }
 
@@ -652,6 +671,8 @@ namespace DAQMW
         bool m_trans_lock;
 
         RTC::CorbaPort m_DAQServicePort;
+        RTC::CorbaPort m_HeartBeatServicePort;
+        RTC::CorbaPort m_TimeOfDayServicePort;
 
         Timer* mytimer;
 
@@ -756,22 +777,24 @@ namespace DAQMW
 
         int get_heart_beat()
         {
-            m_hb = m_daq_service0.getHB();
+            m_hb = m_hbs0.getHB();
             if (1) {
-                std::cerr << "m_hb=" << m_hb->hb_word << std::endl;
+                std::cerr << "\"" << m_hb->hb_word << "\"" << std::endl;
             }
             return 0;
         }
+
         int get_time()
         {
-            m_tods = m_daq_service0.getTimeOfDay();
+            m_tods = m_tods0.getTimeOfDay();
             if (1) {
-                std::cerr << "hour=" << m_tods->hour << std::endl;
-                std::cerr << "minute=" << m_tods->minute << std::endl;
-                std::cerr << "second=" << m_tods->second << std::endl;
+                std::cerr << m_tods->hour << ":"
+                        << m_tods->minute << ":"
+                        << m_tods->second << std::endl;
             }
             return 0;
         }
+
         int set_done()
         {
             m_daq_service0.setDone();

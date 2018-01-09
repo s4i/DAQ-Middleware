@@ -53,8 +53,8 @@ public:
 
 	HeartBeat* getHB();
     TimeOfDay* getTimeOfDay();
-    void setHB(const HeartBeat& hb);
-    void setTimeOfDay();
+    RTC::ReturnCode_t setHB(const HeartBeat& hb);
+    RTC::ReturnCode_t setTimeOfDay();
 
 private:
     DAQCommand m_command;

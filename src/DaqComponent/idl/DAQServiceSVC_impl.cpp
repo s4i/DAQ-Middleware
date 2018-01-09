@@ -140,9 +140,10 @@ FatalErrorStatus* DAQServiceSVC_impl::getFatalStatus()
     return myfatal;
 }
 
-void DAQServiceSVC_impl::setHB(const HeartBeat& hb)
+RTC::ReturnCode_t DAQServiceSVC_impl::setHB(const HeartBeat& hb)
 {
     m_hb = hb;
+    return RTC::RTC_OK;
 }
 
 HeartBeat* DAQServiceSVC_impl::getHB()
@@ -152,7 +153,7 @@ HeartBeat* DAQServiceSVC_impl::getHB()
     return hb;
 }
 
-void DAQServiceSVC_impl::setTimeOfDay()
+RTC::ReturnCode_t DAQServiceSVC_impl::setTimeOfDay()
 {
     time_t now = time(NULL);
     struct tm *time_jpn = localtime(&now);
@@ -160,6 +161,8 @@ void DAQServiceSVC_impl::setTimeOfDay()
     m_start.hour = time_jpn->tm_hour;
     m_start.minute = time_jpn->tm_min;
     m_start.second = time_jpn->tm_sec;
+
+    return RTC::RTC_OK;
 }
 
 TimeOfDay* DAQServiceSVC_impl::getTimeOfDay()

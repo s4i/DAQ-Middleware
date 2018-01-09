@@ -107,13 +107,21 @@ DaqOperator::DaqOperator(RTC::Manager* manager)
         if (m_debug) {
             std::cerr << "service name: " << service_name << std::endl;
         }
-        m_DaqServicePorts.push_back(new RTC::CorbaPort(service_name.c_str() ));
+        m_DaqServicePorts.push_back(new RTC::CorbaPort(service_name.c_str()));
+        m_HeartBeatServicePorts.push_back(new RTC::CorbaPort(service_name.c_str()));
+        m_TimeOfDayServicePorts.push_back(new RTC::CorbaPort(service_name.c_str()));
     }
     /// register CorbaPort
     for (int i = 0; i< m_comp_num; i++) {
         m_DaqServicePorts[i]->
-            registerConsumer("daq_svc", "DAQService", m_daqservices[i] );
+            registerConsumer("daq_svc", "DAQService", m_daqservices[i]);
+        m_HeartBeatServicePorts[i]->
+            registerConsumer("hbs_svc", "HeartBeatService", m_hbs[i]);
+        m_TimeOfDayServicePorts[i]->
+            registerConsumer("tods_svc", "TimeOfDayService", m_tods[i]);
         registerPort( *m_DaqServicePorts[i] );
+        registerPort( *m_HeartBeatServicePorts[i] );
+        registerPort( *m_TimeOfDayServicePorts[i] );
         if (m_debug) {
             std::cerr << "m_daqservices.size() = "
                       << m_daqservices.size() << std::endl;
@@ -161,17 +169,6 @@ RTC::ReturnCode_t DaqOperator::onActivated(RTC::UniqueId ec_id)
     return RTC::RTC_OK;
 }
 
-int DaqOperator::set_heart_beat()
-{
-    HeartBeat* hb = new HeartBeat;
-    hb->hb_word = '0';
-    for (int i = 0; i < m_comp_num; i++) {
-        set_hb(m_hbs[i], *hb);
-    }
-    delete hb;
-    return 0;
-}
-
 RTC::ReturnCode_t DaqOperator::onExecute(RTC::UniqueId ec_id)
 {
     RTC::ReturnCode_t ret = RTC::RTC_OK;
@@ -182,13 +179,12 @@ RTC::ReturnCode_t DaqOperator::onExecute(RTC::UniqueId ec_id)
         ret = run_http_mode();
 
     // HeartBeat
-    if (!first_flag) {
-        reset_send_count();
-        first_flag = true;
-    }
+    // if (!first_flag) {
+    //     reset_send_count();
+    //     first_flag = true;
+    // }
 
     set_heart_beat();
-
     return ret;
 }
 
@@ -351,11 +347,7 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 
     // command check
     if (FD_ISSET(0, &m_rset)) {
-        /* Start time set */
-        for (int i = (m_comp_num - 1); i >= 0; i--) {
-            set_time(m_tods[i]);
-        }
-
+        /* set time position */
         char comm[2];
         if (read(0, comm, sizeof(comm)) == -1) { //read(0:stdin))
             return RTC::RTC_OK;
@@ -632,6 +624,7 @@ int DaqOperator::set_runno(RTC::CorbaConsumer<DAQService> daqservice, unsigned r
 int DaqOperator::set_command(RTC::CorbaConsumer<DAQService> daqservice,
                              DAQCommand daqcom)
 {
+    int status = 0;
     try {
         daqservice->setCommand(daqcom);
     }
@@ -642,16 +635,47 @@ int DaqOperator::set_command(RTC::CorbaConsumer<DAQService> daqservice,
     return 0;
 }
 
-int DaqOperator::set_hb(RTC::CorbaConsumer<HeartBeatService> hbs,
-                             HeartBeat hb)
+int DaqOperator::set_heart_beat()
 {
-    hbs->setHB(hb);
+    HeartBeat* hb = new HeartBeat;
+    hb->hb_word = "0";
+    for (int i = 0; i < m_comp_num; i++) {
+        set_hb(m_hbs[i], *hb);
+    }
+    delete hb;
     return 0;
 }
 
-int DaqOperator::set_time(RTC::CorbaConsumer<TimeOfDayService> tods)
+int DaqOperator::set_hb(RTC::CorbaConsumer<HeartBeatService> hbs,
+                             HeartBeat hb)
 {
-    tods->setTimeOfDay();
+    int status = 0;
+    try {
+        status = hbs->setHB(hb);
+    }
+    catch(...) {
+        std::cerr << "### ERROR: set heartbeat: exception occured\n ";
+    }
+    return 0;
+}
+
+int DaqOperator::set_time()
+{
+    for (int i = 0; i < m_comp_num; i++) {
+        set_tods(m_tods[i]);
+    }
+    return 0;
+}
+
+int DaqOperator::set_tods(RTC::CorbaConsumer<TimeOfDayService> tods)
+{
+    int status = 0;
+    try {
+        status = tods->setTimeOfDay();
+    }
+    catch(...) {
+        std::cerr << "### ERROR: set time: exception occured\n ";
+    }
     return 0;
 }
 
@@ -1071,8 +1095,12 @@ int DaqOperator::log_procedure()
 void DaqOperator::addCorbaPort()
 {
     RTC::CorbaConsumer<DAQService> daqservice;
+    RTC::CorbaConsumer<HeartBeatService> hbs;
+    RTC::CorbaConsumer<TimeOfDayService> tods;
 
     m_daqservices.push_back(daqservice);
+    m_hbs.push_back(hbs);
+    m_tods.push_back(tods);
 
     std::stringstream strstream;
     strstream << m_service_num++;
