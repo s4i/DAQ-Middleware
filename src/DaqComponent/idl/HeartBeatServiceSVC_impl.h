@@ -9,16 +9,18 @@ class HeartBeatServiceSVC_impl
 	: public virtual POA_HeartBeatService,
       public virtual PortableServer::RefCountServantBase
 {
-private:
 public:
 	HeartBeatServiceSVC_impl();
 	virtual ~HeartBeatServiceSVC_impl();
 
-    void setHeartBeat(const CORBA::Char hb);
-	CORBA::Char getHeartBeat();
+	void setOperatorToComp(const CORBA::Char hb);
+	CORBA::Char getOperatorToComp();
+	void setCompToOperator(const CORBA::Char hb);
+	CORBA::Char getCompToOperator();
 
 private:
-    CORBA::Char m_hbs;
+    CORBA::Char m_oc;
+	CORBA::Char m_co;
 };
 
 #endif // HEARTBEATSERVICESVC_IMPL_H

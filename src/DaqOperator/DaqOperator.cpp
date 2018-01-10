@@ -175,18 +175,18 @@ RTC::ReturnCode_t DaqOperator::onExecute(RTC::UniqueId ec_id)
 {
     RTC::ReturnCode_t ret = RTC::RTC_OK;
 
+    // HeartBeat
+    if (!first_flag) {
+        reset_send_count();
+        first_flag = true;
+    }
+    set_hb_to_component();
+
     if (m_isConsoleMode == true)
         ret = run_console_mode();
     else
         ret = run_http_mode();
 
-    // HeartBeat
-    // if (!first_flag) {
-    //     reset_send_count();
-    //     first_flag = true;
-    // }
-
-    set_heart_beat();
     return ret;
 }
 
@@ -318,6 +318,12 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
     FatalErrorStatus_var d_message[m_comp_num];
     Status_var chkStatus;
     resFlag = false;
+
+    /* Heart Beat */
+    get_hb_from_component();
+
+    /* Time set */
+    set_time();
 
     m_tout.tv_sec =  2;
     m_tout.tv_usec = 0;
@@ -628,7 +634,7 @@ int DaqOperator::set_command(RTC::CorbaConsumer<DAQService> daqservice,
 {
     int status = 0;
     try {
-        daqservice->setCommand(daqcom);
+        status = daqservice->setCommand(daqcom);
     }
     catch(...) {
         std::cerr << "### ERROR: set command: exception occured\n ";
@@ -637,16 +643,44 @@ int DaqOperator::set_command(RTC::CorbaConsumer<DAQService> daqservice,
     return 0;
 }
 
-int DaqOperator::set_heart_beat()
+int DaqOperator::set_hb_to_component()
 {
-    char hb = '1';
+    m_hb = '1';
 
     for (int i = 0; i < m_comp_num; i++) {
         try {
-            m_hbs[i]->setHeartBeat(hb);
+            m_hbs[i]->setOperatorToComp(m_hb);
         }
         catch(...) {
-            std::cerr << "### ERROR: set heartbeat: exception occured\n ";
+
+        }
+    }
+    return 0;
+}
+
+int DaqOperator::get_hb_from_component()
+{
+    char hb_result = '1';
+    hb_count = 0;
+    Status_var status;
+    for (int i = 0; i < m_comp_num; i++) {
+        status = m_daqservices[i]->getStatus();
+        try {
+            hb_result = m_hbs[i]->getCompToOperator();
+        }
+        catch(...) {
+
+        }
+        if (hb_result == '1') { // success return 0(Component)
+            inc_send_count();
+            if (m_send_count >= 20000) {
+                reset_send_count();
+                deadFlag = true;
+            }
+        }
+        if (status->comp_status == COMP_FATAL && hb_result == '1')
+        {
+            resFlag = true;
         }
     }
     return 0;

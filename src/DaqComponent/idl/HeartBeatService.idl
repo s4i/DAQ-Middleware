@@ -2,6 +2,8 @@
 
 interface HeartBeatService
 {
-	void setHeartBeat(in char hb);
-	char getHeartBeat();
+	void setOperatorToComp(in char hb);
+	char getOperatorToComp();
+	void setCompToOperator(in char hb);
+	char getCompToOperator();
 };

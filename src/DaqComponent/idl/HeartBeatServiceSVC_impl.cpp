@@ -1,11 +1,33 @@
 #include "HeartBeatServiceSVC_impl.h"
 
-void HeartBeatServiceSVC_impl::setHeartBeat(const CORBA::Char hb)
+HeartBeatServiceSVC_impl::HeartBeatServiceSVC_impl()
+    : m_oc('1'),
+      m_co('1')
 {
-    m_hbs = hb;
+
 }
 
-CORBA::Char HeartBeatServiceSVC_impl::getHeartBeat()
+HeartBeatServiceSVC_impl::~HeartBeatServiceSVC_impl()
 {
-    return m_hbs;
+
+}
+
+void HeartBeatServiceSVC_impl::setOperatorToComp(const CORBA::Char hb)
+{
+    m_oc = hb;
+}
+
+CORBA::Char HeartBeatServiceSVC_impl::getOperatorToComp()
+{
+    return m_oc;
+}
+
+void HeartBeatServiceSVC_impl::setCompToOperator(const CORBA::Char hb)
+{
+    m_co = hb;
+}
+
+CORBA::Char HeartBeatServiceSVC_impl::getCompToOperator()
+{
+    return m_co;
 }

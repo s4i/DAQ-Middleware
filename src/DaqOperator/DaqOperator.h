@@ -139,19 +139,22 @@ private:
     int set_command(RTC::CorbaConsumer<DAQService> daqservice,DAQCommand daqcom);
 
     /* HeartBeat */
-    int set_heart_beat();
+    char m_hb;
+    int hb_count;
+    int set_hb_to_component();
+    int get_hb_from_component();
+
     /* Time */
     int set_time();
 
     int m_send_count;
     bool first_flag;
-    int reset_send_count()
+    void reset_send_count()
     {
         m_send_count = 0;
-        return 0;
     }
-    int inc_send_count() {
-        return m_send_count++;
+    void inc_send_count() {
+        m_send_count++;
     }
 
     int check_done(RTC::CorbaConsumer<DAQService> daqservice);
@@ -214,6 +217,7 @@ private:
     std::string m_config_file_tmp;
 
     bool resFlag;
+    bool deadFlag;
 
     bool m_debug;
 };

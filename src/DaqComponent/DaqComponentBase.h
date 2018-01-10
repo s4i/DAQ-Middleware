@@ -65,8 +65,10 @@ namespace DAQMW
               m_totalDataSize(0),
               m_trans_lock(false),
               m_DAQServicePort("DAQService"),
-              m_HeartBeatServicePort("HeartBeatService"),
+              m_HBSPort("HeartBeatService"),
               m_TimeServicePort("TimeService"),
+              m_hb('0'),
+              m_usec(0),
               m_command(CMD_NOP),
               m_state(LOADED),
               m_state_prev(LOADED),
@@ -226,12 +228,17 @@ namespace DAQMW
         {
             // Set service provider to Ports
             m_DAQServicePort.registerProvider("daq_svc", "DAQService", m_daq_service0);
-            m_HeartBeatServicePort.registerProvider("hbs_svc", "HeartBeatService", m_hbs0);
-            m_TimeServicePort.registerProvider("tsp_svc", "TimeService", m_ts0);
-
             // Set CORBA Service Ports
             registerPort(m_DAQServicePort);
-            registerPort(m_HeartBeatServicePort);
+
+            // Set HeartBeat provider to Ports
+            m_HBSPort.registerProvider("hbs_svc", "HeartBeatService", m_hbs0);
+            // Set Corba HeartBeat Ports
+            registerPort(m_HBSPort);
+
+            // Set Time provider to Ports
+            m_TimeServicePort.registerProvider("ts_svc", "TimeService", m_ts0);
+            // Set Corba Time Ports
             registerPort(m_TimeServicePort);
             return 0;
         }
@@ -518,7 +525,8 @@ namespace DAQMW
         {
             int ret = 0;
             get_command();
-            get_heart_beat();
+            get_hb_from_operator();
+            set_hb_to_operator();
 
             bool status = true;
 
@@ -618,8 +626,6 @@ namespace DAQMW
                     daq_onError();
                 }
             }
-            /* Heart Beat */
-            //recv_heart_beat();
 
             return ret;
         } /// daq_do()
@@ -668,10 +674,12 @@ namespace DAQMW
         bool m_trans_lock;
 
         RTC::CorbaPort m_DAQServicePort;
-        RTC::CorbaPort m_HeartBeatServicePort;
+        RTC::CorbaPort m_HBSPort;
         RTC::CorbaPort m_TimeServicePort;
 
         Timer* mytimer;
+        char m_hb;
+        long m_usec;
 
         DAQCommand m_command;
         DAQLifeCycleState m_state;
@@ -689,10 +697,6 @@ namespace DAQMW
 
         DAQFunc m_daq_trans_func[DAQ_CMD_SIZE];
         DAQFunc m_daq_do_func[DAQ_STATE_SIZE];
-
-        int recv_heart_beat() {
-            return 0;
-        }
 
         int transAction(int command) {
             return (this->*m_daq_trans_func[command])();
@@ -769,21 +773,30 @@ namespace DAQMW
             return 0;
         }
 
-        int get_heart_beat()
+        int get_hb_from_operator()
         {
-            char m_hb = m_hbs0.getHeartBeat();
-            if (1) {
+            m_hb = m_hbs0.getOperatorToComp();
+            return 0;
+        }
+
+        int set_hb_to_operator()
+        {
+            if (m_hb == '1') {
                 std::cerr << "\"" << m_hb << "\"" << std::endl;
+                std::cerr << "OK" << std::endl;
+                m_hb = '0';
+                m_hbs0.setCompToOperator(m_hb);
+            }
+            else {
+                std::cerr << "Failed" << std::endl;
             }
             return 0;
         }
 
         int get_time()
         {
-            long tv_usec = m_ts0.getTime();
-            if (1) {
-                std::cerr << tv_usec << std::endl;
-            }
+            m_usec = m_ts0.getTime();
+            std::cerr << m_usec << std::endl;
             return 0;
         }
 

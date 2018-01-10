@@ -27,7 +27,7 @@ CPPFLAGS += -std=c++11
 SKEL_OBJ += $(AUTO_GEN_DIR)/DAQServiceSkel.o
 IMPL_OBJ += $(AUTO_GEN_DIR)/DAQServiceSVC_impl.o
 SKEL_OBJ += $(AUTO_GEN_DIR)/HeartBeatServiceSkel.o
-IKEL_OBJ += $(AUTO_GEN_DIR)/HeartBeatServiceSVC_impl.o
+IMPL_OBJ += $(AUTO_GEN_DIR)/HeartBeatServiceSVC_impl.o
 SKEL_OBJ += $(AUTO_GEN_DIR)/TimeServiceSkel.o
 IMPL_OBJ += $(AUTO_GEN_DIR)/TimeServiceSVC_impl.o
 OBJS     += $(SKEL_OBJ) $(IMPL_OBJ)
