@@ -73,18 +73,6 @@ struct Status
 	CompStatus comp_status;
 };
 
-struct HeartBeat
-{
-	string hb_word;
-};
-
-struct TimeOfDay
-{
-	short hour;
-	short minute;
-	short second;
-};
-
 interface DAQService
 {
 	DAQLifeCycleState getState();
@@ -100,16 +88,4 @@ interface DAQService
 	long getRunNo();
 	void setFatalStatus(in FatalErrorStatus fatalStaus);
 	FatalErrorStatus getFatalStatus();
-};
-
-interface HeartBeatService
-{
-	RTC::ReturnCode_t setHB(in HeartBeat hb);
-	HeartBeat getHB();
-};
-
-interface TimeOfDayService
-{
-	RTC::ReturnCode_t setTimeOfDay();
-	TimeOfDay getTimeOfDay();
 };

@@ -27,7 +27,11 @@
 #include <rtm/DataPortStatus.h>
 
 #include "DAQServiceSVC_impl.h"
+#include "HeartBeatServiceSVC_impl.h"
+#include "TimeServiceSVC_impl.h"
 #include "DAQService.hh"
+#include "HeartBeatService.hh"
+#include "TimeService.hh"
 #include "DaqComponentException.h"
 #include "Timer.h"
 
@@ -60,7 +64,7 @@ namespace DAQMW
               m_trans_lock(false),
               m_DAQServicePort("DAQService"),
               m_HeartBeatServicePort("HeartBeatService"),
-              m_TimeOfDayServicePort("TimeOfDayService"),
+              m_TimeServicePort("TimeService"),
               m_state(LOADED),
               m_state_prev(LOADED),
               m_isOnError(false),
@@ -76,14 +80,12 @@ namespace DAQMW
             delete mytimer;
         }
 
-        enum BufferStatus {BUF_FATAL = -1, BUF_SUCCESS, BUF_TIMEOUT, BUF_NODATA, BUF_NOBUF};
+        enum BufferStatus{BUF_FATAL = -1, BUF_SUCCESS, BUF_TIMEOUT, BUF_NODATA, BUF_NOBUF};
 
     protected:
-
         DAQServiceSVC_impl m_daq_service0;
-        DAQServiceSVC_impl m_hbs0;
-        DAQServiceSVC_impl m_tods0;
-
+        HeartBeatServiceSVC_impl m_hbs0;
+        TimeServiceSVC_impl m_tsp0;
         Status m_status;
 
         static const unsigned int  HEADER_BYTE_SIZE = 8;
@@ -220,23 +222,13 @@ namespace DAQMW
         {
             // Set service provider to Ports
             m_DAQServicePort.registerProvider("daq_svc", "DAQService", m_daq_service0);
+            m_HeartBeatServicePort.registerProvider("hbs_svc", "HeartBeatService", m_hbs0);
+            m_TimeServicePort.registerProvider("tsp_svc", "TimeService", m_tsp0);
 
             // Set CORBA Service Ports
             registerPort(m_DAQServicePort);
-            return 0;
-        }
-
-        int init_hbs_port()
-        {
-            m_HeartBeatServicePort.registerProvider("hbs_svc", "HeartBeatService", m_hbs0);
             registerPort(m_HeartBeatServicePort);
-            return 0;
-        }
-
-        int init_tods_port()
-        {
-            m_TimeOfDayServicePort.registerProvider("tods_svc", "TimeOfDayService", m_tods0);
-            registerPort(m_TimeOfDayServicePort);
+            registerPort(m_TimeServicePort);
             return 0;
         }
 
@@ -672,16 +664,13 @@ namespace DAQMW
 
         RTC::CorbaPort m_DAQServicePort;
         RTC::CorbaPort m_HeartBeatServicePort;
-        RTC::CorbaPort m_TimeOfDayServicePort;
+        RTC::CorbaPort m_TimeServicePort;
 
         Timer* mytimer;
 
         DAQCommand m_command;
         DAQLifeCycleState m_state;
         DAQLifeCycleState m_state_prev;
-
-        HeartBeat *m_hb;
-        TimeOfDay *m_tods;
 
         std::string m_err_message;
 
@@ -777,20 +766,20 @@ namespace DAQMW
 
         int get_heart_beat()
         {
+            char buf[20];
+            char* m_hb = buf;
             m_hb = m_hbs0.getHB();
             if (1) {
-                std::cerr << "\"" << m_hb->hb_word << "\"" << std::endl;
+                std::cerr << "\"" << m_hb << "\"" << std::endl;
             }
             return 0;
         }
 
         int get_time()
         {
-            m_tods = m_tods0.getTimeOfDay();
+            long tv_usec = m_tsp0.getTime();
             if (1) {
-                std::cerr << m_tods->hour << ":"
-                        << m_tods->minute << ":"
-                        << m_tods->second << std::endl;
+                std::cerr << tv_usec << std::endl;
             }
             return 0;
         }

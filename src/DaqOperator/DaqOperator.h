@@ -33,8 +33,11 @@
 #include <thread>
 #include <cstdlib>
 #include <sys/select.h>
+#include <sys/time.h>
 
 #include "DAQServiceStub.h"
+#include "HeartBeatServiceStub.h"
+#include "TimeServiceStub.h"
 
 #include "ComponentInfoContainer.h"
 #include "ConfFileParser.h"
@@ -116,10 +119,10 @@ public:
 protected:
     std::vector<RTC::CorbaPort *> m_DaqServicePorts;
     std::vector<RTC::CorbaPort *> m_HeartBeatServicePorts;
-    std::vector<RTC::CorbaPort *> m_TimeOfDayServicePorts;
+    std::vector<RTC::CorbaPort *> m_TimeServicePorts;
     std::vector<RTC::CorbaConsumer<DAQService> > m_daqservices;
     std::vector<RTC::CorbaConsumer<HeartBeatService> > m_hbs;
-    std::vector<RTC::CorbaConsumer<TimeOfDayService> > m_tods;
+    std::vector<RTC::CorbaConsumer<TimeService> > m_tods;
     ///std::list<RTC::CorbaConsumer<DAQService> > m_daqservices;
 
 private:
@@ -133,11 +136,8 @@ private:
 
     /* HeartBeat */
     int set_heart_beat();
-    int set_hb(RTC::CorbaConsumer<HeartBeatService> hbs, HeartBeat hb);
-
     /* Time */
     int set_time();
-    int set_tods(RTC::CorbaConsumer<TimeOfDayService> tods);
 
     int m_send_count;
     bool first_flag;

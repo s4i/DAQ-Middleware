@@ -5,8 +5,15 @@ DIR = $(DESTDIR)$(prefix)/include/daqmw/idl
 MODE = 0644
 
 FILES += DAQService.idl
+FILES += HeartBeatService.idl
+FILES += TimeService.idl
+
 FILES += DAQServiceSVC_impl.cpp
 FILES += DAQServiceSVC_impl.h
+FILES += HeartBeatServiceSVC_impl.cpp
+FILES += HeartBeatServiceSVC_impl.h
+FILES += TimeServiceSVC_impl.cpp
+FILES += TimeServiceSVC_impl.h
 
 all:
 
