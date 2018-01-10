@@ -88,12 +88,12 @@ DaqOperator::DaqOperator(RTC::Manager* manager)
 
     /// create CorbaConsumer for the number of components
     for (int i = 0; i < m_comp_num; i++) {
-       RTC::CorbaConsumer<DAQService> daqservice;
-       RTC::CorbaConsumer<HeartBeatService> hbs;
-       RTC::CorbaConsumer<TimeService> tods;
-       m_daqservices.push_back(daqservice);
-       m_hbs.push_back(hbs);
-       m_tods.push_back(tods);
+        RTC::CorbaConsumer<DAQService> daqservice;
+        RTC::CorbaConsumer<HeartBeatService> hbs;
+        RTC::CorbaConsumer<TimeService> ts;
+        m_daqservices.push_back(daqservice);
+        m_hbs.push_back(hbs);
+        m_ts.push_back(ts);
     }
     if (m_debug) {
         std::cerr << "*** m_daqservices.size():" << m_daqservices.size() << std::endl;
@@ -118,10 +118,12 @@ DaqOperator::DaqOperator(RTC::Manager* manager)
         m_HeartBeatServicePorts[i]->
             registerConsumer("hbs_svc", "HeartBeatService", m_hbs[i]);
         m_TimeServicePorts[i]->
-            registerConsumer("tods_svc", "TimeService", m_tods[i]);
+            registerConsumer("ts_svc", "TimeService", m_ts[i]);
+
         registerPort( *m_DaqServicePorts[i] );
         registerPort( *m_HeartBeatServicePorts[i] );
         registerPort( *m_TimeServicePorts[i] );
+
         if (m_debug) {
             std::cerr << "m_daqservices.size() = "
                       << m_daqservices.size() << std::endl;
@@ -637,10 +639,11 @@ int DaqOperator::set_command(RTC::CorbaConsumer<DAQService> daqservice,
 
 int DaqOperator::set_heart_beat()
 {
-    char hb[] = "1";
+    char hb = '1';
+
     for (int i = 0; i < m_comp_num; i++) {
         try {
-            m_hbs[i]->setHB(hb);
+            m_hbs[i]->setHeartBeat(hb);
         }
         catch(...) {
             std::cerr << "### ERROR: set heartbeat: exception occured\n ";
@@ -656,7 +659,7 @@ int DaqOperator::set_time()
 	gettimeofday(&start_time, &tz);
     for (int i = 0; i < m_comp_num; i++) {
         try {
-            m_tods[i]->setTime(start_time.tv_usec);
+            m_ts[i]->setTime(start_time.tv_usec);
         }
         catch(...) {
             std::cerr << "### ERROR: set time: exception occured\n ";
@@ -706,6 +709,8 @@ int DaqOperator::set_service_list()
         struct serviceInfo serviceInfo;
         serviceInfo.comp_id    = myprof[0].name;
         serviceInfo.daqService = m_daqservices[i];
+        serviceInfo.heartBeatService = m_hbs[i];
+        serviceInfo.timeService = m_ts[i];
         m_daqServiceList.push_back(serviceInfo);
     }
     return 0;
@@ -1082,11 +1087,11 @@ void DaqOperator::addCorbaPort()
 {
     RTC::CorbaConsumer<DAQService> daqservice;
     RTC::CorbaConsumer<HeartBeatService> hbs;
-    RTC::CorbaConsumer<TimeService> tods;
+    RTC::CorbaConsumer<TimeService> ts;
 
     m_daqservices.push_back(daqservice);
     m_hbs.push_back(hbs);
-    m_tods.push_back(tods);
+    m_ts.push_back(ts);
 
     std::stringstream strstream;
     strstream << m_service_num++;

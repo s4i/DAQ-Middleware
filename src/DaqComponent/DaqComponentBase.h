@@ -29,9 +29,11 @@
 #include "DAQServiceSVC_impl.h"
 #include "HeartBeatServiceSVC_impl.h"
 #include "TimeServiceSVC_impl.h"
+
 #include "DAQService.hh"
 #include "HeartBeatService.hh"
 #include "TimeService.hh"
+
 #include "DaqComponentException.h"
 #include "Timer.h"
 
@@ -65,6 +67,7 @@ namespace DAQMW
               m_DAQServicePort("DAQService"),
               m_HeartBeatServicePort("HeartBeatService"),
               m_TimeServicePort("TimeService"),
+              m_command(CMD_NOP),
               m_state(LOADED),
               m_state_prev(LOADED),
               m_isOnError(false),
@@ -83,9 +86,10 @@ namespace DAQMW
         enum BufferStatus{BUF_FATAL = -1, BUF_SUCCESS, BUF_TIMEOUT, BUF_NODATA, BUF_NOBUF};
 
     protected:
+
         DAQServiceSVC_impl m_daq_service0;
         HeartBeatServiceSVC_impl m_hbs0;
-        TimeServiceSVC_impl m_tsp0;
+        TimeServiceSVC_impl m_ts0;
         Status m_status;
 
         static const unsigned int  HEADER_BYTE_SIZE = 8;
@@ -223,7 +227,7 @@ namespace DAQMW
             // Set service provider to Ports
             m_DAQServicePort.registerProvider("daq_svc", "DAQService", m_daq_service0);
             m_HeartBeatServicePort.registerProvider("hbs_svc", "HeartBeatService", m_hbs0);
-            m_TimeServicePort.registerProvider("tsp_svc", "TimeService", m_tsp0);
+            m_TimeServicePort.registerProvider("tsp_svc", "TimeService", m_ts0);
 
             // Set CORBA Service Ports
             registerPort(m_DAQServicePort);
@@ -334,6 +338,7 @@ namespace DAQMW
         virtual int daq_stop()        = 0;
         virtual int daq_pause()       = 0;
         virtual int daq_resume()      = 0;
+
         virtual int parse_params( ::NVList* list ) = 0;
 
         void fatal_error_report(FatalType::Enum type, int code = -1)
@@ -766,9 +771,7 @@ namespace DAQMW
 
         int get_heart_beat()
         {
-            char buf[20];
-            char* m_hb = buf;
-            m_hb = m_hbs0.getHB();
+            char m_hb = m_hbs0.getHeartBeat();
             if (1) {
                 std::cerr << "\"" << m_hb << "\"" << std::endl;
             }
@@ -777,7 +780,7 @@ namespace DAQMW
 
         int get_time()
         {
-            long tv_usec = m_tsp0.getTime();
+            long tv_usec = m_ts0.getTime();
             if (1) {
                 std::cerr << tv_usec << std::endl;
             }
@@ -865,6 +868,7 @@ namespace DAQMW
             }
             return ret;
         }
+
     }; /// class
 } /// namespace
 

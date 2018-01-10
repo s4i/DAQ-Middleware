@@ -2,6 +2,6 @@
 
 interface HeartBeatService
 {
-	void setHB(in string hb);
-	string getHB();
+	void setHeartBeat(in char hb);
+	char getHeartBeat();
 };

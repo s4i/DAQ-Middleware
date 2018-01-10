@@ -1,13 +1,11 @@
 #include "HeartBeatServiceSVC_impl.h"
 
-HeartBeatServiceSVC_impl() {}
-virtual ~HeartBeatServiceSVC_impl() {}
-void HeartBeatServiceSVC_impl::setHB(const char* hb)
+void HeartBeatServiceSVC_impl::setHeartBeat(const CORBA::Char hb)
 {
-    m_hb = hb;
+    m_hbs = hb;
 }
 
-char* HeartBeatServiceSVC_impl::getHB()
+CORBA::Char HeartBeatServiceSVC_impl::getHeartBeat()
 {
-    return m_hb;
+    return m_hbs;
 }

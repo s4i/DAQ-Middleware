@@ -2,8 +2,8 @@
 
 #include "TimeServiceSkel.h"
 
-#ifndef TIMEOFDAYSERVICESVC_IMPL_H
-#define TIMEOFDAYSERVICESVC_IMPL_H
+#ifndef TIMESERVICESVC_IMPL_H
+#define TIMESERVICESVC_IMPL_H
 
 class TimeServiceSVC_impl
     : public virtual POA_TimeService,
@@ -21,4 +21,4 @@ private:
     CORBA::Long m_start;
 };
 
-#endif // TIMEOFDAYSERVICESVC_IMPL_H
+#endif // TIMESERVICESVC_IMPL_H

@@ -55,6 +55,8 @@ static const int RET_CODE_REQ_INV_IN_STS	= (-26);
 struct serviceInfo {
     std::string comp_id;
     RTC::CorbaConsumer<DAQService> daqService;
+    RTC::CorbaConsumer<HeartBeatService> heartBeatService;
+    RTC::CorbaConsumer<TimeService> timeService;
 };
 
 typedef std::vector< serviceInfo > DaqServiceList;
@@ -120,10 +122,12 @@ protected:
     std::vector<RTC::CorbaPort *> m_DaqServicePorts;
     std::vector<RTC::CorbaPort *> m_HeartBeatServicePorts;
     std::vector<RTC::CorbaPort *> m_TimeServicePorts;
+
     std::vector<RTC::CorbaConsumer<DAQService> > m_daqservices;
     std::vector<RTC::CorbaConsumer<HeartBeatService> > m_hbs;
-    std::vector<RTC::CorbaConsumer<TimeService> > m_tods;
-    ///std::list<RTC::CorbaConsumer<DAQService> > m_daqservices;
+    std::vector<RTC::CorbaConsumer<TimeService> > m_ts;
+
+    // std::list<RTC::CorbaConsumer<DAQService> > m_daqservices;
 
 private:
     static const int PARAM_PORT = 30000;

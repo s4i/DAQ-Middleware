@@ -1,5 +1,5 @@
 // -*-C++-*-
-#include <iostream>
+
 #include "HeartBeatServiceSkel.h"
 
 #ifndef HEARTBEATSERVICESVC_IMPL_H
@@ -14,11 +14,11 @@ public:
 	HeartBeatServiceSVC_impl();
 	virtual ~HeartBeatServiceSVC_impl();
 
-    void setHB(const std::string hb);
-	char* getHB();
+    void setHeartBeat(const CORBA::Char hb);
+	CORBA::Char getHeartBeat();
 
 private:
-    char* m_hb;
+    CORBA::Char m_hbs;
 };
 
 #endif // HEARTBEATSERVICESVC_IMPL_H
