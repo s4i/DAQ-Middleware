@@ -67,7 +67,6 @@ namespace DAQMW
               m_DAQServicePort("DAQService"),
               m_HBSPort("HeartBeatService"),
               m_TimeServicePort("TimeService"),
-              m_hb('0'),
               m_usec(0),
               m_command(CMD_NOP),
               m_state(LOADED),
@@ -92,6 +91,7 @@ namespace DAQMW
         DAQServiceSVC_impl m_daq_service0;
         HeartBeatServiceSVC_impl m_hbs0;
         TimeServiceSVC_impl m_ts0;
+
         Status m_status;
 
         static const unsigned int  HEADER_BYTE_SIZE = 8;
@@ -594,6 +594,8 @@ namespace DAQMW
                               << std::endl;
                 }
                 set_done();
+                hbs_set_done();
+                ts_set_done();
                 get_time();
             }
             else {
@@ -678,7 +680,8 @@ namespace DAQMW
         RTC::CorbaPort m_TimeServicePort;
 
         Timer* mytimer;
-        char m_hb;
+
+        HB m_hb;
         long m_usec;
 
         DAQCommand m_command;
@@ -775,16 +778,17 @@ namespace DAQMW
 
         int get_hb_from_operator()
         {
+            m_hb = ZERO;
             m_hb = m_hbs0.getOperatorToComp();
             return 0;
         }
 
         int set_hb_to_operator()
         {
-            if (m_hb == '1') {
-                std::cerr << "\"" << m_hb << "\"" << std::endl;
+            if (m_hb == ONE) {
+                std::cerr << "\'" << m_hb << "\'" << std::endl;
                 std::cerr << "OK" << std::endl;
-                m_hb = '0';
+                m_hb = ZERO;
                 m_hbs0.setCompToOperator(m_hb);
             }
             else {
@@ -795,6 +799,7 @@ namespace DAQMW
 
         int get_time()
         {
+            m_usec = 0;
             m_usec = m_ts0.getTime();
             std::cerr << m_usec << std::endl;
             return 0;
@@ -805,6 +810,24 @@ namespace DAQMW
             m_daq_service0.setDone();
             if (m_debug) {
                 std::cerr << "set_done()\n";
+            }
+            return 0;
+        }
+
+        int hbs_set_done()
+        {
+            m_hbs0.setDone();
+            if (m_debug) {
+                std::cerr << "hbs_set_done()\n";
+            }
+            return 0;
+        }
+
+        int ts_set_done()
+        {
+            m_ts0.setDone();
+            if (m_debug) {
+                std::cerr << "ts_set_done()\n";
             }
             return 0;
         }

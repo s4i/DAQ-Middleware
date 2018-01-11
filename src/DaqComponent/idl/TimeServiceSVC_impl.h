@@ -9,16 +9,18 @@ class TimeServiceSVC_impl
     : public virtual POA_TimeService,
       public virtual PortableServer::RefCountServantBase
 {
-private:
 public:
 	TimeServiceSVC_impl();
 	virtual ~TimeServiceSVC_impl();
 
-    void setTime(const CORBA::Long tv_usec);
+    RTC::ReturnCode_t setTime(const CORBA::Long usec);
     CORBA::Long getTime();
+    DAQDone checkDone();
+    void setDone();
 
 private:
     CORBA::Long m_start;
+    DAQDone m_done;
 };
 
 #endif // TIMESERVICESVC_IMPL_H

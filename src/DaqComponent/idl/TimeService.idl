@@ -1,7 +1,9 @@
-#include <RTC.idl>
+#include "DAQService.idl"
 
 interface TimeService
 {
-	void setTime(in long tv_usec);
+	RTC::ReturnCode_t setTime(in long usec);
 	long getTime();
+	DAQDone checkDone();
+	void    setDone();
 };

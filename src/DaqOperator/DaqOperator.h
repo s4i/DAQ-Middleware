@@ -139,9 +139,11 @@ private:
     int set_command(RTC::CorbaConsumer<DAQService> daqservice,DAQCommand daqcom);
 
     /* HeartBeat */
-    char m_hb;
+    HB m_hb;
+    HB hb_result;
     int hb_count;
     int set_hb_to_component();
+    int set_hb(RTC::CorbaConsumer<HeartBeatService> hbs, HB m_hb);
     int get_hb_from_component();
 
     /* Time */
@@ -158,6 +160,8 @@ private:
     }
 
     int check_done(RTC::CorbaConsumer<DAQService> daqservice);
+    int hbs_check_done(RTC::CorbaConsumer<HeartBeatService> hbs);
+    int ts_check_done(RTC::CorbaConsumer<TimeService> ts);
     int set_sitcp_num(int sitcp_num);
     int set_service_list();
 

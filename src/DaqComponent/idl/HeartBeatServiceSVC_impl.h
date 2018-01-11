@@ -13,14 +13,17 @@ public:
 	HeartBeatServiceSVC_impl();
 	virtual ~HeartBeatServiceSVC_impl();
 
-	void setOperatorToComp(const CORBA::Char hb);
-	CORBA::Char getOperatorToComp();
-	void setCompToOperator(const CORBA::Char hb);
-	CORBA::Char getCompToOperator();
+	RTC::ReturnCode_t setOperatorToComp(const HB hbs);
+	HB getOperatorToComp();
+	RTC::ReturnCode_t setCompToOperator(const HB hbs);
+	HB getCompToOperator();
+    DAQDone checkDone();
+    void setDone();
 
 private:
-    CORBA::Char m_oc;
-	CORBA::Char m_co;
+    HB m_oc;
+	HB m_co;
+    DAQDone m_done;
 };
 
 #endif // HEARTBEATSERVICESVC_IMPL_H

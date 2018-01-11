@@ -1,9 +1,16 @@
-#include <RTC.idl>
+#include "DAQService.idl"
+
+enum HB {
+	ZERO,
+	ONE
+};
 
 interface HeartBeatService
 {
-	void setOperatorToComp(in char hb);
-	char getOperatorToComp();
-	void setCompToOperator(in char hb);
-	char getCompToOperator();
+	RTC::ReturnCode_t setOperatorToComp(in HB hbs);
+	HB getOperatorToComp();
+	RTC::ReturnCode_t setCompToOperator(in HB hbs);
+	HB getCompToOperator();
+	DAQDone checkDone();
+	void    setDone();
 };
