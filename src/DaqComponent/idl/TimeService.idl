@@ -1,0 +1,6 @@
+#include <RTC.idl>
+interface TimeService
+{
+	RTC::ReturnCode_t setTime(in long usec);
+	long getTime();
+};

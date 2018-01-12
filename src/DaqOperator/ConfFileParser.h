@@ -49,8 +49,8 @@ struct componentInfo {
 /*!
  * @class ConfFileParser
  * @brief ConfFileParser class
- * 
- * 
+ *
+ *
  *
  */
 class ConfFileParser
@@ -68,20 +68,20 @@ public:
 
 private:
     int checkXmlFile(const char* xmlFile);
-    std::string getElementByTagName(xercesc::DOMElement* ele, 
+    std::string getElementByTagName(xercesc::DOMElement* ele,
 				    XMLCh* chName,
 				    std::string xpath);
 
-    int getElementsFromParent(xercesc::DOMElement* myEle, 
+    int getElementsFromParent(xercesc::DOMElement* myEle,
 			      XMLCh* chName,
 			      std::string xpath);
-    int getElementsFromParent(xercesc::DOMElement* myEle, 
+    int getElementsFromParent(xercesc::DOMElement* myEle,
 			      XMLCh* chName,
 			      std::string xpath,
 			      std::string gid,
 			      ComponentInfoContainer* compCont);
 
-    int getParams(xercesc::DOMElement* myEle, 
+    int getParams(xercesc::DOMElement* myEle,
 		  XMLCh* chName,
 		  std::string xpath,
 		  ///char* compId,
@@ -129,5 +129,5 @@ private:
     XMLCh* TAG_params;
     XMLCh* TAG_param;
     XMLCh* TAG_select;
-}; 
+};
 #endif

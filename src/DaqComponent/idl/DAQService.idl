@@ -73,6 +73,16 @@ struct Status
     CompStatus comp_status;
 };
 
+enum HBMSG {
+    ZERO,
+    ONE
+};
+
+enum HeartBeatDone {
+    HBUNDONE,
+    HBDONE
+};
+
 interface DAQService
 {
     DAQLifeCycleState getState();
@@ -88,12 +98,14 @@ interface DAQService
     long getRunNo();
     void setFatalStatus(in FatalErrorStatus fatalStaus);
     FatalErrorStatus getFatalStatus();
-};
 
-interface HeartBeat
-{
-	int Operator_send();
-	int Operator_recv();
-	int Component_send();
-	int Component_recv();
-}
+    RTC::ReturnCode_t setOperatorToComp();
+    HBMSG getOperatorToComp();
+    //RTC::ReturnCode_t setCompToOperator();
+    //HBMSG getCompToOperator();
+    HeartBeatDone hb_checkDone();
+    void   hb_setDone();
+
+    RTC::ReturnCode_t setTime(in long usec);
+    long getTime();
+};
