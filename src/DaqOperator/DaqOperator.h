@@ -36,8 +36,8 @@
 #include <sys/time.h>
 
 #include "DAQServiceStub.h"
-#include "HeartBeatServiceStub.h"
-#include "TimeServiceStub.h"
+//#include "HeartBeatServiceStub.h"
+//#include "TimeServiceStub.h"
 
 #include "ComponentInfoContainer.h"
 #include "ConfFileParser.h"
@@ -55,11 +55,10 @@ static const int RET_CODE_REQ_INV_IN_STS	= (-26);
 struct serviceInfo {
     std::string comp_id;
     RTC::CorbaConsumer<DAQService> daqService;
-    RTC::CorbaConsumer<HeartBeatService> heartBeatService;
-    RTC::CorbaConsumer<TimeService> timeService;
 };
 
 typedef std::vector< serviceInfo > DaqServiceList;
+typedef std::vector< serviceInfo > DaqServiceList2;
 
 /*!
  * @class DaqOperator
@@ -120,12 +119,10 @@ public:
 
 protected:
     std::vector<RTC::CorbaPort *> m_DaqServicePorts;
-    std::vector<RTC::CorbaPort *> m_HeartBeatServicePorts;
-    std::vector<RTC::CorbaPort *> m_TimeServicePorts;
+    std::vector<RTC::CorbaPort *> m_DaqServicePorts2;
 
     std::vector<RTC::CorbaConsumer<DAQService> > m_daqservices;
-    std::vector<RTC::CorbaConsumer<HeartBeatService> > m_hbs;
-    std::vector<RTC::CorbaConsumer<TimeService> > m_ts;
+    std::vector<RTC::CorbaConsumer<DAQService> > m_daqservices2;
 
     // std::list<RTC::CorbaConsumer<DAQService> > m_daqservices;
 
@@ -136,15 +133,16 @@ private:
     int m_comp_num;
     int m_service_num;
     int set_runno(RTC::CorbaConsumer<DAQService> daqservice, unsigned runno);
-    int set_command(RTC::CorbaConsumer<DAQService> daqservice,DAQCommand daqcom);
+    int set_command(RTC::CorbaConsumer<DAQService> daqservice, DAQCommand daqcom);
 
     /* HeartBeat */
-    HB m_hb;
-    HB hb_result;
+    HBMSG m_hb;
+    HBMSG hb_result;
     int hb_count;
     int set_hb_to_component();
-    int set_hb(RTC::CorbaConsumer<HeartBeatService> hbs, HB m_hb);
-    int get_hb_from_component();
+    int set_hb(RTC::CorbaConsumer<DAQService> daqservice);
+    //int get_hb_from_component();
+    int hb_check_done(RTC::CorbaConsumer<DAQService> daqservice);
 
     /* Time */
     int set_time();
@@ -160,10 +158,8 @@ private:
     }
 
     int check_done(RTC::CorbaConsumer<DAQService> daqservice);
-    int hbs_check_done(RTC::CorbaConsumer<HeartBeatService> hbs);
-    int ts_check_done(RTC::CorbaConsumer<TimeService> ts);
+
     int set_sitcp_num(int sitcp_num);
-    int set_service_list();
 
     int error_stop_procedure();
     int other_stop_procedure();
@@ -196,6 +192,7 @@ private:
     CORBA::Long m_status;
     CompInfoList m_compInfoList;
     DaqServiceList  m_daqServiceList;
+    DaqServiceList  m_daqServiceList2;
 
     fd_set    m_allset;
     fd_set    m_rset;

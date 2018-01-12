@@ -89,11 +89,9 @@ DaqOperator::DaqOperator(RTC::Manager* manager)
     /// create CorbaConsumer for the number of components
     for (int i = 0; i < m_comp_num; i++) {
         RTC::CorbaConsumer<DAQService> daqservice;
-        RTC::CorbaConsumer<HeartBeatService> heartbeatservice;
-        RTC::CorbaConsumer<TimeService> ts;
+        // RTC::CorbaConsumer<DAQService> daqservice2;
         m_daqservices.push_back(daqservice);
-        m_hbs.push_back(heartbeatservice);
-        m_ts.push_back(ts);
+		// m_daqservices2.push_back(daqservice2);
     }
     if (m_debug) {
         std::cerr << "*** m_daqservices.size():" << m_daqservices.size() << std::endl;
@@ -108,21 +106,17 @@ DaqOperator::DaqOperator(RTC::Manager* manager)
             std::cerr << "service name: " << service_name << std::endl;
         }
         m_DaqServicePorts.push_back(new RTC::CorbaPort(service_name.c_str()));
-        m_HeartBeatServicePorts.push_back(new RTC::CorbaPort(service_name.c_str()));
-        m_TimeServicePorts.push_back(new RTC::CorbaPort(service_name.c_str()));
+        // m_DaqServicePorts2.push_back(new RTC::CorbaPort(service_name.c_str()));
     }
     /// register CorbaPort
     for (int i = 0; i< m_comp_num; i++) {
         m_DaqServicePorts[i]->
             registerConsumer("daq_svc", "DAQService", m_daqservices[i]);
-        m_HeartBeatServicePorts[i]->
-            registerConsumer("hbs_svc", "HeartBeatService", m_hbs[i]);
-        m_TimeServicePorts[i]->
-            registerConsumer("ts_svc", "TimeService", m_ts[i]);
+        // m_DaqServicePorts[i]->
+        //    registerConsumer("daq_svc2", "DAQService", m_daqservices2[i]);
 
         registerPort( *m_DaqServicePorts[i] );
-        registerPort( *m_HeartBeatServicePorts[i] );
-        registerPort( *m_TimeServicePorts[i] );
+        // registerPort( *m_DaqServicePorts2[i] );
 
         if (m_debug) {
             std::cerr << "m_daqservices.size() = "
@@ -174,13 +168,6 @@ RTC::ReturnCode_t DaqOperator::onActivated(RTC::UniqueId ec_id)
 RTC::ReturnCode_t DaqOperator::onExecute(RTC::UniqueId ec_id)
 {
     RTC::ReturnCode_t ret = RTC::RTC_OK;
-
-    // HeartBeat
-    if (!first_flag) {
-        reset_send_count();
-        first_flag = true;
-    }
-    set_hb_to_component();
 
     if (m_isConsoleMode == true)
         ret = run_console_mode();
@@ -319,8 +306,15 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
     Status_var chkStatus;
     resFlag = false;
 
+    /* Heart Beat set */
+    //if (!first_flag) {
+    //    reset_send_count();
+    //    first_flag = true;
+    //}
+    //set_hb_to_component();
+
     /* Time set */
-    set_time();
+    //set_time();
 
     m_tout.tv_sec =  2;
     m_tout.tv_usec = 0;
@@ -464,9 +458,6 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
         }// switch (m_state)
     }
     else {
-        /* Heart Beat */
-        //get_hb_from_component();
-
         std::cerr << " " << std::endl;
         std::cerr << "\033[0;0H\033[2J";
         std::cerr << "\033[8;0H"; //default = 5
@@ -562,6 +553,10 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
             }///for
         }///if
     }///if
+
+    /* Heart Beat */
+    // get_hb_from_component();
+
     return RTC::RTC_OK;
 }
 
@@ -645,27 +640,31 @@ int DaqOperator::set_command(RTC::CorbaConsumer<DAQService> daqservice,
 
 int DaqOperator::set_hb_to_component()
 {
-    m_hb = ONE;
-    for (int i = 0; i < m_comp_num; i++) {
-        set_hb(m_hbs[i], m_hb);
-        hbs_check_done(m_hbs[i]);
+    try {
+        for (int i = 0; i < m_comp_num; i++) {
+            set_hb(m_daqservices[i]);
+            hb_check_done(m_daqservices[i]);
+        }
+    }
+    catch (...) {
+        std::cerr << "### ERROR: DaqOperator: Failed to set Heart Beat.\n";
     }
     return 0;
 }
 
-int DaqOperator::set_hb(RTC::CorbaConsumer<HeartBeatService> hbs,
-                         HB m_hb)
+int DaqOperator::set_hb(RTC::CorbaConsumer<DAQService> daqservice)
 {
     int status = 0;
     try {
-        status = hbs->setOperatorToComp(m_hb);
+        status = daqservice->setOperatorToComp();
     }
     catch(...) {
-        std::cerr << "### ERROR: set hb: exception occured\n ";
+        std::cerr << "### ERROR: set hb: exception occured\n";
     }
     return 0;
 }
 
+/*
 int DaqOperator::get_hb_from_component()
 {
     hb_count = 0;
@@ -673,8 +672,8 @@ int DaqOperator::get_hb_from_component()
     for (int i = 0; i < m_comp_num; i++) {
         hb_result = ONE;
         try {
-            hb_result = m_hbs[i]->getCompToOperator();
-            hbs_check_done(m_hbs[i]);
+            hb_result = m_daqservice2[i]->getCompToOperator();
+            hb_check_done(m_daqservice2[i]);
         }
         catch(...) {
             std::cerr << "### ERROR: get hb: exception occured\n ";
@@ -694,22 +693,27 @@ int DaqOperator::get_hb_from_component()
     }
     return 0;
 }
+*/
 
 int DaqOperator::set_time()
 {
     struct timeval start_time;
     struct timezone tz;
 	gettimeofday(&start_time, &tz);
-    for (int i = 0; i < m_comp_num; i++) {
-        try {
-            m_ts[i]->setTime(start_time.tv_usec);
-            ts_check_done(m_ts[i]);
-            std::cerr << start_time.tv_usec << std::endl;
-        }
-        catch(...) {
-            std::cerr << "### ERROR: set time: exception occured\n ";
+    try {
+        for (int i = 0; i < m_comp_num; i++) {
+            try {
+                m_daqservices[i]->setTime(start_time.tv_usec);
+            }
+            catch(...) {
+                std::cerr << "### ERROR: set time: exception occured\n";
+            }
         }
     }
+    catch(...) {
+        std::cerr << "### ERROR: DaqOperator: Failed to set Time.\n";
+    }
+
     return 0;
 }
 
@@ -718,7 +722,6 @@ int DaqOperator::check_done(RTC::CorbaConsumer<DAQService> daqservice)
     int status = 0;
 
     try {
-
         while (status == 0) {
             status = daqservice->checkDone();
             if (status == 0) {
@@ -731,68 +734,20 @@ int DaqOperator::check_done(RTC::CorbaConsumer<DAQService> daqservice)
     return 0;
 }
 
-int DaqOperator::hbs_check_done(RTC::CorbaConsumer<HeartBeatService> hbs)
+int DaqOperator::hb_check_done(RTC::CorbaConsumer<DAQService> daqservice)
 {
     int status = 0;
 
     try {
 
         while (status == 0) {
-            status = hbs->checkDone();
+            status = daqservice->hb_checkDone();
             if (status == 0) {
                 usleep(0);
             }
         }
     } catch(...) {
-        std::cerr << "### checkDone: failed" << std::endl;
-    }
-    return 0;
-}
-
-int DaqOperator::ts_check_done(RTC::CorbaConsumer<TimeService> ts)
-{
-    int status = 0;
-
-    try {
-
-        while (status == 0) {
-            status = ts->checkDone();
-            if (status == 0) {
-                usleep(0);
-            }
-        }
-    } catch(...) {
-        std::cerr << "### checkDone: failed" << std::endl;
-    }
-    return 0;
-}
-
-int DaqOperator::set_service_list()
-{
-
-    if (m_debug) {
-        std::cerr << "==========================================\n";
-        std::cerr << "\n\n---- service num = " << m_service_num << std::endl;
-        std::cerr << "==========================================\n";
-    }
-
-    m_daqServiceList.clear();
-
-    for (int i = 0; i < m_service_num; i++) {
-        RTC::ConnectorProfileList_var myprof;
-        myprof = m_DaqServicePorts[i]->get_connector_profiles();
-        if (m_debug) {
-            std::cerr << " ====> index     :" << i << std::endl;
-            std::cerr << " ====> prof name:" << myprof[0].name << std::endl;
-            std::string id = (std::string)myprof[0].name;
-            std::cerr << "====> ID: " << id << std::endl;
-        }
-        struct serviceInfo serviceInfo;
-        serviceInfo.comp_id    = myprof[0].name;
-        serviceInfo.daqService = m_daqservices[i];
-        serviceInfo.heartBeatService = m_hbs[i];
-        serviceInfo.timeService = m_ts[i];
-        m_daqServiceList.push_back(serviceInfo);
+        std::cerr << "### hb_checkDone: failed" << std::endl;
     }
     return 0;
 }
@@ -834,26 +789,6 @@ int DaqOperator::error_stop_procedure()
     }
 
     try {
-    // ParamList paramList;
-    // ::NVList systemParamList;
-    // ::NVList groupParamList;
-    // for (int i = 0; i < (int)m_daqservices.size(); i++) {
-    //     RTC::ConnectorProfileList_var myprof
-    //         = m_DaqServicePorts[i]->get_connector_profiles();
-
-    //     char * id = CORBA::string_dup(myprof[0].name);
-
-    //     for (int j = 0; j < (int)paramList.size(); j++) {
-    //         if (paramList[j].getId() == id) {
-    //             int len = paramList[j].getList().length();
-    //             ::NVList mylist(len);
-    //             mylist = paramList[j].getList();
-    //             m_daqservices[i]->setCompParams( paramList[j].getList() );
-    //         }
-    //     }
-    //     CORBA::string_free(id);
-    // }
-
         for (int i = 0; i < m_comp_num; i++) {
             status = m_daqservices[i]->getStatus();
             if (status->state == LOADED) {
@@ -884,8 +819,8 @@ int DaqOperator::other_stop_procedure()
 		for (int i = 0; i < m_comp_num; i++) {
             status = m_daqservices[i]->getStatus();
             if (status->state == RUNNING) {
-            set_runno(m_daqservices[i], CMD_STOP);
-            check_done(m_daqservices[i]);
+                set_runno(m_daqservices[i], CMD_STOP);
+                check_done(m_daqservices[i]);
 			}
         }
     } catch (...) {
@@ -1068,12 +1003,12 @@ int DaqOperator::start_procedure()
             std::cerr << "start_parocedure: runno: " << m_runNumber << std::endl;
         }
 
-        for (int i = 0; i< m_comp_num; i++) {
+        for (int i = 0; i < m_comp_num; i++) {
             set_runno(m_daqservices[i], m_runNumber);
             check_done(m_daqservices[i]);
         }
 
-        for (int i = 0; i< m_comp_num; i++) {
+        for (int i = 0; i < m_comp_num; i++) {
             set_command(m_daqservices[i], CMD_START);
             check_done(m_daqservices[i]);
         }

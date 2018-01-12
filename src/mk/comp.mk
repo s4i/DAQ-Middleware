@@ -26,10 +26,10 @@ CPPFLAGS += -std=c++11
 
 SKEL_OBJ += $(AUTO_GEN_DIR)/DAQServiceSkel.o
 IMPL_OBJ += $(AUTO_GEN_DIR)/DAQServiceSVC_impl.o
-SKEL_OBJ += $(AUTO_GEN_DIR)/HeartBeatServiceSkel.o
-IMPL_OBJ += $(AUTO_GEN_DIR)/HeartBeatServiceSVC_impl.o
-SKEL_OBJ += $(AUTO_GEN_DIR)/TimeServiceSkel.o
-IMPL_OBJ += $(AUTO_GEN_DIR)/TimeServiceSVC_impl.o
+#SKEL_OBJ += $(AUTO_GEN_DIR)/HeartBeatServiceSkel.o
+#IMPL_OBJ += $(AUTO_GEN_DIR)/HeartBeatServiceSVC_impl.o
+#SKEL_OBJ += $(AUTO_GEN_DIR)/TimeServiceSkel.o
+#IMPL_OBJ += $(AUTO_GEN_DIR)/TimeServiceSVC_impl.o
 OBJS     += $(SKEL_OBJ) $(IMPL_OBJ)
 OBJS     += $(subst .cpp,.o, $(SRCS))
 
@@ -64,11 +64,11 @@ $(COMP_NAME)Comp.o: $(COMP_NAME)Comp.cpp $(COMP_NAME).h
 	mkdir $(AUTO_GEN_DIR)
 	(cd $(AUTO_GEN_DIR); ln -s $(IDL_PATH)/DAQService.idl; $(IDLC) $(IDLFLAGS) DAQService.idl; $(WRAPPER) $(WRAPPER_FLAGS) --idl-file=DAQService.idl)
 	(cd $(AUTO_GEN_DIR); $(IDLC) $(IDLFLAGS) DAQService.idl; $(WRAPPER) $(WRAPPER_FLAGS) --idl-file=DAQService.idl)
-	(cd $(AUTO_GEN_DIR); ln -s $(IDL_PATH)/HeartBeatService.idl; $(IDLC) $(IDLFLAGS) HeartBeatService.idl; $(WRAPPER) $(WRAPPER_FLAGS) --idl-file=HeartBeatService.idl)
-	(cd $(AUTO_GEN_DIR); $(IDLC) $(IDLFLAGS) HeartBeatService.idl; $(WRAPPER) $(WRAPPER_FLAGS) --idl-file=HeartBeatService.idl)
-	(cd $(AUTO_GEN_DIR); ln -s $(IDL_PATH)/TimeService.idl; $(IDLC) $(IDLFLAGS) TimeService.idl; $(WRAPPER) $(WRAPPER_FLAGS) --idl-file=TimeService.idl)
-	(cd $(AUTO_GEN_DIR); $(IDLC) $(IDLFLAGS) TimeService.idl; $(WRAPPER) $(WRAPPER_FLAGS) --idl-file=TimeService.idl)
 	@touch .depend
+#(cd $(AUTO_GEN_DIR); ln -s $(IDL_PATH)/HeartBeatService.idl; $(IDLC) $(IDLFLAGS) HeartBeatService.idl; $(WRAPPER) $(WRAPPER_FLAGS) --idl-file=HeartBeatService.idl)
+#(cd $(AUTO_GEN_DIR); $(IDLC) $(IDLFLAGS) HeartBeatService.idl; $(WRAPPER) $(WRAPPER_FLAGS) --idl-file=HeartBeatService.idl)
+#(cd $(AUTO_GEN_DIR); ln -s $(IDL_PATH)/TimeService.idl; $(IDLC) $(IDLFLAGS) TimeService.idl; $(WRAPPER) $(WRAPPER_FLAGS) --idl-file=TimeService.idl)
+#(cd $(AUTO_GEN_DIR); $(IDLC) $(IDLFLAGS) TimeService.idl; $(WRAPPER) $(WRAPPER_FLAGS) --idl-file=TimeService.idl)
 
 # install target should be defined in the user's makefile
 # because we don't know where is the install directory.
@@ -84,12 +84,12 @@ clean:
 	@rm -f *~
 	@rm -f DAQService.hh DAQServiceDynSK.cc DAQServiceSK.cc
 	@rm -f DAQService.idl
-	@rm -f HeartBeatService.hh HeartBeatServiceDynSK.cc HeartBeatServiceSK.cc
-	@rm -f HeartBeatService.idl
-	@rm -f TimeService.hh TimeServiceDynSK.cc TimeServiceSK.cc
-	@rm -f TimeService.idl
 	@rm -f symlink
 	@rm -fr $(AUTO_GEN_DIR) .depend
+#@rm -f HeartBeatService.hh HeartBeatServiceDynSK.cc HeartBeatServiceSK.cc
+#@rm -f HeartBeatService.idl
+#@rm -f TimeService.hh TimeServiceDynSK.cc TimeServiceSK.cc
+#@rm -f TimeService.idl
 
 #DAQServiceSkel.cpp: DAQService.idl
 #	$(IDLC) $(IDLFLAGS) DAQService.idl
@@ -102,10 +102,11 @@ clean:
 
 $(AUTO_GEN_DIR)/DAQServiceSVC_impl.o: DAQServiceSVC_impl.cpp
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c -o $@ $<
-$(AUTO_GEN_DIR)/HeartBeatServiceSVC_impl.o: HeartBeatServiceSVC_impl.cpp
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c -o $@ $<
-$(AUTO_GEN_DIR)/TimeServiceSVC_impl.o: TimeServiceSVC_impl.cpp
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c -o $@ $<
+#$(AUTO_GEN_DIR)/HeartBeatServiceSVC_impl.o: HeartBeatServiceSVC_impl.cpp
+#	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c -o $@ $<
+#$(AUTO_GEN_DIR)/TimeServiceSVC_impl.o: TimeServiceSVC_impl.cpp
+#	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c -o $@ $<
+
 #$(AUTO_GEN_DIR)/DAQServiceSkel.o: $(AUTO_GEN_DIR)/DAQServiceSkel.cpp $(AUTO_GEN_DIR)/DAQServiceSkel.h
 
 # comp.mk ends here

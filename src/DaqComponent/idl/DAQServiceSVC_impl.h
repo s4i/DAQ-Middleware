@@ -51,6 +51,14 @@ public:
 
     FatalErrorStatus* getFatalStatus();
 
+	RTC::ReturnCode_t setOperatorToComp();
+	HBMSG getOperatorToComp();
+    HeartBeatDone hb_checkDone();
+    void hb_setDone();
+
+    RTC::ReturnCode_t setTime(const CORBA::Long usec);
+    CORBA::Long getTime();
+
 private:
     DAQCommand m_command;
     int m_new;
@@ -60,6 +68,12 @@ private:
     FatalErrorStatus m_fatalStatus;
     NVList m_comp_params;
     CORBA::Long   m_run_no;
+
+    HBMSG m_oc;
+    HBMSG m_co;
+    int m_hb_new;
+    HeartBeatDone m_hb_done;
+    CORBA::Long m_start;
 };
 
 #endif // DAQSERVICESVC_IMPL_H
