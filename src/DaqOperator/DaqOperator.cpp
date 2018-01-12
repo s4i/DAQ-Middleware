@@ -527,9 +527,6 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
                               << check_compStatus(status->comp_status)
                               << "\033[39m" << std::endl;
                 }
-
-                std::cerr << status->event_size << std::endl;
-
             } catch(...) {
                 std::cerr << " ### ERROR: " << compname
                           << " : cannot connect" << std::endl;
