@@ -222,14 +222,14 @@ def find_all_files(directory, target_file):
 def file_clean(path):
     file_path = []
     make_result = []
-    target = 'Makefile'
+    target_file = 'Makefile'
     command = "rm -r omninames-*.bak omninames-*.log \
              rtc.conf .confFilePath __pycache__ *.pyc"
     flag = False
     automake_flag = False
     current = os.getcwd()
     if re.match('make', path) != None:
-        print('Exec make')
+        print('Makefile execution')
         while True:
             automake = raw_input('Automake[y/N]: ').lower()
             if automake in ['y', 'ye', 'yes', '']:
@@ -237,8 +237,8 @@ def file_clean(path):
                 break
             elif automake in ['n', 'no']:
                 break
-        for file in find_all_files(current, target):
-            os.chdir(file.strip(target))
+        for file in find_all_files(current, target_file):
+            os.chdir(file.strip(target_file))
             make_result += file + '\n'
             if not automake_flag:
                 print(os.getcwd()),
@@ -258,7 +258,7 @@ def file_clean(path):
         print('File clean finished')
         sys.exit(0)
     elif re.match('rm', path) != None:
-        print('File clean'),
+        print('File clean execution'),
         while True:
             choice = raw_input('[y/N]: ').lower()
             if choice in ['y', 'ye', 'yes', '']:
@@ -270,7 +270,7 @@ def file_clean(path):
                 break
         sys.exit(0)
     elif re.match('clean', path) != None:
-        print('Make clean')
+        print('Make clean execution')
         for root, dirs, files in os.walk(current):
             for dir in dirs:
                 if dir == 'autogen':
@@ -290,7 +290,7 @@ def file_clean(path):
         if len(file_path) == 0:
             print('Not found Makefile')
         print('Make clean finished')
-        print('File clean')
+        print('File clean execution')
         for root, dirs, files in os.walk(current):
             for dir in dirs:
                 for file in files:

@@ -72,7 +72,7 @@ public:
     ~DaqOperator();
 
     // The initialize action (on CREATED->ALIVE transition)
-    // formaer rtc_init_entry()
+    // former rtc_init_entry()
     virtual RTC::ReturnCode_t onInitialize();
 
     // The startup action when ExecutionContext startup

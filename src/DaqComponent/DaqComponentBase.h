@@ -601,6 +601,7 @@ namespace DAQMW
                     daq_onError();
                 }
             }
+            /* Heart Beat */
             return ret;
         } /// daq_do()
 
