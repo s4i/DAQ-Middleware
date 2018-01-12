@@ -110,11 +110,11 @@ DaqOperator::DaqOperator(RTC::Manager* manager)
         // m_DaqServicePorts2.push_back(new RTC::CorbaPort(service_name.c_str()));
     }
     /// register CorbaPort
-    for (int i = 0; i< m_comp_num; i++) {
+    for (int i = 0; i < m_comp_num; i++) {
         m_DaqServicePorts[i]->
             registerConsumer("daq_svc", "DAQService", m_daqservices[i]);
-        // m_DaqServicePorts[i]->
-        //    registerConsumer("daq_svc2", "DAQService", m_daqservices2[i]);
+        // m_DaqServicePorts2[i]->
+        //    registerConsumer2("daq_svc2", "DAQService", m_daqservices2[i]);
 
         registerPort( *m_DaqServicePorts[i] );
         // registerPort( *m_DaqServicePorts2[i] );
@@ -479,33 +479,20 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 
                 compname = myprof[0].name; //compname = "group*:*"
                 //std::cerr << "COMPNAME: " << compname << std::endl;
+
                 status = m_daqservices[i]->getStatus();
-                if (status->comp_status == COMP_FATAL) {
-                    m_state = ERRORED;
-                }
-
-                FatalErrorStatus_var errStatus;
-                errStatus = m_daqservices[i]->getFatalStatus();
-
                 std::cerr << " " << std::setw(22) << std::left
                           << myprof[0].name //group:comp_name
                           << '\t'
                           << std::setw(14) << std::right
                           << status->event_size; // data size(byte)
 
-                if (status->comp_status == COMP_FATAL ||
-                    status->comp_status == COMP_RESTART) {
+                if (status->comp_status == COMP_FATAL) {
+                    errStatus = m_daqservices[i]->getFatalStatus();
                     std::cerr << "\033[35m"
                               << std::setw(12) << std::right
-                              << "__RUNNING__" << "\033[39m";
-                }
-                else {
-                    std::cerr << std::setw(12) << std::right
-                              << check_state(status->state);
-                }
-
-                if (status->comp_status == COMP_FATAL) {
-                    std::cerr << "\033[31m" << std::setw(14) << std::right
+                              << "__RUNNING__" << "\033[39m"
+                              << "\033[31m" << std::setw(14) << std::right
                               << check_compStatus(status->comp_status)
                               << "\033[39m" << std::endl;
                     /** Use error console display **/
@@ -513,7 +500,11 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
                     d_message[i] = errStatus;
                 }///if Fatal
                 else if (status->comp_status == COMP_RESTART) {
-                    std::cerr << "\033[33m" << std::setw(14) << std::right
+                    errStatus = m_daqservices[i]->getFatalStatus();
+                    std::cerr << "\033[35m"
+                              << std::setw(12) << std::right
+                              << "__RUNNING__" << "\033[39m"
+                              << "\033[33m" << std::setw(14) << std::right
                               << check_compStatus(status->comp_status)
                               << "\033[39m" << std::endl;
                     /** Use error console display **/
@@ -522,7 +513,9 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
                     resFlag = true;
                 }///if Restart Request
                 else {
-                    std::cerr << "\033[32m"
+                    std::cerr << std::setw(12) << std::right
+                              << check_state(status->state)
+                              << "\033[32m"
                               << std::setw(14) << std::right
                               << check_compStatus(status->comp_status)
                               << "\033[39m" << std::endl;

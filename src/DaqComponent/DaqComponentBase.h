@@ -65,7 +65,6 @@ namespace DAQMW
               m_totalDataSize(0),
               m_trans_lock(false),
               m_DAQServicePort("DAQService"),
-              m_DAQServicePort2("DAQService"),
               m_usec(0),
               m_command(CMD_NOP),
               m_state(LOADED),
@@ -88,7 +87,7 @@ namespace DAQMW
     protected:
 
         DAQServiceSVC_impl m_daq_service0;
-        DAQServiceSVC_impl m_daq_service1;
+        //DAQServiceSVC_impl m_daq_service1;
 
         Status m_status;
 
@@ -529,8 +528,6 @@ namespace DAQMW
         {
             int ret = 0;
             get_command();
-            // get_hb_from_operator();
-            //set_hb_to_operator();
 
             bool status = true;
 
@@ -598,8 +595,6 @@ namespace DAQMW
                               << std::endl;
                 }
                 set_done();
-                // set_hb_done();
-                //get_time();
             }
             else {
                 ///same command as previous, stay same state, do same action
@@ -631,6 +626,14 @@ namespace DAQMW
                     daq_onError();
                 }
             }
+
+            //get_hb_from_operator();
+            // set_hb_to_operator();
+            // if (m_hb == ONE) {
+
+            // }
+            // set_hb_done();
+            // get_time();
 
             return ret;
         } /// daq_do()
@@ -666,6 +669,7 @@ namespace DAQMW
     private:
         static const int DAQ_CMD_SIZE       = 10;
         static const int DAQ_STATE_SIZE     =  6;
+        static const int DAQ_HB_SIZE        =  2;
         static const int DAQ_IDLE_TIME_USEC =  10000; // 10 m sec
         static const int STATUS_CYCLE_SEC   =  2;
 
@@ -679,7 +683,7 @@ namespace DAQMW
         bool m_trans_lock;
 
         RTC::CorbaPort m_DAQServicePort;
-        RTC::CorbaPort m_DAQServicePort2;
+        // RTC::CorbaPort m_DAQServicePort2;
         // RTC::CorbaPort m_HBMSGSPort;
         // RTC::CorbaPort m_TimeServicePort;
 
@@ -703,10 +707,15 @@ namespace DAQMW
         typedef int (DAQMW::DaqComponentBase::*DAQFunc)();
 
         DAQFunc m_daq_trans_func[DAQ_CMD_SIZE];
+        DAQFunc m_daq_hb_func[DAQ_HB_SIZE];
         DAQFunc m_daq_do_func[DAQ_STATE_SIZE];
 
         int transAction(int command) {
             return (this->*m_daq_trans_func[command])();
+        }
+
+        int hbAction(int hb) {
+            return (this->*m_daq_hb_func[hb])();
         }
 
         void doAction(int state){

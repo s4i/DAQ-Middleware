@@ -30,7 +30,7 @@
 #include <sstream>
 #include <vector>
 #include <map>
-#include <stdlib.h>
+#include <cstdlib>
 #include <sys/select.h>
 #include <sys/time.h>
 
