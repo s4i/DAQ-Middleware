@@ -58,7 +58,7 @@ struct serviceInfo {
 };
 
 typedef std::vector< serviceInfo > DaqServiceList;
-typedef std::vector< serviceInfo > DaqServiceList2;
+//typedef std::vector< serviceInfo > DaqServiceList2;
 
 /*!
  * @class DaqOperator
@@ -119,10 +119,10 @@ public:
 
 protected:
     std::vector<RTC::CorbaPort *> m_DaqServicePorts;
-    std::vector<RTC::CorbaPort *> m_DaqServicePorts2;
+    // std::vector<RTC::CorbaPort *> m_DaqServicePorts2;
 
     std::vector<RTC::CorbaConsumer<DAQService> > m_daqservices;
-    std::vector<RTC::CorbaConsumer<DAQService> > m_daqservices2;
+    // std::vector<RTC::CorbaConsumer<DAQService> > m_daqservices2;
 
     // std::list<RTC::CorbaConsumer<DAQService> > m_daqservices;
 
@@ -192,7 +192,7 @@ private:
     CORBA::Long m_status;
     CompInfoList m_compInfoList;
     DaqServiceList  m_daqServiceList;
-    DaqServiceList  m_daqServiceList2;
+    // DaqServiceList  m_daqServiceList2;
 
     fd_set    m_allset;
     fd_set    m_rset;

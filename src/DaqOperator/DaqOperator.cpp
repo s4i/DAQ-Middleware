@@ -48,6 +48,7 @@ DaqOperator* DaqOperator::Instance()
 
 DaqOperator::DaqOperator(RTC::Manager* manager)
   : RTC::DataFlowComponentBase(manager),
+    m_comp_num(0),
     m_service_num(0),
     m_state(LOADED),
     m_runNumber(0),
@@ -131,7 +132,7 @@ DaqOperator::DaqOperator(RTC::Manager* manager)
 
    m_tout.tv_sec =  3;
    m_tout.tv_usec = 0;
-};
+}
 
 DaqOperator::~DaqOperator()
 {
@@ -526,6 +527,9 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
                               << check_compStatus(status->comp_status)
                               << "\033[39m" << std::endl;
                 }
+
+                std::cerr << status->event_size << std::endl;
+
             } catch(...) {
                 std::cerr << " ### ERROR: " << compname
                           << " : cannot connect" << std::endl;
@@ -907,7 +911,7 @@ int DaqOperator::configure_procedure()
             }
         }
         if (m_debug) {
-            for (int i = 0; i< (int)m_daqServiceList.size(); i++) {
+            for (int i = 0; i < (int)m_daqServiceList.size(); i++) {
                 std::cerr << "*** id:" << m_daqServiceList[i].comp_id << std::endl;
             }
         }
@@ -1102,15 +1106,17 @@ int DaqOperator::log_procedure()
 void DaqOperator::addCorbaPort()
 {
     RTC::CorbaConsumer<DAQService> daqservice;
+
     m_daqservices.push_back(daqservice);
 
     std::stringstream strstream;
     strstream << m_service_num++;
     std::string service_name = "service" + strstream.str();
 }
+
 void DaqOperator::delCorbaPort()
 {
-    ;
+
 }
 #endif
 

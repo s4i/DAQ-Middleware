@@ -83,6 +83,7 @@ DAQCommand DAQServiceSVC_impl::getCommand()
     }
     else
 	return CMD_NOP;
+
 }
 
 DAQDone DAQServiceSVC_impl::checkDone()

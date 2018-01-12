@@ -1,4 +1,4 @@
-#GNU make 3.80 does not allow else ifdef clause.
+# GNU make 3.80 does not allow else ifdef clause.
 INCLUDE_PATH = /usr/include/daqmw
 
 ifdef DAQMWSRCROOT
