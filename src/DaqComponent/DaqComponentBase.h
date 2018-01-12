@@ -6,7 +6,7 @@
  * @author Kazuo Nakayoshi (kazuo.nakayoshi@kek.jp)
  * @author Yoshiji Yasu (yoshiji.yasu@kek.jp)
  *
- * Copyright (C) 2008-2001
+ * Copyright (C) 2008-2011
  *     Kazuo Nakayoshi and Yoshiji Yasu
  *     High Energy Accelerator Research Organization (KEK), Japan.
  *     All rights reserved.
@@ -27,7 +27,13 @@
 #include <rtm/DataPortStatus.h>
 
 #include "DAQServiceSVC_impl.h"
+//#include "HeartBeatServiceSVC_impl.h"
+//#include "TimeServiceSVC_impl.h"
+
 #include "DAQService.hh"
+//#include "HeartBeatService.hh"
+//#include "TimeService.hh"
+
 #include "DaqComponentException.h"
 #include "Timer.h"
 
@@ -59,6 +65,8 @@ namespace DAQMW
               m_totalDataSize(0),
               m_trans_lock(false),
               m_DAQServicePort("DAQService"),
+              m_DAQServicePort2("DAQService"),
+              m_usec(0),
               m_command(CMD_NOP),
               m_state(LOADED),
               m_state_prev(LOADED),
@@ -75,11 +83,13 @@ namespace DAQMW
             delete mytimer;
         }
 
-        enum BufferStatus {BUF_FATAL = -1, BUF_SUCCESS, BUF_TIMEOUT, BUF_NODATA, BUF_NOBUF};
+        enum BufferStatus{BUF_FATAL = -1, BUF_SUCCESS, BUF_TIMEOUT, BUF_NODATA, BUF_NOBUF};
 
     protected:
 
         DAQServiceSVC_impl m_daq_service0;
+        DAQServiceSVC_impl m_daq_service1;
+
         Status m_status;
 
         static const unsigned int  HEADER_BYTE_SIZE = 8;
@@ -216,9 +226,24 @@ namespace DAQMW
         {
             // Set service provider to Ports
             m_DAQServicePort.registerProvider("daq_svc", "DAQService", m_daq_service0);
-
             // Set CORBA Service Ports
             registerPort(m_DAQServicePort);
+
+            // Set service provider to Ports 2
+            // m_DAQServicePort2.registerProvider("daq_svc2", "DAQService", m_daq_service1);
+            // Set CORBA Service Ports 2
+            // registerPort(m_DAQServicePort2);
+
+            // Set HeartBeat provider to Ports
+            //m_HBMSGSPort.registerProvider("hbs_svc", "HeartBeatService", m_hbs0);
+            // Set Corba HeartBeat Ports
+            //registerPort(m_HBMSGSPort);
+
+            // Set Time provider to Ports
+            //m_TimeServicePort.registerProvider("ts_svc", "TimeService", m_ts0);
+            // Set Corba Time Ports
+            //registerPort(m_TimeServicePort);
+
             return 0;
         }
 
@@ -324,6 +349,7 @@ namespace DAQMW
         virtual int daq_stop()        = 0;
         virtual int daq_pause()       = 0;
         virtual int daq_resume()      = 0;
+
         virtual int parse_params( ::NVList* list ) = 0;
 
         void fatal_error_report(FatalType::Enum type, int code = -1)
@@ -503,6 +529,8 @@ namespace DAQMW
         {
             int ret = 0;
             get_command();
+            // get_hb_from_operator();
+            //set_hb_to_operator();
 
             bool status = true;
 
@@ -570,6 +598,8 @@ namespace DAQMW
                               << std::endl;
                 }
                 set_done();
+                // set_hb_done();
+                //get_time();
             }
             else {
                 ///same command as previous, stay same state, do same action
@@ -601,7 +631,7 @@ namespace DAQMW
                     daq_onError();
                 }
             }
-            /* Heart Beat */
+
             return ret;
         } /// daq_do()
 
@@ -649,8 +679,14 @@ namespace DAQMW
         bool m_trans_lock;
 
         RTC::CorbaPort m_DAQServicePort;
+        RTC::CorbaPort m_DAQServicePort2;
+        // RTC::CorbaPort m_HBMSGSPort;
+        // RTC::CorbaPort m_TimeServicePort;
 
         Timer* mytimer;
+
+        HBMSG m_hb;
+        long m_usec;
 
         DAQCommand m_command;
         DAQLifeCycleState m_state;
@@ -744,11 +780,50 @@ namespace DAQMW
             return 0;
         }
 
+        int get_hb_from_operator()
+        {
+            m_hb = m_daq_service0.getOperatorToComp();
+            if (m_debug) {
+                std::cerr << "m_hb=" << m_hb << std::endl;
+            }
+            return 0;
+        }
+
+        //int set_hb_to_operator()
+        //{
+        //    if (m_hb == ONE) {
+        //        std::cerr << "\'" << m_hb << "\'" << std::endl;
+        //        std::cerr << "OK" << std::endl;
+        //        m_hb = ZERO;
+        //        m_hbs0.setCompToOperator(m_hb);
+        //    }
+        //    else {
+        //        std::cerr << "Failed" << std::endl;
+        //    }
+        //    return 0;
+        //}
+
+        int get_time()
+        {
+            m_usec = m_daq_service0.getTime();
+            std::cerr << m_usec << std::endl;
+            return 0;
+        }
+
         int set_done()
         {
             m_daq_service0.setDone();
             if (m_debug) {
                 std::cerr << "set_done()\n";
+            }
+            return 0;
+        }
+
+        int set_hb_done()
+        {
+            m_daq_service0.hb_setDone();
+            if (m_debug) {
+                std::cerr << "set_hb_done()\n";
             }
             return 0;
         }
@@ -825,6 +900,7 @@ namespace DAQMW
             }
             return ret;
         }
+
     }; /// class
 } /// namespace
 

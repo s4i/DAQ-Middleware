@@ -8,6 +8,14 @@ FILES += DAQService.idl
 FILES += DAQServiceSVC_impl.cpp
 FILES += DAQServiceSVC_impl.h
 
+FILES += HeartBeatService.idl
+FILES += HeartBeatServiceSVC_impl.cpp
+FILES += HeartBeatServiceSVC_impl.h
+
+FILES += TimeService.idl
+FILES += TimeServiceSVC_impl.cpp
+FILES += TimeServiceSVC_impl.h
+
 all:
 
 clean:

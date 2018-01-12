@@ -21,11 +21,15 @@
  * Example implementational code for IDL interface DAQService
  */
 DAQServiceSVC_impl::DAQServiceSVC_impl()
-    : m_command(CMD_NOP), 
-      m_new(0), 
-      m_done(DONE), 
-      m_state(LOADED), 
-      m_run_no(0)
+    : m_command(CMD_NOP),
+      m_new(0),
+      m_done(DONE),
+      m_state(LOADED),
+      m_run_no(0),
+      m_oc(ZERO),
+      m_co(ZERO),
+      m_hb_new(0),
+      m_start(0)
 {
     // Please add extra constructor code here.
 }
@@ -76,8 +80,8 @@ DAQCommand DAQServiceSVC_impl::getCommand()
 	///std::cerr << "new command\n";
 	m_new = 0;
 	return m_command;
-    } 
-    else 
+    }
+    else
 	return CMD_NOP;
 
 }
@@ -102,7 +106,7 @@ Status* DAQServiceSVC_impl::getStatus()
 {
     Status* mystatus = new Status;
     *mystatus = m_status;
-    
+
     return mystatus;
 }
 
@@ -116,7 +120,7 @@ NVList* DAQServiceSVC_impl::getCompParams()
     return &m_comp_params;
 }
 
-void DAQServiceSVC_impl::setRunNo(const CORBA::Long run_no) 
+void DAQServiceSVC_impl::setRunNo(const CORBA::Long run_no)
 {
     m_run_no = run_no;
 }
@@ -126,17 +130,69 @@ CORBA::Long DAQServiceSVC_impl::getRunNo()
     return m_run_no;
 }
 
-void DAQServiceSVC_impl::setFatalStatus(const FatalErrorStatus& fatalStatus) 
+void DAQServiceSVC_impl::setFatalStatus(const FatalErrorStatus& fatalStatus)
 {
     std::cerr << "### setFatalStatus:" << fatalStatus.fatalTypes << std::endl;
     m_fatalStatus = fatalStatus;
 }
 
-FatalErrorStatus* DAQServiceSVC_impl::getFatalStatus() 
+FatalErrorStatus* DAQServiceSVC_impl::getFatalStatus()
 {
     FatalErrorStatus* myfatal = new FatalErrorStatus;
     *myfatal = m_fatalStatus;
     return myfatal;
+}
+
+RTC::ReturnCode_t DAQServiceSVC_impl::setOperatorToComp()
+{
+#ifdef OLD
+    if (m_done == HBDONE) {
+
+    m_oc = ONE;
+
+    m_hb_new = 1;
+    m_hb_done = HB_UNDONE;
+    return RTC::RTC_OK;
+    } else {
+    return RTC::RTC_ERROR;
+    }
+#endif
+    m_oc = ONE;
+    m_hb_new = 1;
+    m_hb_done = HBUNDONE;
+    ///std::cerr << "HB_UNDONE\n";
+    return RTC::RTC_OK;
+}
+
+HBMSG DAQServiceSVC_impl::getOperatorToComp()
+{
+    if (m_hb_new) {
+    m_hb_new = 0;
+    return m_oc;
+    }
+    else
+    return ZERO;
+}
+
+HeartBeatDone DAQServiceSVC_impl::hb_checkDone()
+{
+    return m_hb_done;
+}
+
+void DAQServiceSVC_impl::hb_setDone()
+{
+    m_hb_done = HBDONE;
+}
+
+RTC::ReturnCode_t DAQServiceSVC_impl::setTime(const CORBA::Long usec)
+{
+	m_start = usec;
+    return RTC::RTC_OK;
+}
+
+CORBA::Long DAQServiceSVC_impl::getTime()
+{
+    return m_start;
 }
 
 /*

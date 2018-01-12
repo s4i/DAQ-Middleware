@@ -30,10 +30,14 @@
 #include <sstream>
 #include <vector>
 #include <map>
-#include <stdlib.h>
+#include <thread>
+#include <cstdlib>
 #include <sys/select.h>
+#include <sys/time.h>
 
 #include "DAQServiceStub.h"
+//#include "HeartBeatServiceStub.h"
+//#include "TimeServiceStub.h"
 
 #include "ComponentInfoContainer.h"
 #include "ConfFileParser.h"
@@ -54,6 +58,7 @@ struct serviceInfo {
 };
 
 typedef std::vector< serviceInfo > DaqServiceList;
+//typedef std::vector< serviceInfo > DaqServiceList2;
 
 /*!
  * @class DaqOperator
@@ -114,8 +119,12 @@ public:
 
 protected:
     std::vector<RTC::CorbaPort *> m_DaqServicePorts;
+    // std::vector<RTC::CorbaPort *> m_DaqServicePorts2;
+
     std::vector<RTC::CorbaConsumer<DAQService> > m_daqservices;
-    ///std::list<RTC::CorbaConsumer<DAQService> > m_daqservices;
+    // std::vector<RTC::CorbaConsumer<DAQService> > m_daqservices2;
+
+    // std::list<RTC::CorbaConsumer<DAQService> > m_daqservices;
 
 private:
     static const int PARAM_PORT = 30000;
@@ -124,10 +133,33 @@ private:
     int m_comp_num;
     int m_service_num;
     int set_runno(RTC::CorbaConsumer<DAQService> daqservice, unsigned runno);
-    int set_command(RTC::CorbaConsumer<DAQService> daqservice,DAQCommand daqcom);
+    int set_command(RTC::CorbaConsumer<DAQService> daqservice, DAQCommand daqcom);
+
+    /* HeartBeat */
+    HBMSG m_hb;
+    HBMSG hb_result;
+    int hb_count;
+    int set_hb_to_component();
+    int set_hb(RTC::CorbaConsumer<DAQService> daqservice);
+    //int get_hb_from_component();
+    int hb_check_done(RTC::CorbaConsumer<DAQService> daqservice);
+
+    /* Time */
+    int set_time();
+
+    int m_send_count;
+    bool first_flag;
+    void reset_send_count()
+    {
+        m_send_count = 0;
+    }
+    void inc_send_count() {
+        m_send_count++;
+    }
+
     int check_done(RTC::CorbaConsumer<DAQService> daqservice);
+
     int set_sitcp_num(int sitcp_num);
-    int set_service_list();
 
     int error_stop_procedure();
     int other_stop_procedure();
@@ -160,6 +192,7 @@ private:
     CORBA::Long m_status;
     CompInfoList m_compInfoList;
     DaqServiceList  m_daqServiceList;
+    // DaqServiceList  m_daqServiceList2;
 
     fd_set    m_allset;
     fd_set    m_rset;
@@ -185,6 +218,7 @@ private:
     std::string m_config_file_tmp;
 
     bool resFlag;
+    bool deadFlag;
 
     bool m_debug;
 };
