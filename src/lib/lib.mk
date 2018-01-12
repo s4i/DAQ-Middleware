@@ -8,7 +8,7 @@ LIBRARY_SO                = lib$(LIBNAME).so
 LIBRARY_SO_API            = $(LIBRARY_SO).$(API_VERSION)
 LIBRARY_SO_API_PATCHLEVEL = $(LIBRARY_SO).$(API_VERSION).$(PATCHLEVEL)
 
-CFLAGS   = -pipe -O2 -Wall
+CFLAGS   = -g -pipe -O2 -Wall
 CXXFLAGS = $(CFLAGS) -std=c++11
 CPPFLAGS = $(addprefix -I, $(INC_DIRS))
 ARFLAGS  = r

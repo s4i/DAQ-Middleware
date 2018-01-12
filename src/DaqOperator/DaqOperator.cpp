@@ -92,7 +92,7 @@ DaqOperator::DaqOperator(RTC::Manager* manager)
         RTC::CorbaConsumer<DAQService> daqservice;
         // RTC::CorbaConsumer<DAQService> daqservice2;
         m_daqservices.push_back(daqservice);
-		// m_daqservices2.push_back(daqservice2);
+        // m_daqservices2.push_back(daqservice2);
     }
     if (m_debug) {
         std::cerr << "*** m_daqservices.size():" << m_daqservices.size() << std::endl;
@@ -700,7 +700,7 @@ int DaqOperator::set_time()
 {
     struct timeval start_time;
     struct timezone tz;
-	gettimeofday(&start_time, &tz);
+    gettimeofday(&start_time, &tz);
     try {
         for (int i = 0; i < m_comp_num; i++) {
             try {
@@ -817,12 +817,12 @@ int DaqOperator::other_stop_procedure()
     m_stop_date.erase(0, 4);
 
     try {
-		for (int i = 0; i < m_comp_num; i++) {
+        for (int i = 0; i < m_comp_num; i++) {
             status = m_daqservices[i]->getStatus();
             if (status->state == RUNNING) {
                 set_runno(m_daqservices[i], CMD_STOP);
                 check_done(m_daqservices[i]);
-			}
+            }
         }
     } catch (...) {
         std::cerr << "### ERROR: DaqOperator: Failed to stop Component.\n";
@@ -845,12 +845,12 @@ int DaqOperator::restart_procedure()
 
     Status_var status;
     try {
-		for (int i = 0; i < m_comp_num; i++) {
+        for (int i = 0; i < m_comp_num; i++) {
             // status = m_daqservices[i]->getStatus();
             // if (status->state == CONFIGURED) {
             set_runno(m_daqservices[i], m_runNumber);
             check_done(m_daqservices[i]);
-			// }
+            // }
         }
 
         for (int i = 0; i < m_comp_num; i++) {
@@ -1195,7 +1195,7 @@ int DaqOperator::command_unconfigure()
 
 int DaqOperator::command_start()
 {
-	//std::cout << "command_start: enter" << std::endl;
+    //std::cout << "command_start: enter" << std::endl;
 
     if (m_state != CONFIGURED) {
         createDom_ng("Begin");
