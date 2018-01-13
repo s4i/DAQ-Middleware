@@ -17,6 +17,9 @@
 #define DAQCOMPONENTBASE_H
 
 #include <iostream>
+#include <ctime>
+#include <fstream>
+#include <sys/time.h>
 
 #include <rtm/Manager.h>
 #include <rtm/DataFlowComponentBase.h>
@@ -595,6 +598,7 @@ namespace DAQMW
                               << std::endl;
                 }
                 set_done();
+                time_performance(m_command);
             }
             else {
                 ///same command as previous, stay same state, do same action
@@ -628,12 +632,9 @@ namespace DAQMW
             }
 
             get_hb_from_operator();
-            //if (m_hb == ONE) {
-            //    set_hb_done();
-            //}
-
-            //get_time();
-
+            if (m_hb == ONE) {
+                set_hb_done();
+            }
             return ret;
         } /// daq_do()
 
@@ -682,7 +683,6 @@ namespace DAQMW
         bool m_trans_lock;
 
         RTC::CorbaPort m_DAQServicePort;
-        // RTC::CorbaPort m_DAQServicePort2;
         // RTC::CorbaPort m_HBMSGSPort;
         // RTC::CorbaPort m_TimeServicePort;
 
@@ -811,10 +811,61 @@ namespace DAQMW
         //    return 0;
         //}
 
-        int get_time()
+        int time_performance(int command)
         {
-            m_usec = m_daq_service0.getTime();
-            std::cerr << m_usec << std::endl;
+            TimeVal st;
+            struct timeval end_time;
+            struct timezone tz;
+            long result;
+
+            char date[64];
+            char fname[64];
+
+
+            /* end time */
+            gettimeofday(&end_time, &tz);
+
+            /* start time */
+            st = m_daq_service0.getTime();
+
+            /* calc */
+            result = (end_time.tv_sec - st.sec) * 1000000
+                    + (end_time.tv_usec - st.usec);
+
+            if (result < 0) {
+                result = (st.sec - end_time.tv_sec) * 1000000
+                        + (st.usec - end_time.tv_usec);
+            }
+
+            time_t t = time(NULL);
+            strftime(date, sizeof(date), "/home/sai/%Y-%m-%d", localtime(&t));
+            sprintf(fname, "%s.cvs", date);
+            std::ofstream csv_file(fname, std::ios::app);
+
+            switch (command) {
+            case CMD_CONFIGURE:
+                csv_file << "Loaded to Configured," << result << std::endl;
+                break;
+            case CMD_START:
+                csv_file << "Configured to Run," << result << std::endl;
+                break;
+            case CMD_STOP:
+                csv_file << "Run to Configured," << result << std::endl;
+                break;
+            case CMD_UNCONFIGURE:
+                csv_file << "Configured to Loaded," << result << std::endl;
+                break;
+            case CMD_PAUSE:
+                csv_file << "Run to Pause," << result << std::endl;
+                break;
+            case CMD_RESUME:
+                csv_file << "Pause to Run," << result << std::endl;
+                break;
+            case CMD_RESTART:
+                csv_file << "Run(Errrored) to Run(Normal)," << result << std::endl;
+                break;
+            }
+            csv_file.close();
             return 0;
         }
 

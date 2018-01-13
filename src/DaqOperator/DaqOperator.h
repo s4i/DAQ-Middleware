@@ -136,33 +136,33 @@ private:
 
     /* HeartBeat */
     HBMSG m_hb;
-    HBMSG hb_result;
-    int hb_count;
     int set_hb_to_component();
     int set_hb(RTC::CorbaConsumer<DAQService> daqservice);
     //int get_hb_from_component();
-    int hb_check_done(RTC::CorbaConsumer<DAQService> daqservice);
 
     /* Time */
     int set_time();
     int set_gettime(RTC::CorbaConsumer<DAQService> daqservice);
 
-    int reset_send_count()
+    int m_send_count;
+
+    void reset_send_count()
     {
         m_send_count = 0;
-        return 0;
     }
 
-    int inc_send_count()
+    void inc_send_count()
     {
         m_send_count++;
-        return 0;
     }
 
-    int m_send_count;
-    bool first_flag;
+    int get_send_count()
+    {
+        return m_send_count;
+    }
 
     int check_done(RTC::CorbaConsumer<DAQService> daqservice);
+    int hb_check_done(RTC::CorbaConsumer<DAQService> daqservice);
 
     int set_sitcp_num(int sitcp_num);
 
