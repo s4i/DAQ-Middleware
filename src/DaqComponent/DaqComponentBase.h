@@ -527,9 +527,9 @@ namespace DAQMW
         int daq_do()
         {
             int ret = 0;
-            get_command();
-
             bool status = true;
+
+            get_command();
 
             if (m_command != CMD_NOP) {          // got other command
                 status = set_state(m_command);   // set next state
@@ -627,13 +627,12 @@ namespace DAQMW
                 }
             }
 
-            //get_hb_from_operator();
-            // set_hb_to_operator();
-            // if (m_hb == ONE) {
+            get_hb_from_operator();
+            //if (m_hb == ONE) {
+            //    set_hb_done();
+            //}
 
-            // }
-            // set_hb_done();
-            // get_time();
+            //get_time();
 
             return ret;
         } /// daq_do()
