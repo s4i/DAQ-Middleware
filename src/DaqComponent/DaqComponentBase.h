@@ -791,7 +791,7 @@ namespace DAQMW
         int get_hb_from_operator()
         {
             m_hb = m_daq_service0.getOperatorToComp();
-            if (1) {
+            if (m_debug) {
                 std::cerr << "m_hb=" << m_hb << std::endl;
             }
             return 0;
