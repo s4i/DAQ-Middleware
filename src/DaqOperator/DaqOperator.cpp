@@ -308,11 +308,13 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
     resFlag = false;
 
     /* Heart Beat set */
-    //if (!first_flag) {
-    //    reset_send_count();
-    //    first_flag = true;
-    //}
-    //set_hb_to_component();
+    if (!first_flag) {
+        reset_send_count();
+        first_flag = true;
+    }
+    inc_send_count();
+
+    set_hb_to_component();
 
     /* Time set */
     //set_time();
@@ -541,7 +543,8 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
                     }
                     else {
                         std::cerr << "\033[31m" << d_message[i]->description
-                                  << "\033[39m" << std::endl;
+                                  << "\033[39m" << std::endl
+                                  << m_send_count << '\n';
                     }
                 }
             }///for
@@ -637,7 +640,7 @@ int DaqOperator::set_hb_to_component()
     try {
         for (int i = 0; i < m_comp_num; i++) {
             set_hb(m_daqservices[i]);
-            hb_check_done(m_daqservices[i]);
+            //hb_check_done(m_daqservices[i]);
         }
     }
     catch (...) {
@@ -673,7 +676,6 @@ int DaqOperator::get_hb_from_component()
             std::cerr << "### ERROR: get hb: exception occured\n ";
         }
         if (hb_result == ONE) { // success return 0(Component)
-            inc_send_count();
             if (m_send_count >= 20000) {
                 reset_send_count();
                 deadFlag = true;
@@ -691,13 +693,10 @@ int DaqOperator::get_hb_from_component()
 
 int DaqOperator::set_time()
 {
-    struct timeval start_time;
-    struct timezone tz;
-    gettimeofday(&start_time, &tz);
     try {
         for (int i = 0; i < m_comp_num; i++) {
             try {
-                m_daqservices[i]->setTime(start_time.tv_usec);
+                set_gettime(m_daqservices[i]);
             }
             catch(...) {
                 std::cerr << "### ERROR: set time: exception occured\n";
@@ -708,6 +707,21 @@ int DaqOperator::set_time()
         std::cerr << "### ERROR: DaqOperator: Failed to set Time.\n";
     }
 
+    return 0;
+}
+
+int DaqOperator::set_gettime(RTC::CorbaConsumer<DAQService> daqservice)
+{
+    int status = 0;
+    struct timeval start_time;
+    struct timezone tz;
+    gettimeofday(&start_time, &tz);
+    try {
+        status = daqservice->setTime(start_time.tv_usec);
+    }
+    catch(...) {
+        std::cerr << "### ERROR: set time: exception occured\n";
+    }
     return 0;
 }
 
