@@ -30,12 +30,7 @@
 #include <rtm/DataPortStatus.h>
 
 #include "DAQServiceSVC_impl.h"
-//#include "HeartBeatServiceSVC_impl.h"
-//#include "TimeServiceSVC_impl.h"
-
 #include "DAQService.hh"
-//#include "HeartBeatService.hh"
-//#include "TimeService.hh"
 
 #include "DaqComponentException.h"
 #include "Timer.h"
@@ -68,7 +63,6 @@ namespace DAQMW
               m_totalDataSize(0),
               m_trans_lock(false),
               m_DAQServicePort("DAQService"),
-              m_usec(0),
               m_command(CMD_NOP),
               m_state(LOADED),
               m_state_prev(LOADED),
@@ -90,8 +84,6 @@ namespace DAQMW
     protected:
 
         DAQServiceSVC_impl m_daq_service0;
-        //DAQServiceSVC_impl m_daq_service1;
-
         Status m_status;
 
         static const unsigned int  HEADER_BYTE_SIZE = 8;
@@ -230,22 +222,6 @@ namespace DAQMW
             m_DAQServicePort.registerProvider("daq_svc", "DAQService", m_daq_service0);
             // Set CORBA Service Ports
             registerPort(m_DAQServicePort);
-
-            // Set service provider to Ports 2
-            // m_DAQServicePort2.registerProvider("daq_svc2", "DAQService", m_daq_service1);
-            // Set CORBA Service Ports 2
-            // registerPort(m_DAQServicePort2);
-
-            // Set HeartBeat provider to Ports
-            //m_HBMSGSPort.registerProvider("hbs_svc", "HeartBeatService", m_hbs0);
-            // Set Corba HeartBeat Ports
-            //registerPort(m_HBMSGSPort);
-
-            // Set Time provider to Ports
-            //m_TimeServicePort.registerProvider("ts_svc", "TimeService", m_ts0);
-            // Set Corba Time Ports
-            //registerPort(m_TimeServicePort);
-
             return 0;
         }
 
@@ -598,7 +574,7 @@ namespace DAQMW
                               << std::endl;
                 }
                 set_done();
-                time_performance(m_command);
+                get_time_performance(m_command);
             }
             else {
                 ///same command as previous, stay same state, do same action
@@ -683,13 +659,10 @@ namespace DAQMW
         bool m_trans_lock;
 
         RTC::CorbaPort m_DAQServicePort;
-        // RTC::CorbaPort m_HBMSGSPort;
-        // RTC::CorbaPort m_TimeServicePort;
 
         Timer* mytimer;
 
         HBMSG m_hb;
-        long m_usec;
 
         DAQCommand m_command;
         DAQLifeCycleState m_state;
@@ -711,10 +684,6 @@ namespace DAQMW
 
         int transAction(int command) {
             return (this->*m_daq_trans_func[command])();
-        }
-
-        int hbAction(int hb) {
-            return (this->*m_daq_hb_func[hb])();
         }
 
         void doAction(int state){
@@ -811,7 +780,7 @@ namespace DAQMW
         //    return 0;
         //}
 
-        int time_performance(int command)
+        int get_time_performance(int command)
         {
             TimeVal st;
             struct timeval end_time;
@@ -842,27 +811,29 @@ namespace DAQMW
             sprintf(fname, "%s.cvs", date);
             std::ofstream csv_file(fname, std::ios::app);
 
+            result *= 1000;
+
             switch (command) {
             case CMD_CONFIGURE:
-                csv_file << "Loaded to Configured," << result << std::endl;
+                csv_file << "Configure," << result << std::endl;
                 break;
             case CMD_START:
-                csv_file << "Configured to Run," << result << std::endl;
+                csv_file << "Start," << result << std::endl;
                 break;
             case CMD_STOP:
-                csv_file << "Run to Configured," << result << std::endl;
+                csv_file << "Stop," << result << std::endl;
                 break;
             case CMD_UNCONFIGURE:
-                csv_file << "Configured to Loaded," << result << std::endl;
+                csv_file << "Unconfigure," << result << std::endl;
                 break;
             case CMD_PAUSE:
-                csv_file << "Run to Pause," << result << std::endl;
+                csv_file << "Pause," << result << std::endl;
                 break;
             case CMD_RESUME:
-                csv_file << "Pause to Run," << result << std::endl;
+                csv_file << "Resume," << result << std::endl;
                 break;
             case CMD_RESTART:
-                csv_file << "Run(Errrored) to Run(Normal)," << result << std::endl;
+                csv_file << "Restart," << result << std::endl;
                 break;
             }
             csv_file.close();
