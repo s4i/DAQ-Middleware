@@ -129,11 +129,15 @@ DaqOperator::DaqOperator(RTC::Manager* manager)
 
 	m_tout.tv_sec =  3;
 	m_tout.tv_usec = 0;
+
+	/* Timer */
+	mytimer = new Timer(HB_CYCLE_SEC);
 }
 
 DaqOperator::~DaqOperator()
 {
 	XMLPlatformUtils::Terminate();
+	delete mytimer;
 }
 
 RTC::ReturnCode_t DaqOperator::onInitialize()
@@ -166,6 +170,8 @@ RTC::ReturnCode_t DaqOperator::onActivated(RTC::UniqueId ec_id)
 RTC::ReturnCode_t DaqOperator::onExecute(RTC::UniqueId ec_id)
 {
 	RTC::ReturnCode_t ret = RTC::RTC_OK;
+
+    clockwork_hb_recv();
 
 	if (m_isConsoleMode == true)
 		ret = run_console_mode();
@@ -303,8 +309,6 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 	FatalErrorStatus_var d_message[m_comp_num];
 	Status_var chkStatus;
 	resFlag = false;
-
-	set_hb_to_component();
 
 	m_tout.tv_sec =  2;
 	m_tout.tv_usec = 0;

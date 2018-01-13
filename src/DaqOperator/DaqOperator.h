@@ -43,6 +43,8 @@
 #include "CreateDom.h"
 #include "ParameterServer.h"
 
+#include "Timer.h"
+
 using namespace RTC;
 
 // error code for dom
@@ -115,14 +117,16 @@ public:
 
 protected:
     std::vector<RTC::CorbaPort *> m_DaqServicePorts;
-
     std::vector<RTC::CorbaConsumer<DAQService> > m_daqservices;
-
     // std::list<RTC::CorbaConsumer<DAQService> > m_daqservices;
+
+    Timer* mytimer;
 
 private:
     static const int PARAM_PORT = 30000;
     static DaqOperator* _instance;
+
+    static const int HB_CYCLE_SEC = 5;
 
     int m_comp_num;
     int m_service_num;
@@ -153,6 +157,21 @@ private:
     int get_send_count()
     {
         return m_send_count;
+    }
+
+    int reset_mytimer()
+    {
+        mytimer->resetTimer();
+        return 0;
+    }
+
+    int clockwork_hb_recv()
+    {
+        if (mytimer->checkTimer()) {
+            set_hb_to_component();
+            mytimer->resetTimer();
+        }
+        return 0;
     }
 
     int check_done(RTC::CorbaConsumer<DAQService> daqservice);
