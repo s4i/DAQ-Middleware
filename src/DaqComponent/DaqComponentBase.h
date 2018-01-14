@@ -31,7 +31,6 @@
 
 #include "DAQServiceSVC_impl.h"
 #include "DAQService.hh"
-
 #include "DaqComponentException.h"
 #include "Timer.h"
 
@@ -79,7 +78,7 @@ namespace DAQMW
             delete mytimer;
         }
 
-        enum BufferStatus{BUF_FATAL = -1, BUF_SUCCESS, BUF_TIMEOUT, BUF_NODATA, BUF_NOBUF};
+        enum BufferStatus {BUF_FATAL = -1, BUF_SUCCESS, BUF_TIMEOUT, BUF_NODATA, BUF_NOBUF};
 
     protected:
 
@@ -506,9 +505,9 @@ namespace DAQMW
         int daq_do()
         {
             int ret = 0;
-            bool status = true;
-
             get_command();
+
+            bool status = true;
 
             if (m_command != CMD_NOP) {          // got other command
                 status = set_state(m_command);   // set next state
@@ -645,7 +644,6 @@ namespace DAQMW
     private:
         static const int DAQ_CMD_SIZE       = 10;
         static const int DAQ_STATE_SIZE     =  6;
-        static const int DAQ_HB_SIZE        =  2;
         static const int DAQ_IDLE_TIME_USEC =  10000; // 10 m sec
         static const int STATUS_CYCLE_SEC   =  2;
 
@@ -679,7 +677,6 @@ namespace DAQMW
         typedef int (DAQMW::DaqComponentBase::*DAQFunc)();
 
         DAQFunc m_daq_trans_func[DAQ_CMD_SIZE];
-        DAQFunc m_daq_hb_func[DAQ_HB_SIZE];
         DAQFunc m_daq_do_func[DAQ_STATE_SIZE];
 
         int transAction(int command) {
@@ -804,11 +801,9 @@ namespace DAQMW
             }
 
             time_t t = time(NULL);
-            strftime(date, sizeof(date), "/home/sai/DAQ-Middleware/csv/%Y-%m-%d", localtime(&t));
-            sprintf(fname, "%s.cvs", date);
+            strftime(date, sizeof(date), "/home/sai/DAQ-Middleware/csv/s4i/%Y-%m-%d", localtime(&t));
+            sprintf(fname, "%s.csv", date);
             std::ofstream csv_file(fname, std::ios::app);
-
-            result *= 1000;
 
             switch (command) {
             case CMD_CONFIGURE:

@@ -719,7 +719,7 @@ int DaqOperator::hb_check_done(RTC::CorbaConsumer<DAQService> daqservice)
 			status = daqservice->hb_checkDone();
             if (status == 0) {
                 send_count = get_send_count();
-                if (send_count <= 20000) {
+                if (send_count <= 6) {
                     deadFlag = true;
                 }
                 else {
