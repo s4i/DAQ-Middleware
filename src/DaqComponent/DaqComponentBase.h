@@ -785,9 +785,8 @@ namespace DAQMW
             struct timezone tz;
             long result;
 
-            char date[64];
-            char fname[64];
-
+            char date[128];
+            char fname[128];
 
             /* end time */
             gettimeofday(&end_time, &tz);
@@ -805,7 +804,7 @@ namespace DAQMW
             }
 
             time_t t = time(NULL);
-            strftime(date, sizeof(date), "/home/sai/%Y-%m-%d", localtime(&t));
+            strftime(date, sizeof(date), "/home/sai/DAQ-Middleware/csv/%Y-%m-%d", localtime(&t));
             sprintf(fname, "%s.cvs", date);
             std::ofstream csv_file(fname, std::ios::app);
 
