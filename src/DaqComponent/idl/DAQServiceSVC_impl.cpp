@@ -27,9 +27,8 @@ DAQServiceSVC_impl::DAQServiceSVC_impl()
       m_state(LOADED),
       m_run_no(0),
       m_oc(ZERO),
-      m_co(ZERO),
       m_hb_new(0),
-      m_start(0)
+      m_hb_done(HBDONE)
 {
     // Please add extra constructor code here.
 }
@@ -151,7 +150,7 @@ RTC::ReturnCode_t DAQServiceSVC_impl::setOperatorToComp()
     m_oc = ONE;
 
     m_hb_new = 1;
-    m_hb_done = HB_UNDONE;
+    m_hb_done = HBUNDONE;
     return RTC::RTC_OK;
     } else {
     return RTC::RTC_ERROR;
@@ -184,15 +183,18 @@ void DAQServiceSVC_impl::hb_setDone()
     m_hb_done = HBDONE;
 }
 
-RTC::ReturnCode_t DAQServiceSVC_impl::setTime(const CORBA::Long usec)
+RTC::ReturnCode_t DAQServiceSVC_impl::setTime(const TimeVal& now)
 {
-	m_start = usec;
+	m_start = now;
     return RTC::RTC_OK;
 }
 
-CORBA::Long DAQServiceSVC_impl::getTime()
+TimeVal DAQServiceSVC_impl::getTime()
 {
-    return m_start;
+    TimeVal* start_time = new TimeVal;
+    *start_time = m_start;
+
+    return *start_time;
 }
 
 /*

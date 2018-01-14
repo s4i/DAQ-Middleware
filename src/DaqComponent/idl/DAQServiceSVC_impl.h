@@ -23,57 +23,57 @@
  */
 
 class DAQServiceSVC_impl
-    : public virtual POA_DAQService,
-      public virtual PortableServer::RefCountServantBase
+	: public virtual POA_DAQService,
+	  public virtual PortableServer::RefCountServantBase
 {
 private:
-    // Make sure all instances are built on the heap by making the
-    // destructor non-public
-    //virtual ~DAQServiceSVC_impl();
+	// Make sure all instances are built on the heap by making the
+	// destructor non-public
+	//virtual ~DAQServiceSVC_impl();
 
 public:
-    // standard constructor
-    DAQServiceSVC_impl();
-    virtual ~DAQServiceSVC_impl();
+	// standard constructor
+	DAQServiceSVC_impl();
+	virtual ~DAQServiceSVC_impl();
 
-    DAQLifeCycleState getState();
-    RTC::ReturnCode_t setCommand(DAQCommand command);
-    DAQCommand getCommand();
-    DAQDone checkDone();
-    void setDone();
-    void setStatus(const Status& stat);
-    Status* getStatus();
-    void setCompParams(const NVList& comp_params);
-    NVList* getCompParams();
-    void setRunNo(const CORBA::Long run_no);
-    CORBA::Long getRunNo();
-    void setFatalStatus(const FatalErrorStatus& fatalStaus);
+	DAQLifeCycleState getState();
+	RTC::ReturnCode_t setCommand(DAQCommand command);
+	DAQCommand getCommand();
+	DAQDone checkDone();
+	void setDone();
+	void setStatus(const Status& stat);
+	Status* getStatus();
+	void setCompParams(const NVList& comp_params);
+	NVList* getCompParams();
+	void setRunNo(const CORBA::Long run_no);
+	CORBA::Long getRunNo();
+	void setFatalStatus(const FatalErrorStatus& fatalStaus);
 
-    FatalErrorStatus* getFatalStatus();
+	FatalErrorStatus* getFatalStatus();
 
 	RTC::ReturnCode_t setOperatorToComp();
 	HBMSG getOperatorToComp();
-    HeartBeatDone hb_checkDone();
-    void hb_setDone();
+	HeartBeatDone hb_checkDone();
+	void hb_setDone();
 
-    RTC::ReturnCode_t setTime(const CORBA::Long usec);
-    CORBA::Long getTime();
+	RTC::ReturnCode_t setTime(const TimeVal& now);
+	TimeVal getTime();
 
 private:
-    DAQCommand m_command;
-    int m_new;
-    DAQDone m_done;
-    DAQLifeCycleState m_state;
-    Status m_status;
-    FatalErrorStatus m_fatalStatus;
-    NVList m_comp_params;
-    CORBA::Long   m_run_no;
+	DAQCommand m_command;
+	int m_new;
+	DAQDone m_done;
+	DAQLifeCycleState m_state;
+	Status m_status;
+	FatalErrorStatus m_fatalStatus;
+	NVList m_comp_params;
+	CORBA::Long   m_run_no;
 
-    HBMSG m_oc;
-    HBMSG m_co;
-    int m_hb_new;
-    HeartBeatDone m_hb_done;
-    CORBA::Long m_start;
+	HBMSG m_oc;
+	int m_hb_new;
+	HeartBeatDone m_hb_done;
+
+	TimeVal m_start;
 };
 
 #endif // DAQSERVICESVC_IMPL_H

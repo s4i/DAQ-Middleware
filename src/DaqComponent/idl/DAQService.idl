@@ -83,6 +83,11 @@ enum HeartBeatDone {
     HBDONE
 };
 
+struct TimeVal {
+    long sec;
+    long usec;
+};
+
 interface DAQService
 {
     DAQLifeCycleState getState();
@@ -101,11 +106,9 @@ interface DAQService
 
     RTC::ReturnCode_t setOperatorToComp();
     HBMSG getOperatorToComp();
-    //RTC::ReturnCode_t setCompToOperator();
-    //HBMSG getCompToOperator();
     HeartBeatDone hb_checkDone();
     void   hb_setDone();
 
-    RTC::ReturnCode_t setTime(in long usec);
-    long getTime();
+    RTC::ReturnCode_t setTime(in TimeVal now);
+    TimeVal getTime();
 };

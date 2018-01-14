@@ -17,6 +17,9 @@
 #define DAQCOMPONENTBASE_H
 
 #include <iostream>
+#include <ctime>
+#include <fstream>
+#include <sys/time.h>
 
 #include <rtm/Manager.h>
 #include <rtm/DataFlowComponentBase.h>
@@ -27,12 +30,7 @@
 #include <rtm/DataPortStatus.h>
 
 #include "DAQServiceSVC_impl.h"
-//#include "HeartBeatServiceSVC_impl.h"
-//#include "TimeServiceSVC_impl.h"
-
 #include "DAQService.hh"
-//#include "HeartBeatService.hh"
-//#include "TimeService.hh"
 
 #include "DaqComponentException.h"
 #include "Timer.h"
@@ -65,7 +63,6 @@ namespace DAQMW
               m_totalDataSize(0),
               m_trans_lock(false),
               m_DAQServicePort("DAQService"),
-              m_usec(0),
               m_command(CMD_NOP),
               m_state(LOADED),
               m_state_prev(LOADED),
@@ -87,8 +84,6 @@ namespace DAQMW
     protected:
 
         DAQServiceSVC_impl m_daq_service0;
-        //DAQServiceSVC_impl m_daq_service1;
-
         Status m_status;
 
         static const unsigned int  HEADER_BYTE_SIZE = 8;
@@ -227,22 +222,6 @@ namespace DAQMW
             m_DAQServicePort.registerProvider("daq_svc", "DAQService", m_daq_service0);
             // Set CORBA Service Ports
             registerPort(m_DAQServicePort);
-
-            // Set service provider to Ports 2
-            // m_DAQServicePort2.registerProvider("daq_svc2", "DAQService", m_daq_service1);
-            // Set CORBA Service Ports 2
-            // registerPort(m_DAQServicePort2);
-
-            // Set HeartBeat provider to Ports
-            //m_HBMSGSPort.registerProvider("hbs_svc", "HeartBeatService", m_hbs0);
-            // Set Corba HeartBeat Ports
-            //registerPort(m_HBMSGSPort);
-
-            // Set Time provider to Ports
-            //m_TimeServicePort.registerProvider("ts_svc", "TimeService", m_ts0);
-            // Set Corba Time Ports
-            //registerPort(m_TimeServicePort);
-
             return 0;
         }
 
@@ -595,6 +574,7 @@ namespace DAQMW
                               << std::endl;
                 }
                 set_done();
+                get_time_performance(m_command);
             }
             else {
                 ///same command as previous, stay same state, do same action
@@ -628,12 +608,9 @@ namespace DAQMW
             }
 
             get_hb_from_operator();
-            //if (m_hb == ONE) {
-            //    set_hb_done();
-            //}
-
-            //get_time();
-
+            if (m_hb == ONE) {
+                set_hb_done();
+            }
             return ret;
         } /// daq_do()
 
@@ -682,14 +659,10 @@ namespace DAQMW
         bool m_trans_lock;
 
         RTC::CorbaPort m_DAQServicePort;
-        // RTC::CorbaPort m_DAQServicePort2;
-        // RTC::CorbaPort m_HBMSGSPort;
-        // RTC::CorbaPort m_TimeServicePort;
 
         Timer* mytimer;
 
         HBMSG m_hb;
-        long m_usec;
 
         DAQCommand m_command;
         DAQLifeCycleState m_state;
@@ -711,10 +684,6 @@ namespace DAQMW
 
         int transAction(int command) {
             return (this->*m_daq_trans_func[command])();
-        }
-
-        int hbAction(int hb) {
-            return (this->*m_daq_hb_func[hb])();
         }
 
         void doAction(int state){
@@ -791,9 +760,7 @@ namespace DAQMW
         int get_hb_from_operator()
         {
             m_hb = m_daq_service0.getOperatorToComp();
-            if (m_debug) {
-                std::cerr << "m_hb=" << m_hb << std::endl;
-            }
+            std::cerr << "m_hb=" << m_hb << std::endl;
             return 0;
         }
 
@@ -811,10 +778,63 @@ namespace DAQMW
         //    return 0;
         //}
 
-        int get_time()
+        int get_time_performance(int command)
         {
-            m_usec = m_daq_service0.getTime();
-            std::cerr << m_usec << std::endl;
+            TimeVal st;
+            struct timeval end_time;
+            struct timezone tz;
+            long result;
+
+            char date[128];
+            char fname[128];
+
+            /* end time */
+            gettimeofday(&end_time, &tz);
+
+            /* start time */
+            st = m_daq_service0.getTime();
+
+            /* calc */
+            result = (end_time.tv_sec - st.sec) * 1000000
+                    + (end_time.tv_usec - st.usec);
+
+            if (result < 0) {
+                result = (st.sec - end_time.tv_sec) * 1000000
+                        + (st.usec - end_time.tv_usec);
+            }
+
+            time_t t = time(NULL);
+            strftime(date, sizeof(date), "/home/sai/DAQ-Middleware/csv/%Y-%m-%d", localtime(&t));
+            sprintf(fname, "%s.cvs", date);
+            std::ofstream csv_file(fname, std::ios::app);
+
+            result *= 1000;
+
+            switch (command) {
+            case CMD_CONFIGURE:
+                csv_file << "Configure," << result << std::endl;
+                break;
+            case CMD_START:
+                csv_file << "Start," << result << std::endl;
+                break;
+            case CMD_STOP:
+                csv_file << "Stop," << result << std::endl;
+                break;
+            case CMD_UNCONFIGURE:
+                csv_file << "Unconfigure," << result << std::endl;
+                break;
+            case CMD_PAUSE:
+                csv_file << "Pause," << result << std::endl;
+                break;
+            case CMD_RESUME:
+                csv_file << "Resume," << result << std::endl;
+                break;
+            case CMD_RESTART:
+                csv_file << "Restart," << result << std::endl;
+                break;
+            }
+            csv_file.close();
+
             return 0;
         }
 
