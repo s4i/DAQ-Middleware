@@ -120,8 +120,6 @@ protected:
     std::vector<RTC::CorbaConsumer<DAQService> > m_daqservices;
     // std::list<RTC::CorbaConsumer<DAQService> > m_daqservices;
 
-    Timer* mytimer;
-
 private:
     static const int PARAM_PORT = 30000;
     static DaqOperator* _instance;
@@ -235,6 +233,8 @@ private:
 
     bool resFlag;
     bool deadFlag;
+
+    Timer* mytimer;
 
     bool m_debug;
 };
