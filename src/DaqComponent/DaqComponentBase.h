@@ -760,9 +760,7 @@ namespace DAQMW
         int get_hb_from_operator()
         {
             m_hb = m_daq_service0.getOperatorToComp();
-            if (m_debug) {
-                std::cerr << "m_hb=" << m_hb << std::endl;
-            }
+            std::cerr << "m_hb=" << m_hb << std::endl;
             return 0;
         }
 
@@ -837,6 +835,7 @@ namespace DAQMW
                 break;
             }
             csv_file.close();
+
             return 0;
         }
 
