@@ -21,10 +21,10 @@
  * Example implementational code for IDL interface DAQService
  */
 DAQServiceSVC_impl::DAQServiceSVC_impl()
-    : m_command(CMD_NOP), 
-      m_new(0), 
-      m_done(DONE), 
-      m_state(LOADED), 
+    : m_command(CMD_NOP),
+      m_new(0),
+      m_done(DONE),
+      m_state(LOADED),
       m_run_no(0)
 {
     // Please add extra constructor code here.
@@ -76,8 +76,8 @@ DAQCommand DAQServiceSVC_impl::getCommand()
 	///std::cerr << "new command\n";
 	m_new = 0;
 	return m_command;
-    } 
-    else 
+    }
+    else
 	return CMD_NOP;
 
 }
@@ -102,7 +102,7 @@ Status* DAQServiceSVC_impl::getStatus()
 {
     Status* mystatus = new Status;
     *mystatus = m_status;
-    
+
     return mystatus;
 }
 
@@ -116,7 +116,7 @@ NVList* DAQServiceSVC_impl::getCompParams()
     return &m_comp_params;
 }
 
-void DAQServiceSVC_impl::setRunNo(const CORBA::Long run_no) 
+void DAQServiceSVC_impl::setRunNo(const CORBA::Long run_no)
 {
     m_run_no = run_no;
 }
@@ -126,19 +126,32 @@ CORBA::Long DAQServiceSVC_impl::getRunNo()
     return m_run_no;
 }
 
-void DAQServiceSVC_impl::setFatalStatus(const FatalErrorStatus& fatalStatus) 
+void DAQServiceSVC_impl::setFatalStatus(const FatalErrorStatus& fatalStatus)
 {
     std::cerr << "### setFatalStatus:" << fatalStatus.fatalTypes << std::endl;
     m_fatalStatus = fatalStatus;
 }
 
-FatalErrorStatus* DAQServiceSVC_impl::getFatalStatus() 
+FatalErrorStatus* DAQServiceSVC_impl::getFatalStatus()
 {
     FatalErrorStatus* myfatal = new FatalErrorStatus;
     *myfatal = m_fatalStatus;
     return myfatal;
 }
 
+RTC::ReturnCode_t DAQServiceSVC_impl::setTime(const TimeVal& now)
+{
+	m_start = now;
+    return RTC::RTC_OK;
+}
+
+TimeVal DAQServiceSVC_impl::getTime()
+{
+    TimeVal* start_time = new TimeVal;
+    *start_time = m_start;
+
+    return *start_time;
+}
 /*
 void DAQServiceSVC_impl::setMessage(const char* message) {
     std::cerr << "setMessage:" << message << std::endl;

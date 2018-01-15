@@ -17,6 +17,11 @@
 #define DAQCOMPONENTBASE_H
 
 #include <iostream>
+#include <ctime>
+#include <fstream>
+#include <pwd.h>
+#include <unistd.h>
+#include <sys/time.h>
 
 #include <rtm/Manager.h>
 #include <rtm/DataFlowComponentBase.h>
@@ -40,7 +45,7 @@ namespace DAQMW
   /*!
    * @class DaqComponentBase
    * @brief DaqComponentBase class
-   * 
+   *
    * This is default condition class. User uses the class as base class.
    *
    */
@@ -386,7 +391,7 @@ namespace DAQMW
             RTC::DataPortStatus::Enum out_status = myOutPort.getStatus(index);
             if(m_debug) {
                 std::cerr << "OutPort status: "
-                          << RTC::DataPortStatus::toString(out_status) 
+                          << RTC::DataPortStatus::toString(out_status)
                           << std::endl;
             }
             switch(out_status) {
@@ -404,7 +409,7 @@ namespace DAQMW
             case RTC::DataPortStatus::PRECONDITION_NOT_MET:
             case RTC::DataPortStatus::CONNECTION_LOST:
                 std::cerr << "OutPort status: "
-                          << RTC::DataPortStatus::toString(out_status) 
+                          << RTC::DataPortStatus::toString(out_status)
                           << std::endl;
                 ret = BUF_FATAL;
                 break;
@@ -417,7 +422,7 @@ namespace DAQMW
             case RTC::DataPortStatus::BUFFER_ERROR:
             case RTC::DataPortStatus::INVALID_ARGS:
                 std::cerr << "Impossible OutPort status: "
-                          << RTC::DataPortStatus::toString(out_status) 
+                          << RTC::DataPortStatus::toString(out_status)
                           << std::endl;
                 ret = BUF_FATAL;
                 break;
@@ -471,8 +476,8 @@ namespace DAQMW
             case RTC::DataPortStatus::INVALID_ARGS:
             case RTC::DataPortStatus::CONNECTION_LOST:
             case RTC::DataPortStatus::UNKNOWN_ERROR:
-                std::cerr << "Impossible InPort status: " 
-                          << RTC::DataPortStatus::toString(in_status) 
+                std::cerr << "Impossible InPort status: "
+                          << RTC::DataPortStatus::toString(in_status)
                           << std::endl;
                 ret = BUF_FATAL;
                 break;
@@ -571,6 +576,8 @@ namespace DAQMW
                               << std::endl;
                 }
                 set_done();
+                get_time_performance(m_command);
+                output_time_performance(m_command);
             }
             else {
                 ///same command as previous, stay same state, do same action
@@ -740,6 +747,115 @@ namespace DAQMW
             if (m_debug) {
                 std::cerr << "m_command=" << m_command << std::endl;
             }
+            return 0;
+        }
+
+        int get_time_performance(int command)
+        {
+            TimeVal st;
+            struct timeval end_time;
+            struct timezone tz;
+            long result;
+
+            struct passwd *pw;
+            uid_t uid;
+
+            char date[128];
+            char fname[128];
+
+            /* end time */
+            gettimeofday(&end_time, &tz);
+
+            /* start time */
+            st = m_daq_service0.getTime();
+
+            /* calc */
+            result = (end_time.tv_sec - st.sec) * 1000000
+                    + (end_time.tv_usec - st.usec);
+
+            if (result < 0) {
+                result = (st.sec - end_time.tv_sec) * 1000000
+                        + (st.usec - end_time.tv_usec);
+            }
+
+            uid = getuid();
+            if ((pw = getpwuid (uid))) {
+                sprintf(date, "/home/%s/DAQ-Middleware/csv/h-sendai/%s-file-inline", pw->pw_name, pw->pw_name, pw->pw_name);
+            }
+            sprintf(fname, "%s.csv", date);
+            std::ofstream csv_file(fname, std::ios::app);
+
+            switch (command) {
+            case CMD_CONFIGURE:
+                csv_file << "Configure," << result << std::endl;
+                break;
+            case CMD_START:
+                csv_file << "Start," << result << std::endl;
+                break;
+            case CMD_STOP:
+                csv_file << "Stop," << result << std::endl;
+                break;
+            case CMD_UNCONFIGURE:
+                csv_file << "Unconfigure," << result << std::endl;
+                break;
+            case CMD_PAUSE:
+                csv_file << "Pause," << result << std::endl;
+                break;
+            case CMD_RESUME:
+                csv_file << "Resume," << result << std::endl;
+                break;
+            }
+            csv_file.close();
+
+            return 0;
+        }
+
+        int output_time_performance(int command)
+        {
+            struct timeval end_time;
+            struct timezone tz;
+
+            struct passwd *pw;
+            uid_t uid;
+
+            char date[128];
+            char fname[128];
+
+            long gt;
+
+            /* end time */
+            gettimeofday(&end_time, &tz);
+            gt = end_time.tv_sec * 1000000 + end_time.tv_usec;
+
+            uid = getuid();
+            if ((pw = getpwuid (uid))) {
+                sprintf(date, "/home/%s/DAQ-Middleware/csv/h-sendai/%s-file-output", pw->pw_name, pw->pw_name, pw->pw_name);
+            }
+            sprintf(fname, "%s.csv", date);
+            std::ofstream csv_file(fname, std::ios::app);
+
+            switch (command) {
+            case CMD_CONFIGURE:
+                csv_file << "et,Configure," << gt << std::endl;
+                break;
+            case CMD_START:
+                csv_file << "et,Start," << gt << std::endl;
+                break;
+            case CMD_STOP:
+                csv_file << "et,Stop," << gt << std::endl;
+                break;
+            case CMD_UNCONFIGURE:
+                csv_file << "et,Unconfigure," << gt << std::endl;
+                break;
+            case CMD_PAUSE:
+                csv_file << "et,Pause," << gt << std::endl;
+                break;
+            case CMD_RESUME:
+                csv_file << "et,Resume," << gt << std::endl;
+                break;
+            }
+            csv_file.close();
+
             return 0;
         }
 

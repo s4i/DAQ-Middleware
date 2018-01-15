@@ -17,7 +17,7 @@
 
 #ifndef DAQSERVICESVC_IMPL_H
 #define DAQSERVICESVC_IMPL_H
- 
+
 /*
  * Example class implementing IDL interface DAQService
  */
@@ -51,6 +51,9 @@ public:
 
     FatalErrorStatus* getFatalStatus();
 
+	RTC::ReturnCode_t setTime(const TimeVal& now);
+	TimeVal getTime();
+
 private:
     DAQCommand m_command;
     int m_new;
@@ -60,6 +63,8 @@ private:
     FatalErrorStatus m_fatalStatus;
     NVList m_comp_params;
     CORBA::Long   m_run_no;
+
+	TimeVal m_start;
 };
 
 #endif // DAQSERVICESVC_IMPL_H

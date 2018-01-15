@@ -31,7 +31,11 @@
 #include <vector>
 #include <map>
 #include <stdlib.h>
+#include <fstream>
+#include <pwd.h>
+#include <unistd.h>
 #include <sys/select.h>
+#include <sys/time.h>
 
 #include "DAQServiceStub.h"
 
@@ -58,8 +62,8 @@ typedef std::vector< serviceInfo > DaqServiceList;
 /*!
  * @class DaqOperator
  * @brief DaqOperator class
- * 
- * 
+ *
+ *
  *
  */
 class DaqOperator
@@ -72,7 +76,7 @@ public:
     ~DaqOperator();
 
     // The initialize action (on CREATED->ALIVE transition)
-    // formaer rtc_init_entry() 
+    // formaer rtc_init_entry()
     virtual RTC::ReturnCode_t onInitialize();
 
     // The startup action when ExecutionContext startup
@@ -125,6 +129,9 @@ private:
     int m_service_num;
     int set_runno(RTC::CorbaConsumer<DAQService> daqservice, unsigned runno);
     int set_command(RTC::CorbaConsumer<DAQService> daqservice,DAQCommand daqcom);
+    int set_time();
+    int set_gettime(RTC::CorbaConsumer<DAQService> daqservice);
+    int output_performance(int command);
     int check_done(RTC::CorbaConsumer<DAQService> daqservice);
     int set_sitcp_num(int sitcp_num);
     int set_service_list();
@@ -157,7 +164,7 @@ private:
     CORBA::Long m_status;
     CompInfoList m_compInfoList;
     DaqServiceList  m_daqServiceList;
-    
+
     fd_set    m_allset;
     fd_set    m_rset;
     int       m_maxfd;

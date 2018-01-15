@@ -70,6 +70,11 @@ struct Status
     CompStatus comp_status;
 };
 
+struct TimeVal {
+    long sec;
+    long usec;
+};
+
 interface DAQService
 {
     DAQLifeCycleState getState();
@@ -85,5 +90,8 @@ interface DAQService
     long getRunNo();
     void setFatalStatus(in FatalErrorStatus fatalStaus);
     FatalErrorStatus getFatalStatus();
+
+    RTC::ReturnCode_t setTime(in TimeVal now);
+    TimeVal getTime();
 };
 

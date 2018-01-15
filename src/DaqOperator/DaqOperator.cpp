@@ -195,7 +195,7 @@ RTC::ReturnCode_t DaqOperator::run_http_mode()
         g_server->bind("put:Restart", &m_body, cb_command_resume);
         g_server->bind("put:StopParamsSet", &m_body, cb_command_stopparamsset);
         g_server->bind("put:Save", &m_body, cb_command_save);
-        g_server->bind("put:ConfirmConnection", &m_body, 
+        g_server->bind("put:ConfirmConnection", &m_body,
                        cb_command_confirmconnection);
         g_server->bind("put:dummy", &m_body, cb_command_dummy);
         if (m_debug) {
@@ -259,13 +259,13 @@ void DaqOperator::run_data()
         for (int i = 0; i< m_comp_num; i++) {
             Status_var status;
             status = m_daqservices[i]->getStatus();
-              
+
             if (status->comp_status == COMP_FATAL) {
                 RTC::ConnectorProfileList_var myprof =
                     m_DaqServicePorts[i]->get_connector_profiles();
                 std::cerr << myprof[0].name << " "
                             << "### on ERROR ###  " << std::endl;
-                
+
                 FatalErrorStatus_var errStatus;
                 errStatus = m_daqservices[i]->getFatalStatus();
                 std::cerr << "\033[1;0H";
@@ -324,11 +324,13 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
     }
 
     if (FD_ISSET(0, &m_rset)) {
+        set_time();
         char comm[2];
         if ( read(0, comm, sizeof(comm)) == -1) {
             return RTC::RTC_OK;
         }
         command = (int)(comm[0] - '0');
+        output_performance(command);
 
         switch (m_state) {
         case PAUSED:
@@ -453,7 +455,7 @@ bool DaqOperator::parse_body(const char* buf, const std::string tagname)
 {
     XercesDOMParser* parser = new XercesDOMParser;
 
-    MemBufInputSource* memBufIS 
+    MemBufInputSource* memBufIS
         = new MemBufInputSource( (const XMLByte*)buf, strlen(buf), "test", false);
 
     parser->parse(*memBufIS);
@@ -513,7 +515,7 @@ int DaqOperator::set_runno(RTC::CorbaConsumer<DAQService> daqservice, unsigned r
     return 0;
 }
 
-int DaqOperator::set_command(RTC::CorbaConsumer<DAQService> daqservice, 
+int DaqOperator::set_command(RTC::CorbaConsumer<DAQService> daqservice,
                              DAQCommand daqcom)
 {
     int status = 0;
@@ -525,6 +527,44 @@ int DaqOperator::set_command(RTC::CorbaConsumer<DAQService> daqservice,
         std::cerr << "### ERROR: set command: exception occured\n ";
     }
 
+    return 0;
+}
+
+int DaqOperator::set_time()
+{
+	try {
+		for (int i = 0; i < m_comp_num; i++) {
+			try {
+				set_gettime(m_daqservices[i]);
+			}
+			catch(...) {
+				std::cerr << "### ERROR: set time: exception occured\n";
+			}
+		}
+	}
+	catch(...) {
+		std::cerr << "### ERROR: DaqOperator: Failed to set Time.\n";
+	}
+
+	return 0;
+}
+
+int DaqOperator::set_gettime(RTC::CorbaConsumer<DAQService> daqservice)
+{
+    struct timeval start_time;
+    struct timezone tz;
+    gettimeofday(&start_time, &tz);
+
+    TimeVal *st = new TimeVal;
+    st->sec = start_time.tv_sec;
+    st->usec = start_time.tv_usec;
+    try {
+        daqservice->setTime(*st);
+    }
+    catch(...) {
+        std::cerr << "### ERROR: set time: exception occured\n";
+    }
+    delete st;
     return 0;
 }
 
@@ -630,7 +670,7 @@ int DaqOperator::configure_procedure()
     }
     try {
         for (int i = 0; i < (int)m_daqservices.size(); i++) {
-            RTC::ConnectorProfileList_var myprof 
+            RTC::ConnectorProfileList_var myprof
                 = m_DaqServicePorts[i]->get_connector_profiles();
 
             char * id = CORBA::string_dup(myprof[0].name);
@@ -1152,3 +1192,55 @@ extern "C"
                                  RTC::Delete<DaqOperator>);
     }
 };
+
+int DaqOperator::output_performance(int command)
+{
+	struct timeval start_time;
+	struct timezone tz;
+
+	struct passwd *pw;
+	uid_t uid;
+
+	char date[256];
+	char fname[256];
+	long gt;
+
+	/* end time */
+	gettimeofday(&start_time, &tz);
+	gt = start_time.tv_sec * 1000000 + start_time.tv_usec;
+
+	uid = getuid();
+	if ((pw = getpwuid (uid))) {
+		sprintf(date, "/home/%s/DAQ-Middleware/csv/%s/%s-file-output",
+				pw->pw_name, pw->pw_name, pw->pw_name);
+	}
+	sprintf(fname, "%s.csv", date);
+	std::ofstream csv_file(fname, std::ios::app);
+
+	switch (command) {
+	case CMD_CONFIGURE:
+		csv_file << "st,Configure," << gt << std::endl;
+		break;
+	case CMD_START:
+		csv_file << "st,Start," << gt << std::endl;
+		break;
+	case CMD_STOP:
+		csv_file << "st,Stop," << gt << std::endl;
+		break;
+	case CMD_UNCONFIGURE:
+		csv_file << "st,Unconfigure," << gt << std::endl;
+		break;
+	case CMD_PAUSE:
+		csv_file << "st,Pause," << gt << std::endl;
+		break;
+	case CMD_RESUME:
+		csv_file << "st,Resume," << gt << std::endl;
+		break;
+	case CMD_RESTART:
+		csv_file << "st,Restart," << gt << std::endl;
+		break;
+	}
+	csv_file.close();
+
+	return 0;
+}
