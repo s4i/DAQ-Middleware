@@ -324,12 +324,12 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
     }
 
     if (FD_ISSET(0, &m_rset)) {
-        set_time();
         char comm[2];
         if ( read(0, comm, sizeof(comm)) == -1) {
             return RTC::RTC_OK;
         }
         command = (int)(comm[0] - '0');
+        set_time();
         output_performance(command);
 
         switch (m_state) {
@@ -362,6 +362,11 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
                 std::cerr << "input RUN NO(same run no is prohibited):   ";
                 std::cerr << "\033[3;62H";
                 std::cin >> srunNo;
+
+				/* set time */
+				set_time();
+				output_performance(command);
+
                 m_runNumber = atoi( srunNo.c_str());
                 start_procedure();
                 m_state = RUNNING;
