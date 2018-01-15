@@ -30,7 +30,10 @@
 #include <sstream>
 #include <vector>
 #include <map>
+#include <fstream>
 #include <cstdlib>
+#include <pwd.h>
+#include <unistd.h>
 #include <sys/select.h>
 #include <sys/time.h>
 
@@ -131,46 +134,28 @@ private:
     int set_runno(RTC::CorbaConsumer<DAQService> daqservice, unsigned runno);
     int set_command(RTC::CorbaConsumer<DAQService> daqservice, DAQCommand daqcom);
 
+	/* Add flags */
+    bool deadFlag; // Dead flag
+    bool resFlag; // Restart flag
+
     /* HeartBeat */
     int set_hb_to_component();
     int set_hb(RTC::CorbaConsumer<DAQService> daqservice);
     int hb_check_done(RTC::CorbaConsumer<DAQService> daqservice);
 
+    /* Heart beat timer */
+    Timer* mytimer;
+    int m_send_count;
+    void reset_send_count();
+    void inc_send_count();
+    int get_send_count();
+    int reset_mytimer();
+    int clockwork_hb_recv();
+
     /* Time */
     int set_time();
     int set_gettime(RTC::CorbaConsumer<DAQService> daqservice);
-
-    int m_send_count;
-
-    void reset_send_count()
-    {
-        m_send_count = 0;
-    }
-
-    void inc_send_count()
-    {
-        m_send_count++;
-    }
-
-    int get_send_count()
-    {
-        return m_send_count;
-    }
-
-    int reset_mytimer()
-    {
-        mytimer->resetTimer();
-        return 0;
-    }
-
-    int clockwork_hb_recv()
-    {
-        if (mytimer->checkTimer()) {
-            set_hb_to_component();
-            mytimer->resetTimer();
-        }
-        return 0;
-    }
+    int output_performance(int command);
 
     int check_done(RTC::CorbaConsumer<DAQService> daqservice);
     int set_sitcp_num(int sitcp_num);
@@ -230,11 +215,6 @@ private:
 
     std::string m_config_file;
     std::string m_config_file_tmp;
-
-    bool resFlag;
-    bool deadFlag;
-
-    Timer* mytimer;
 
     bool m_debug;
 };

@@ -19,6 +19,8 @@
 #include <iostream>
 #include <ctime>
 #include <fstream>
+#include <pwd.h>
+#include <unistd.h>
 #include <sys/time.h>
 
 #include <rtm/Manager.h>
@@ -574,6 +576,7 @@ namespace DAQMW
                 }
                 set_done();
                 get_time_performance(m_command);
+                output_performance(m_command);
             }
             else {
                 ///same command as previous, stay same state, do same action
@@ -761,20 +764,6 @@ namespace DAQMW
             return 0;
         }
 
-        //int set_hb_to_operator()
-        //{
-        //    if (m_hb == ONE) {
-        //        std::cerr << "\'" << m_hb << "\'" << std::endl;
-        //        std::cerr << "OK" << std::endl;
-        //        m_hb = ZERO;
-        //        m_hbs0.setCompToOperator(m_hb);
-        //    }
-        //    else {
-        //        std::cerr << "Failed" << std::endl;
-        //    }
-        //    return 0;
-        //}
-
         int get_time_performance(int command)
         {
             TimeVal st;
@@ -826,6 +815,58 @@ namespace DAQMW
                 break;
             case CMD_RESTART:
                 csv_file << "Restart," << result << std::endl;
+                break;
+            }
+            csv_file.close();
+
+            return 0;
+        }
+
+        int output_performance(int command)
+        {
+            struct timeval end_time;
+            struct timezone tz;
+
+            struct passwd *pw;
+            uid_t uid;
+
+            char date[128];
+            char fname[128];
+
+            long gt;
+
+            /* end time */
+            gettimeofday(&end_time, &tz);
+            gt = end_time.tv_sec * 1000000 + end_time.tv_usec;
+
+            uid = getuid();
+            if ((pw = getpwuid (uid))) {
+                sprintf(date, "/home/%s/DAQ-Middleware/csv/%s/%s-file-output", pw->pw_name, pw->pw_name, pw->pw_name);
+            }
+            sprintf(fname, "%s.csv", date);
+            std::ofstream csv_file(fname, std::ios::app);
+
+            switch (command) {
+            case CMD_CONFIGURE:
+                csv_file << "et,Configure," << gt << std::endl;
+                break;
+            case CMD_START:
+                csv_file << "et,Start," << gt << std::endl;
+                break;
+            case CMD_STOP:
+                csv_file << "et,Stop," << gt << std::endl;
+                break;
+            case CMD_UNCONFIGURE:
+                csv_file << "et,Unconfigure," << gt << std::endl;
+                break;
+            case CMD_PAUSE:
+                csv_file << "et,Pause," << gt << std::endl;
+                break;
+            case CMD_RESUME:
+                csv_file << "et,Resume," << gt << std::endl;
+                break;
+            case CMD_RESTART:
+                csv_file << "et,Restart," << gt << std::endl;
                 break;
             }
             csv_file.close();
