@@ -1236,9 +1236,6 @@ int DaqOperator::output_performance(int command)
 	case CMD_RESUME:
 		csv_file << "st,Resume," << gt << std::endl;
 		break;
-	case CMD_RESTART:
-		csv_file << "st,Restart," << gt << std::endl;
-		break;
 	}
 	csv_file.close();
 
