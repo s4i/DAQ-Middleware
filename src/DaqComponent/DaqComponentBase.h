@@ -576,7 +576,7 @@ namespace DAQMW
                 }
                 set_done();
                 get_time_performance(m_command);
-                output_performance(m_command);
+                output_time_performance(m_command);
             }
             else {
                 ///same command as previous, stay same state, do same action
@@ -771,6 +771,9 @@ namespace DAQMW
             struct timezone tz;
             long result;
 
+            struct passwd *pw;
+            uid_t uid;
+
             char date[128];
             char fname[128];
 
@@ -789,8 +792,10 @@ namespace DAQMW
                         + (st.usec - end_time.tv_usec);
             }
 
-            time_t t = time(NULL);
-            strftime(date, sizeof(date), "/home/sai/DAQ-Middleware/csv/s4i/%Y-%m-%d", localtime(&t));
+            uid = getuid();
+            if ((pw = getpwuid (uid))) {
+                sprintf(date, "/home/%s/DAQ-Middleware/csv/%s/%s-file-inline", pw->pw_name, pw->pw_name, pw->pw_name);
+            }
             sprintf(fname, "%s.csv", date);
             std::ofstream csv_file(fname, std::ios::app);
 
@@ -822,7 +827,7 @@ namespace DAQMW
             return 0;
         }
 
-        int output_performance(int command)
+        int output_time_performance(int command)
         {
             struct timeval end_time;
             struct timezone tz;
