@@ -127,8 +127,6 @@ private:
     static const int PARAM_PORT = 30000;
     static DaqOperator* _instance;
 
-    static const int HB_CYCLE_SEC = 5;
-
     int m_comp_num;
     int m_service_num;
     int set_runno(RTC::CorbaConsumer<DAQService> daqservice, unsigned runno);
@@ -144,6 +142,7 @@ private:
     int hb_check_done(RTC::CorbaConsumer<DAQService> daqservice);
 
     /* Heart beat timer */
+    static const int HB_CYCLE_SEC = 5;
     Timer* mytimer;
     int m_send_count;
     void reset_send_count();

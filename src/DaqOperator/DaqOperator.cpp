@@ -382,6 +382,11 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 				std::cerr << "input RUN NO(same run no is prohibited):   ";
 				std::cerr << "\033[5;62H";
 				std::cin >> srunNo;
+
+				/* set time */
+				set_time();
+				output_performance(command);
+
 				m_runNumber = atoi(srunNo.c_str());
 				start_procedure();
 				m_state = RUNNING;
