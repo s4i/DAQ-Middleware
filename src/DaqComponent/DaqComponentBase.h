@@ -794,7 +794,7 @@ namespace DAQMW
 
             uid = getuid();
             if ((pw = getpwuid (uid))) {
-                sprintf(date, "/home/%s/DAQ-Middleware/csv/%s/%s-file-inline", pw->pw_name, pw->pw_name, pw->pw_name);
+                sprintf(date, "/home/%s/DAQ-Middleware/csv/s4i/s4i-file-inline", pw->pw_name);
             }
             sprintf(fname, "%s.csv", date);
             std::ofstream csv_file(fname, std::ios::app);
@@ -838,40 +838,41 @@ namespace DAQMW
             char date[128];
             char fname[128];
 
-            long gt;
+            long gt[2];
 
             /* end time */
             gettimeofday(&end_time, &tz);
-            gt = end_time.tv_sec * 1000000 + end_time.tv_usec;
+            gt[0] = end_time.tv_sec;
+            gt[1] = end_time.tv_usec;
 
             uid = getuid();
             if ((pw = getpwuid (uid))) {
-                sprintf(date, "/home/%s/DAQ-Middleware/csv/%s/%s-file-output", pw->pw_name, pw->pw_name, pw->pw_name);
+                sprintf(date, "/home/%s/DAQ-Middleware/csv/s4i/s4i-file-output", pw->pw_name);
             }
             sprintf(fname, "%s.csv", date);
             std::ofstream csv_file(fname, std::ios::app);
 
             switch (command) {
             case CMD_CONFIGURE:
-                csv_file << "et,Configure," << gt << std::endl;
+                csv_file << "et,Configure," << gt[0] << ',' << gt[1] << std::endl;
                 break;
             case CMD_START:
-                csv_file << "et,Start," << gt << std::endl;
+                csv_file << "et,Start," << gt[0] << ',' << gt[1] << std::endl;
                 break;
             case CMD_STOP:
-                csv_file << "et,Stop," << gt << std::endl;
+                csv_file << "et,Stop," << gt[0] << ',' << gt[1] << std::endl;
                 break;
             case CMD_UNCONFIGURE:
-                csv_file << "et,Unconfigure," << gt << std::endl;
+                csv_file << "et,Unconfigure," << gt[0] << ',' << gt[1] << std::endl;
                 break;
             case CMD_PAUSE:
-                csv_file << "et,Pause," << gt << std::endl;
+                csv_file << "et,Pause," << gt[0] << ',' << gt[1] << std::endl;
                 break;
             case CMD_RESUME:
-                csv_file << "et,Resume," << gt << std::endl;
+                csv_file << "et,Resume," << gt[0] << ',' << gt[1] << std::endl;
                 break;
             case CMD_RESTART:
-                csv_file << "et,Restart," << gt << std::endl;
+                csv_file << "et,Restart," << gt[0] << ',' << gt[1] << std::endl;
                 break;
             }
             csv_file.close();

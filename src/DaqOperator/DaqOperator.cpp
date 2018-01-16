@@ -1491,41 +1491,42 @@ int DaqOperator::output_performance(int command)
 
 	char date[256];
 	char fname[256];
-	long gt;
+	long gt[2];
 
 	/* end time */
 	gettimeofday(&start_time, &tz);
-	gt = start_time.tv_sec * 1000000 + start_time.tv_usec;
+	gt[0] = start_time.tv_sec;
+	gt[1] = start_time.tv_usec;
 
 	uid = getuid();
 	if ((pw = getpwuid (uid))) {
-		sprintf(date, "/home/%s/DAQ-Middleware/csv/%s/%s-file-output",
-				pw->pw_name, pw->pw_name, pw->pw_name);
+		sprintf(date, "/home/%s/DAQ-Middleware/csv/s4i/s4i-file-output",
+				pw->pw_name);
 	}
 	sprintf(fname, "%s.csv", date);
 	std::ofstream csv_file(fname, std::ios::app);
 
 	switch (command) {
 	case CMD_CONFIGURE:
-		csv_file << "st,Configure," << gt << std::endl;
+		csv_file << "st,Configure," << gt[0] << ',' << gt[1] << std::endl;
 		break;
 	case CMD_START:
-		csv_file << "st,Start," << gt << std::endl;
+		csv_file << "st,Start," << gt[0] << ',' << gt[1] << std::endl;
 		break;
 	case CMD_STOP:
-		csv_file << "st,Stop," << gt << std::endl;
+		csv_file << "st,Stop," << gt[0] << ',' << gt[1] << std::endl;
 		break;
 	case CMD_UNCONFIGURE:
-		csv_file << "st,Unconfigure," << gt << std::endl;
+		csv_file << "st,Unconfigure," << gt[0] << ',' << gt[1] << std::endl;
 		break;
 	case CMD_PAUSE:
-		csv_file << "st,Pause," << gt << std::endl;
+		csv_file << "st,Pause," << gt[0] << ',' << gt[1] << std::endl;
 		break;
 	case CMD_RESUME:
-		csv_file << "st,Resume," << gt << std::endl;
+		csv_file << "st,Resume," << gt[0] << ',' << gt[1] << std::endl;
 		break;
 	case CMD_RESTART:
-		csv_file << "st,Restart," << gt << std::endl;
+		csv_file << "st,Restart," << gt[0] << ',' << gt[1] << std::endl;
 		break;
 	}
 	csv_file.close();
