@@ -52,6 +52,7 @@ DaqOperator::DaqOperator(RTC::Manager* manager)
 	m_service_num(0),
     deadFlag(false),
 	resFlag(false),
+	HB_CYCLE_SEC(5),
     m_send_count(0),
 	m_state(LOADED),
 	m_runNumber(0),
@@ -132,11 +133,13 @@ DaqOperator::DaqOperator(RTC::Manager* manager)
 
 	/* Timer */
 	mytimer = new Timer(HB_CYCLE_SEC);
+	keep_alive = new int[m_comp_num];
 }
 
 DaqOperator::~DaqOperator()
 {
 	XMLPlatformUtils::Terminate();
+	delete keep_alive;
 	delete mytimer;
 }
 
@@ -266,7 +269,7 @@ void DaqOperator::run_data()
 	std::cerr << "\033[;H\033[2J";
 
 	try {
-		for (int i = 0; i< m_comp_num; i++) {
+		for (int i = 0; i < m_comp_num; i++) {
 			Status_var status;
 			status = m_daqservices[i]->getStatus();
 
@@ -297,7 +300,6 @@ void DaqOperator::run_data()
 		 << " start at: "  << m_start_date
 		 << " stop at: "   << m_stop_date   << std::endl;
 }
-
 
 //#ifdef AAA
 RTC::ReturnCode_t DaqOperator::run_console_mode()
@@ -523,7 +525,11 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 				if (d_compname[i].length() != 0) {
 					std::cerr << " [ERROR" << ++cnt  << "] ";
 					std::cerr << d_compname[i] << '\t' << "<= ";
-					if (resFlag == true) {
+					if (deadFlag == true) {
+						std::cerr << "\033[36m"	  << " Heart beat return wait."
+								  << std::endl;
+					}
+					else if (resFlag == true) {
 						std::cerr << "\033[36m"	  << " Restart Ready"
 								  << std::endl;
 						std::cerr << "\033[0;13H" << " 2:stop or 6:reboot"
@@ -623,9 +629,9 @@ int DaqOperator::set_command(RTC::CorbaConsumer<DAQService> daqservice,
 int DaqOperator::set_hb_to_component()
 {
 	try {
-		for (int i = 0; i < m_comp_num; i++) {
+		for (int i = (m_comp_num - 1); i >= 0; i--) {
 			set_hb(m_daqservices[i]);
-			hb_check_done(m_daqservices[i]);
+			check_hb_done(m_daqservices[i]);
 		}
 	}
 	catch (...) {
@@ -699,7 +705,7 @@ int DaqOperator::check_done(RTC::CorbaConsumer<DAQService> daqservice)
 	return 0;
 }
 
-int DaqOperator::hb_check_done(RTC::CorbaConsumer<DAQService> daqservice)
+int DaqOperator::check_hb_done(RTC::CorbaConsumer<DAQService> daqservice)
 {
 	int status = 0;
     int recv_count= 0;
@@ -846,7 +852,7 @@ int DaqOperator::set_service_list()
 
     m_daqServiceList.clear();
 
-    for (int i = 0; i< m_service_num; i++) {
+    for (int i = 0; i < m_service_num; i++) {
         RTC::ConnectorProfileList_var myprof;
         myprof = m_DaqServicePorts[i]->get_connector_profiles();
         if (m_debug) {
@@ -956,7 +962,7 @@ int DaqOperator::configure_procedure()
 			CORBA::string_free(id);
 		}
 
-		for (int i = 0; i< m_comp_num; i++) {
+		for (int i = 0; i < m_comp_num; i++) {
 			set_command(m_daqservices[i], CMD_CONFIGURE);
 			check_done(m_daqservices[i]);
 		}
@@ -1069,7 +1075,7 @@ int DaqOperator::resume_procedure()
 	m_com_completed = false;
 	try {
 
-		for (int i = 0; i< m_comp_num; i++) {
+		for (int i = 0; i < m_comp_num; i++) {
 			set_command(m_daqservices[i], CMD_RESUME);
 			check_done(m_daqservices[i]);
 		}

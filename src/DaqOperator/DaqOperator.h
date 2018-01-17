@@ -139,11 +139,12 @@ private:
     /* HeartBeat */
     int set_hb_to_component();
     int set_hb(RTC::CorbaConsumer<DAQService> daqservice);
-    int hb_check_done(RTC::CorbaConsumer<DAQService> daqservice);
+    int check_hb_done(RTC::CorbaConsumer<DAQService> daqservice);
+    int *keep_alive;
 
     /* Heart beat timer */
-    static const int HB_CYCLE_SEC = 5;
     Timer* mytimer;
+    int HB_CYCLE_SEC;
     int m_send_count;
     void reset_send_count();
     void inc_send_count();
@@ -151,7 +152,7 @@ private:
     int reset_mytimer();
     int clockwork_hb_recv();
 
-    /* Time */
+    /* Time measurement */
     int set_time();
     int set_gettime(RTC::CorbaConsumer<DAQService> daqservice);
     int output_performance(int command);
