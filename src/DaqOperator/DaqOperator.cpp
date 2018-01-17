@@ -352,6 +352,7 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
         set_time();
 		output_performance(command);
 
+		std::cerr << "\033[0;10H";
 		switch (m_state) {	// m_state init (LOADED)
 		case PAUSED:
 			switch ((DAQCommand)command) {
@@ -701,22 +702,17 @@ int DaqOperator::check_done(RTC::CorbaConsumer<DAQService> daqservice)
 int DaqOperator::hb_check_done(RTC::CorbaConsumer<DAQService> daqservice)
 {
 	int status = 0;
-    int send_count = 0;
-
-    deadFlag = false;
+    int recv_count= 0;
 
 	try {
-		while (status == 0) {
-			status = daqservice->hb_checkDone();
-            if (status == 0) {
-                send_count = get_send_count();
-                if (send_count <= 6) {
-                    deadFlag = true;
-                }
-                else {
-                    reset_send_count();
-                }
-            }
+		inc_send_count();
+		status = daqservice->hb_checkDone();
+		if (status == 0) {
+			recv_count = get_send_count();
+			if (recv_count >= 6) {
+				reset_send_count();
+				deadFlag = true;
+			}
 		}
 	} catch(...) {
 		std::cerr << "### hb_checkDone: failed" << std::endl;
@@ -1474,7 +1470,6 @@ int DaqOperator::reset_mytimer()
 int DaqOperator::clockwork_hb_recv()
 {
 	if (mytimer->checkTimer()) {
-		inc_send_count();
 		set_hb_to_component();
 		mytimer->resetTimer();
 	}
