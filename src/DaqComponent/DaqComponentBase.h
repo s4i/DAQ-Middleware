@@ -650,7 +650,7 @@ namespace DAQMW
         static const int DAQ_CMD_SIZE       = 10;
         static const int DAQ_STATE_SIZE     =  6;
         static const int DAQ_IDLE_TIME_USEC =  10000; // 10 m sec
-        static const int STATUS_CYCLE_SEC   =  2; // default = 3
+        static const int STATUS_CYCLE_SEC   =  3; // default = 3
 
         std::string m_comp_name;
         unsigned int m_runNumber;
@@ -762,9 +762,9 @@ namespace DAQMW
         int get_hb_from_operator()
         {
             m_hb = m_daq_service0.getOperatorToComp();
-            if (m_debug) {
+            // if (m_debug) {
                 std::cerr << "m_hb=" << m_hb << std::endl;
-            }
+            // }
             return 0;
         }
 

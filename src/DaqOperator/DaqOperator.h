@@ -139,8 +139,9 @@ private:
     /* HeartBeat */
     int set_hb_to_component();
     int set_hb(RTC::CorbaConsumer<DAQService> daqservice);
-    int check_hb_done(RTC::CorbaConsumer<DAQService> daqservice);
+    int check_hb_done(RTC::CorbaConsumer<DAQService> daqservice, int comp_id);
     int *keep_alive;
+    int *keep_dead;
 
     /* Heart beat timer */
     Timer* mytimer;

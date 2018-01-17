@@ -133,13 +133,18 @@ DaqOperator::DaqOperator(RTC::Manager* manager)
 
 	/* Timer */
 	mytimer = new Timer(HB_CYCLE_SEC);
+
 	keep_alive = new int[m_comp_num];
+	keep_dead = new int[m_comp_num];
+	std::fill(keep_alive, keep_alive + m_comp_num, 0);
+	std::fill(keep_dead, keep_dead + m_comp_num, 0);
 }
 
 DaqOperator::~DaqOperator()
 {
 	XMLPlatformUtils::Terminate();
 	delete keep_alive;
+	delete keep_dead;
 	delete mytimer;
 }
 
@@ -333,8 +338,7 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 
 	std::cerr << std::endl << " RUN NO: " << m_runNumber;
 	std::cerr << std::endl << " start at: "  << m_start_date
-			  << "\tstop at: " << m_stop_date
-			  << std::endl << std::endl;
+			  << " stop at: " << m_stop_date << "\n\n";
 	std::cerr << "\033[0;11H";
 
 	select(1, &m_rset, NULL, NULL, &m_tout);
@@ -439,7 +443,7 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 				std::cerr << "\033[0;13H" << "\033[34m"
 						  << "Send reboot command"
 						  << "\033[39m" << std::endl;
-						m_state = RUNNING;
+				m_state = RUNNING;
 				break;
 			default:
 				break;
@@ -523,24 +527,29 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 			std::cerr << std::endl;
 			for (int i = (m_comp_num - 1); i >= 0; i--) {
 				if (d_compname[i].length() != 0) {
-					std::cerr << " [ERROR" << ++cnt  << "] ";
-					std::cerr << d_compname[i] << '\t' << "<= ";
+					std::cerr << " [ERROR" << ++cnt  << "] "
+							  << d_compname[i] << '\t'
+							  << "\033[31m" << "<- " << d_message[i]->description
+							  << "\033[39m" << std::endl;
 					if (deadFlag == true) {
-						std::cerr << "\033[36m"	  << " Heart beat return wait."
-								  << std::endl;
+						if (keep_dead[i] == 1) {
+							std::cerr << "\033[31m"	<< " Heart beat return wait..."
+									<< "\033[39m" << std::endl;
+						}
 					}
 					else if (resFlag == true) {
-						std::cerr << "\033[36m"	  << " Restart Ready"
-								  << std::endl;
-						std::cerr << "\033[0;13H" << " 2:stop or 6:reboot"
-								  << "\033[39m"   << std::endl;
-					}
-					else {
-						std::cerr << "\033[31m" << d_message[i]->description
-								  << "\033[39m" << std::endl;
+						if (keep_alive[i] == 1) {
+							std::cerr << "\033[36m" << "Heart beat re-acquisition. "
+									<< "Push command 2:stop or 6:reboot"
+									<< "\033[39m" << std::endl;
+						}
 					}
 				}
 			}///for
+		}
+		else {
+			resFlag = false;
+			deadFlag = false;
 		}///if
 	}///if
 
@@ -631,7 +640,7 @@ int DaqOperator::set_hb_to_component()
 	try {
 		for (int i = (m_comp_num - 1); i >= 0; i--) {
 			set_hb(m_daqservices[i]);
-			check_hb_done(m_daqservices[i]);
+			check_hb_done(m_daqservices[i], i);
 		}
 	}
 	catch (...) {
@@ -648,6 +657,53 @@ int DaqOperator::set_hb(RTC::CorbaConsumer<DAQService> daqservice)
 	}
 	catch(...) {
 		std::cerr << "### ERROR: set hb: exception occured\n";
+	}
+	return 0;
+}
+
+int DaqOperator::check_done(RTC::CorbaConsumer<DAQService> daqservice)
+{
+	int status = 0;
+
+	try {
+		status = daqservice->checkDone();
+        if (status == 0) {
+            usleep(0);
+        }
+	} catch(...) {
+		std::cerr << "### checkDone: failed" << std::endl;
+	}
+	return 0;
+}
+
+int DaqOperator::check_hb_done(RTC::CorbaConsumer<DAQService> daqservice,
+								int comp_id)
+{
+	int status = 0;
+    int recv_count= 0;
+
+	try {
+		inc_send_count();
+		status = daqservice->hb_checkDone();
+		if (status == 0) {
+			if (deadFlag == false) {
+				recv_count = get_send_count();
+				if (recv_count >= 4) {
+					reset_send_count();
+					deadFlag = true;
+					keep_dead[comp_id] = 1;
+				}
+			}
+		}
+		else {
+			if (deadFlag == true) {
+				keep_dead[comp_id] = 0;
+				keep_alive[comp_id] = 1;
+				resFlag = true;
+			}
+		}
+	} catch(...) {
+		std::cerr << "### hb_checkDone: failed" << std::endl;
 	}
 	return 0;
 }
@@ -688,42 +744,6 @@ int DaqOperator::set_gettime(RTC::CorbaConsumer<DAQService> daqservice)
     }
     delete st;
     return 0;
-}
-
-int DaqOperator::check_done(RTC::CorbaConsumer<DAQService> daqservice)
-{
-	int status = 0;
-
-	try {
-		status = daqservice->checkDone();
-        if (status == 0) {
-            usleep(0);
-        }
-	} catch(...) {
-		std::cerr << "### checkDone: failed" << std::endl;
-	}
-	return 0;
-}
-
-int DaqOperator::check_hb_done(RTC::CorbaConsumer<DAQService> daqservice)
-{
-	int status = 0;
-    int recv_count= 0;
-
-	try {
-		inc_send_count();
-		status = daqservice->hb_checkDone();
-		if (status == 0) {
-			recv_count = get_send_count();
-			if (recv_count >= 6) {
-				reset_send_count();
-				deadFlag = true;
-			}
-		}
-	} catch(...) {
-		std::cerr << "### hb_checkDone: failed" << std::endl;
-	}
-	return 0;
 }
 
 int DaqOperator::error_stop_procedure()
