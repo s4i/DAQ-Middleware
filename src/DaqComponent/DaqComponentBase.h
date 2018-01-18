@@ -19,6 +19,7 @@
 #include <iostream>
 #include <ctime>
 #include <fstream>
+#include <memory>
 #include <pwd.h>
 #include <unistd.h>
 #include <sys/time.h>
@@ -70,14 +71,16 @@ namespace DAQMW
               m_isOnError(false),
               m_isTimerAlarm(false),
               m_has_printed_error_log(false),
-              m_debug(false)
+              m_debug(false),
+              m_time(false)
         {
-            mytimer = new Timer(STATUS_CYCLE_SEC);
+            // mytimer = new Timer(STATUS_CYCLE_SEC);
         }
 
         virtual ~DaqComponentBase()
         {
-            delete mytimer;
+            // delete mytimer;
+            // mytimer = nullptr;
         }
 
         enum BufferStatus {BUF_FATAL = -1, BUF_SUCCESS, BUF_TIMEOUT, BUF_NODATA, BUF_NOBUF};
@@ -507,6 +510,7 @@ namespace DAQMW
         int daq_do()
         {
             int ret = 0;
+
             get_command();
 
             bool status = true;
@@ -575,8 +579,11 @@ namespace DAQMW
                               << std::endl;
                 }
                 set_done();
-                get_time_performance(m_command);
-                output_time_performance(m_command);
+
+                if (m_time) {
+                    get_time_performance(m_command);
+                    output_time_performance(m_command);
+                }
             }
             else {
                 ///same command as previous, stay same state, do same action
@@ -613,6 +620,7 @@ namespace DAQMW
             if (m_hb == ONE) {
                 set_hb_done();
             }
+
             return ret;
         } /// daq_do()
 
@@ -648,7 +656,7 @@ namespace DAQMW
         static const int DAQ_CMD_SIZE       = 10;
         static const int DAQ_STATE_SIZE     =  6;
         static const int DAQ_IDLE_TIME_USEC =  10000; // 10 m sec
-        static const int STATUS_CYCLE_SEC   =  2;
+        static const int STATUS_CYCLE_SEC   =  3; // default = 3
 
         std::string m_comp_name;
         unsigned int m_runNumber;
@@ -661,8 +669,10 @@ namespace DAQMW
 
         RTC::CorbaPort m_DAQServicePort;
 
-        Timer* mytimer;
+        // Timer* mytimer;
+        std::unique_ptr<Timer> mytimer{new Timer(STATUS_CYCLE_SEC)};
 
+        // Heart beat
         HBMSG m_hb;
 
         DAQCommand m_command;
@@ -676,6 +686,7 @@ namespace DAQMW
         bool m_has_printed_error_log;
 
         bool m_debug;
+        bool m_time;
 
         typedef int (DAQMW::DaqComponentBase::*DAQFunc)();
 
@@ -760,12 +771,16 @@ namespace DAQMW
         int get_hb_from_operator()
         {
             m_hb = m_daq_service0.getOperatorToComp();
-            std::cerr << "m_hb=" << m_hb << std::endl;
+            // if (m_debug) {
+                std::cerr << "m_hb=" << m_hb << std::endl;
+            // }
             return 0;
         }
 
         int get_time_performance(int command)
         {
+            char fname_inline[] = "s4i-file-inline";
+
             TimeVal st;
             struct timeval end_time;
             struct timezone tz;
@@ -794,7 +809,7 @@ namespace DAQMW
 
             uid = getuid();
             if ((pw = getpwuid (uid))) {
-                sprintf(date, "/home/%s/DAQ-Middleware/csv/%s/%s-file-inline", pw->pw_name, pw->pw_name, pw->pw_name);
+                sprintf(date, "/home/%s/DAQ-Middleware/csv/s4i/%s", pw->pw_name, fname_inline);
             }
             sprintf(fname, "%s.csv", date);
             std::ofstream csv_file(fname, std::ios::app);
@@ -829,6 +844,8 @@ namespace DAQMW
 
         int output_time_performance(int command)
         {
+            char fname_output[] = "s4i-file-inline";
+
             struct timeval end_time;
             struct timezone tz;
 
@@ -838,40 +855,41 @@ namespace DAQMW
             char date[128];
             char fname[128];
 
-            long gt;
+            long gt[2];
 
             /* end time */
             gettimeofday(&end_time, &tz);
-            gt = end_time.tv_sec * 1000000 + end_time.tv_usec;
+            gt[0] = end_time.tv_sec;
+            gt[1] = end_time.tv_usec;
 
             uid = getuid();
             if ((pw = getpwuid (uid))) {
-                sprintf(date, "/home/%s/DAQ-Middleware/csv/%s/%s-file-output", pw->pw_name, pw->pw_name, pw->pw_name);
+                sprintf(date, "/home/%s/DAQ-Middleware/csv/s4i/%s", pw->pw_name, fname_output);
             }
             sprintf(fname, "%s.csv", date);
             std::ofstream csv_file(fname, std::ios::app);
 
             switch (command) {
             case CMD_CONFIGURE:
-                csv_file << "et,Configure," << gt << std::endl;
+                csv_file << "et,Configure," << gt[0] << ',' << gt[1] << std::endl;
                 break;
             case CMD_START:
-                csv_file << "et,Start," << gt << std::endl;
+                csv_file << "et,Start," << gt[0] << ',' << gt[1] << std::endl;
                 break;
             case CMD_STOP:
-                csv_file << "et,Stop," << gt << std::endl;
+                csv_file << "et,Stop," << gt[0] << ',' << gt[1] << std::endl;
                 break;
             case CMD_UNCONFIGURE:
-                csv_file << "et,Unconfigure," << gt << std::endl;
+                csv_file << "et,Unconfigure," << gt[0] << ',' << gt[1] << std::endl;
                 break;
             case CMD_PAUSE:
-                csv_file << "et,Pause," << gt << std::endl;
+                csv_file << "et,Pause," << gt[0] << ',' << gt[1] << std::endl;
                 break;
             case CMD_RESUME:
-                csv_file << "et,Resume," << gt << std::endl;
+                csv_file << "et,Resume," << gt[0] << ',' << gt[1] << std::endl;
                 break;
             case CMD_RESTART:
-                csv_file << "et,Restart," << gt << std::endl;
+                csv_file << "et,Restart," << gt[0] << ',' << gt[1] << std::endl;
                 break;
             }
             csv_file.close();

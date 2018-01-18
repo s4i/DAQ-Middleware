@@ -30,6 +30,7 @@
 #include <sstream>
 #include <vector>
 #include <map>
+#include <memory>
 #include <fstream>
 #include <cstdlib>
 #include <pwd.h>
@@ -136,14 +137,24 @@ private:
     bool deadFlag; // Dead flag
     bool resFlag; // Restart flag
 
+    /* Console viewer */
+    std::vector<std::string> compnames{};
+    int m_new;
+    int copy_compname();
+
     /* HeartBeat */
+    std::vector<int> keep_alive{};
+    std::vector<int> keep_dead{};
+    // int *keep_alive;
+    // int *keep_dead;
     int set_hb_to_component();
     int set_hb(RTC::CorbaConsumer<DAQService> daqservice);
-    int hb_check_done(RTC::CorbaConsumer<DAQService> daqservice);
+    int check_hb_done(RTC::CorbaConsumer<DAQService> daqservice);
 
     /* Heart beat timer */
+    // Timer* mytimer;
     static const int HB_CYCLE_SEC = 5;
-    Timer* mytimer;
+	std::unique_ptr<Timer> mytimer{new Timer(HB_CYCLE_SEC)};
     int m_send_count;
     void reset_send_count();
     void inc_send_count();
@@ -151,7 +162,7 @@ private:
     int reset_mytimer();
     int clockwork_hb_recv();
 
-    /* Time */
+    /* Time measurement */
     int set_time();
     int set_gettime(RTC::CorbaConsumer<DAQService> daqservice);
     int output_performance(int command);
@@ -216,6 +227,7 @@ private:
     std::string m_config_file_tmp;
 
     bool m_debug;
+    bool m_time;
 };
 
 extern "C"
