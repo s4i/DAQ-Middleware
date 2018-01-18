@@ -30,6 +30,7 @@
 #include <sstream>
 #include <vector>
 #include <map>
+#include <memory>
 #include <fstream>
 #include <cstdlib>
 #include <pwd.h>
@@ -136,21 +137,24 @@ private:
     bool deadFlag; // Dead flag
     bool resFlag; // Restart flag
 
+    /* Console viewer */
+    std::vector<std::string> compnames{};
     int m_new;
-    std::vector<std::string> compnames;
+    int copy_compname();
 
     /* HeartBeat */
-    // std::vector<int> keep_alive;
-    // std::vector<int> keep_dead;
-    int *keep_alive;
-    int *keep_dead;
+    std::vector<int> keep_alive{};
+    std::vector<int> keep_dead{};
+    // int *keep_alive;
+    // int *keep_dead;
     int set_hb_to_component();
     int set_hb(RTC::CorbaConsumer<DAQService> daqservice);
-    int check_hb_done(RTC::CorbaConsumer<DAQService> daqservice, int comp_id);
+    int check_hb_done(RTC::CorbaConsumer<DAQService> daqservice);
 
     /* Heart beat timer */
-    Timer* mytimer;
-    int HB_CYCLE_SEC;
+    // Timer* mytimer;
+    static const int HB_CYCLE_SEC = 5;
+	std::unique_ptr<Timer> mytimer{new Timer(HB_CYCLE_SEC)};
     int m_send_count;
     void reset_send_count();
     void inc_send_count();

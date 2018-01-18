@@ -19,6 +19,7 @@
 #include <iostream>
 #include <ctime>
 #include <fstream>
+#include <memory>
 #include <pwd.h>
 #include <unistd.h>
 #include <sys/time.h>
@@ -73,13 +74,13 @@ namespace DAQMW
               m_debug(false),
               m_time(false)
         {
-            mytimer = new Timer(STATUS_CYCLE_SEC);
+            // mytimer = new Timer(STATUS_CYCLE_SEC);
         }
 
         virtual ~DaqComponentBase()
         {
-            delete mytimer;
-            mytimer = nullptr;
+            // delete mytimer;
+            // mytimer = nullptr;
         }
 
         enum BufferStatus {BUF_FATAL = -1, BUF_SUCCESS, BUF_TIMEOUT, BUF_NODATA, BUF_NOBUF};
@@ -578,6 +579,7 @@ namespace DAQMW
                               << std::endl;
                 }
                 set_done();
+
                 if (m_time) {
                     get_time_performance(m_command);
                     output_time_performance(m_command);
@@ -667,8 +669,10 @@ namespace DAQMW
 
         RTC::CorbaPort m_DAQServicePort;
 
-        Timer* mytimer;
+        // Timer* mytimer;
+        std::unique_ptr<Timer> mytimer{new Timer(STATUS_CYCLE_SEC)};
 
+        // Heart beat
         HBMSG m_hb;
 
         DAQCommand m_command;
