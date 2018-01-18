@@ -52,6 +52,7 @@ DaqOperator::DaqOperator(RTC::Manager* manager)
 	m_service_num(0),
     deadFlag(false),
 	resFlag(false),
+	m_new(0),
 	HB_CYCLE_SEC(5),
     m_send_count(0),
 	m_state(LOADED),
@@ -309,10 +310,9 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 
 	int command;
 
-	/* Console error display */
-	std::string d_compname[m_comp_num];
+	/* console error display */
 	FatalErrorStatus_var d_message[m_comp_num];
-	Status_var chkStatus;
+	Status_var chkstatus;
 
 	m_tout.tv_sec =  2;
 	m_tout.tv_usec = 0;
@@ -448,6 +448,10 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 		}// switch (m_state)
 	}
 	else {
+		Status_var status;
+		FatalErrorStatus_var errStatus;
+		RTC::ConnectorProfileList_var myprof;
+
 		std::cerr << " " << std::endl;
 		std::cerr << "\033[0;0H\033[2J";
 		std::cerr << "\033[8;0H";
@@ -458,20 +462,17 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 				  << std::endl;
 		///std::cerr << "RUN NO: " << m_runNumber << std::endl;
 
-		std::string compname;
-		Status_var status;
-		FatalErrorStatus_var errStatus;
 		for (int i = (m_comp_num - 1); i >= 0; i--) {
 			try {
-				RTC::ConnectorProfileList_var myprof
-					= m_DaqServicePorts[i]->get_connector_profiles();
-
-				compname = myprof[0].name; //compname = "group*:*"
+				if (!m_new) {
+					myprof = m_DaqServicePorts[i]->get_connector_profiles();
+					compname[i] = myprof[0].name; //compname = "group*:*"
+				}
 				//std::cerr << "COMPNAME: " << compname << std::endl;
 
 				status = m_daqservices[i]->getStatus();
 				std::cerr << " " << std::setw(22) << std::left
-						  << myprof[0].name //group:comp_name
+						  << compname[i] //group:comp_name
 						  << '\t'
 						  << std::setw(14) << std::right
 						  << status->event_size; // data size(byte)
@@ -485,7 +486,6 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 							  << check_compStatus(status->comp_status)
 							  << "\033[39m" << std::endl;
 					/** Use error console display **/
-					d_compname[i] = compname;
 					d_message[i] = errStatus;
 					m_state = ERRORED;
 				}///if Fatal
@@ -498,7 +498,6 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 							  << check_compStatus(status->comp_status)
 							  << "\033[39m" << std::endl;
 					/** Use error console display **/
-					d_compname[i] = compname;
 					d_message[i] = errStatus;
 					m_state = ERRORED;
 					resFlag = true;
@@ -512,19 +511,22 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 							  << "\033[39m" << std::endl;
 				}
 			} catch(...) {
-				std::cerr << " ### ERROR: " << compname << "  : cannot connect\n";
-				usleep(1000);
+				for (int i = (m_comp_num - 1); i >= 0; i--) {
+					std::cerr << " ### ERROR: " << compname[i] << "  : cannot connect\n";
+					usleep(1000);
+				}
 			}
 		}//for
+		m_new = 1;
 
 		/* Display Error Console */
 		if (m_state == ERRORED) {
 			int cnt = 0;
 			std::cerr << std::endl;
 			for (int i = (m_comp_num - 1); i >= 0; i--) {
-				if (d_compname[i].length() != 0) {
+				if (compname[i].length() != 0) {
 					std::cerr << " [ERROR" << ++cnt  << "] ";
-					std::cerr << d_compname[i] << '\t' << "<= ";
+					std::cerr << compname[i] << '\t' << "<= ";
 					if (deadFlag == true) {
 						std::cerr << "\033[36m"	  << " Heart beat return wait."
 								  << std::endl;

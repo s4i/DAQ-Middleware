@@ -136,6 +136,9 @@ private:
     bool deadFlag; // Dead flag
     bool resFlag; // Restart flag
 
+    int m_new;
+    std::vector<std::string> compname;
+
     /* HeartBeat */
     int set_hb_to_component();
     int set_hb(RTC::CorbaConsumer<DAQService> daqservice);
