@@ -137,10 +137,11 @@ DaqOperator::DaqOperator(RTC::Manager* manager)
 
 	/* Timer */
 	mytimer = new Timer(HB_CYCLE_SEC);
-	keep_alive = new int[m_comp_num];
-	keep_dead = new int[m_comp_num];
-	std::fill(keep_alive, keep_alive + m_comp_num, 0);
-	std::fill(keep_dead, keep_dead + m_comp_num, 0);
+
+	// keep_alive = new int[m_comp_num];
+	// keep_dead = new int[m_comp_num];
+	// std::fill(keep_alive, keep_alive + m_comp_num, 0);
+	// std::fill(keep_dead, keep_dead + m_comp_num, 0);
 }
 
 DaqOperator::~DaqOperator()
