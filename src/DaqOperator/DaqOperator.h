@@ -137,13 +137,16 @@ private:
     bool resFlag; // Restart flag
 
     int m_new;
-    std::vector<std::string> compname;
+    std::vector<std::string> compnames;
 
     /* HeartBeat */
+    // std::vector<int> keep_alive;
+    // std::vector<int> keep_dead;
+    int *keep_alive;
+    int *keep_dead;
     int set_hb_to_component();
     int set_hb(RTC::CorbaConsumer<DAQService> daqservice);
-    int check_hb_done(RTC::CorbaConsumer<DAQService> daqservice);
-    int *keep_alive;
+    int check_hb_done(RTC::CorbaConsumer<DAQService> daqservice, int comp_id);
 
     /* Heart beat timer */
     Timer* mytimer;
@@ -220,6 +223,7 @@ private:
     std::string m_config_file_tmp;
 
     bool m_debug;
+    bool m_time;
 };
 
 extern "C"
