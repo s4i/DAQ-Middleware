@@ -840,7 +840,7 @@ namespace DAQMW
 
         int output_time_performance(int command)
         {
-            char fname_inline[] = "s4i-file-inline";
+            char fname_output[] = "s4i-file-inline";
 
             struct timeval end_time;
             struct timezone tz;

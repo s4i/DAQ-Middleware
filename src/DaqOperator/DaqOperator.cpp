@@ -476,7 +476,7 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 				  << std::endl;
 		///std::cerr << "RUN NO: " << m_runNumber << std::endl;
 
-		for (int i = (m_comp_num - 1); i >= 0; i--) {
+		for (int i = 0; i < m_comp_num; i++) {
 			if (m_new == 0) {
 				myprof = m_DaqServicePorts[i]->get_connector_profiles();
 				compname = myprof[0].name;
