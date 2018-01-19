@@ -14,6 +14,9 @@
  */
 
 #include "DAQServiceSkel.h"
+#include <iostream>
+#include <memory>
+#include <rtm/CORBA_SeqUtil.h>
 
 #ifndef DAQSERVICESVC_IMPL_H
 #define DAQSERVICESVC_IMPL_H

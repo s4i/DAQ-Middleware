@@ -13,9 +13,7 @@
  *
  */
 
-#include <iostream>
 #include "DAQServiceSVC_impl.h"
-#include <rtm/CORBA_SeqUtil.h>
 
 /*
  * Example implementational code for IDL interface DAQService

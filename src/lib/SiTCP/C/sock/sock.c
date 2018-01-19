@@ -37,7 +37,7 @@ int sock_connect_tcp(sock_header* header) {
     printf("sock_connect_tcp:enter\n");
     printf("ip address = %s port = %d\n", header->ip_address, header->port);
   }
-  fd = connect_sitcp(header->ip_address, header->port, 
+  fd = connect_sitcp(header->ip_address, header->port,
 		     header->timeout, SOCK_STREAM);
   header->sockfd = fd;
   if( fd == -1 ) {
@@ -55,7 +55,7 @@ int sock_connect_tcp(sock_header* header) {
 
 int sock_connect_udp(sock_header* header) {
   int fd;
-  fd = connect_sitcp(header->ip_address, header->port, 
+  fd = connect_sitcp(header->ip_address, header->port,
 		     header->timeout, SOCK_DGRAM);
   header->sockfd = fd;
   return SUCCESS;
@@ -107,7 +107,7 @@ int sock_write_all(sock_header* header, unsigned char* buffer, int nbytes) {
     ptr   += nwritten;
   }
   return(nbytes - nleft);
-}    
+}
 
 int sock_read_all(sock_header* header, unsigned char* buffer, int nbytes) {
   //  size_t  nleft;
@@ -161,7 +161,7 @@ int sock_read_select(sock_header* header, unsigned char* buffer, int nbytes) {
     /* receive packet */
     if(FD_ISSET(header->sockfd, &setSelect)){
       n = read(header->sockfd, buffer, nbytes);
-      if(n < 0) 
+      if(n < 0)
 	return ERROR_FATAL;
     } else
       return 0; // no data
@@ -200,7 +200,7 @@ int connect_sitcp(char *ip_address, int port, float timeout, int type)
 	int sockfd;
 	struct sockaddr_in servaddr;
 	struct timeval tv;
-	
+
 	bzero(&servaddr, sizeof(servaddr));
 	servaddr.sin_family = AF_INET;
 	if (port < 0 || port > 65535) {
@@ -251,6 +251,6 @@ int connect_sitcp(char *ip_address, int port, float timeout, int type)
 	if (connect(sockfd, (const struct sockaddr *)&servaddr, sizeof(servaddr)) < 0) {
 		return ERROR_FATAL;
 	}
-	
+
 	return sockfd;
 }

@@ -32,7 +32,7 @@ namespace DAQMW {
     m_timeout = 2.0;
   }
 
-  Sock::Sock(const std::string host, const int port ) 
+  Sock::Sock(const std::string host, const int port )
     : m_connectTimeout(2.0), m_debug(false) {
     m_sock = -1;
     m_timeout = 2.0;
@@ -40,7 +40,7 @@ namespace DAQMW {
     m_port = port;
     memset ( &m_addr, 0, sizeof ( m_addr ) );
     if(m_debug) {
-      std::cerr << "Sock::Sock:ipaddress = "<<  m_ipAddress 
+      std::cerr << "Sock::Sock:ipaddress = "<<  m_ipAddress
 		<< "  port = " << m_port << std::endl;
     }
     // for sendTo(UDP)
@@ -155,7 +155,7 @@ namespace DAQMW {
     int addr_length = sizeof ( m_addr );
     new_socket.m_sock = ::accept ( m_sock, ( sockaddr * ) &m_addr,
 				   ( socklen_t * )&addr_length );
-    if ( new_socket.m_sock < 0 ) { 
+    if ( new_socket.m_sock < 0 ) {
       perror("### ERROR: Sock::accept(Sock&):accept");
       throw SockException("Sock::accept error");
     } else {
@@ -200,14 +200,14 @@ namespace DAQMW {
     }
     m_addr.sin_family = AF_INET;
     m_addr.sin_port = htons ( port );
-    
+
     int status = inet_pton ( AF_INET, host.c_str(), &m_addr.sin_addr );
     if (status < 0) {
       perror("### ERROR: Sock::connect(string, int) inet_pton");
       return ERROR_FATAL;
     } else if(status == 0) { // specified by hostname not ip
       struct hostent *hostinfo = gethostbyname(host.c_str());
-      if(hostinfo != NULL) {
+      if(hostinfo != nullptr) {
 	m_addr.sin_addr.s_addr = *(unsigned int*)hostinfo->h_addr_list[0];
       } else {
 	std:: cerr << "### ERROR: Sock::connect(string, int) gethostbyname" << std::endl;
@@ -247,7 +247,7 @@ namespace DAQMW {
     int socketType;
     int status;
     int on;
-    
+
     switch(type) {
     case TCP:
       if(m_debug)
@@ -269,7 +269,7 @@ namespace DAQMW {
       std::cerr << "Sock::connect(int): socket was created" << std::endl;
     }
     on = 1; // Reuse is active
-    if ( setsockopt ( m_sock, SOL_SOCKET, SO_REUSEADDR, 
+    if ( setsockopt ( m_sock, SOL_SOCKET, SO_REUSEADDR,
 		      ( const char* ) &on, sizeof ( on ) ) == -1 ) {
       perror("### ERROR: Sock::connect(int):setsockopt:ReUseAddr");
       return ERROR_FATAL;
@@ -280,7 +280,7 @@ namespace DAQMW {
     }
 
     // Receive(recv/read) timeout is set.
-    if ( (status = setsockopt ( m_sock, SOL_SOCKET, SO_RCVTIMEO, 
+    if ( (status = setsockopt ( m_sock, SOL_SOCKET, SO_RCVTIMEO,
 				&tv, sizeof(tv))) < 0) {
       perror("### ERROR: Sock::connect(int):setsockopt:ReceiveTimeout");
       return ERROR_FATAL;
@@ -288,7 +288,7 @@ namespace DAQMW {
     if (m_debug)
       std::cerr << "Sock::connect(int):setsockopt:RecvTimeout done" << std::endl;
     // Send(send/write) timeout is set.
-    if ( (status = setsockopt ( m_sock, SOL_SOCKET, SO_SNDTIMEO, 
+    if ( (status = setsockopt ( m_sock, SOL_SOCKET, SO_SNDTIMEO,
 				&tv, sizeof(tv))) < 0) {
       perror("### ERROR: Sock::connect(int):setsockopt:SendTimeout");
       return ERROR_FATAL;
@@ -380,7 +380,7 @@ namespace DAQMW {
 	  return ERROR_TIMEOUT;
 	}
 	perror("### ERROR: Sock::sendAll(const string):send");
-	throw SockException("Sock::sendAll(const string) error");	
+	throw SockException("Sock::sendAll(const string) error");
       }
       nleft -= nwritten;
       ptr   += nwritten;
@@ -419,14 +419,14 @@ namespace DAQMW {
     memset ( buf, 0, MAXRECV + 1 );
   again:
     int status = ::recv ( m_sock, buf, MAXRECV, 0 );
-    if ( status < 0 ) { 
+    if ( status < 0 ) {
       if(errno ==EINTR) {
 	goto again;
       } else if((errno == ETIMEDOUT)||(errno == EAGAIN)) {
 	return ERROR_TIMEOUT;
       }
       perror("### ERROR: Sock::recv(string&)");
-      throw SockException("Sock::recv(string&) fatal error");	
+      throw SockException("Sock::recv(string&) fatal error");
     } else if(status == 0) {  // far end node link will be off.
       perror("### ERROR: Sock::recv(string&)");
       throw SockException("Sock::recv(string&) fatal error: far end node link off");
@@ -459,7 +459,7 @@ namespace DAQMW {
     char buf [ MAXRECV + 1 ];
     if(size > MAXRECV) {
       std::cerr << "### ERROR: specified size is too large in Socket::recvAll(string&)\n";
-      throw SockException("Sock::recvAll(string&, int&) fatal error");	
+      throw SockException("Sock::recvAll(string&, int&) fatal error");
     }
     memset ( buf, 0, MAXRECV + 1 );
   again:
@@ -664,7 +664,7 @@ namespace DAQMW {
 
   int Sock::setOptNonBlocking ( const bool flag ) const {
     int opts;
-    
+
     opts = fcntl ( m_sock, F_GETFL );
     if ( opts == -1 ) {
       perror("### ERROR: Sock::setNonBlocking(F_GETFL) error");
@@ -691,7 +691,7 @@ namespace DAQMW {
       on = 1;
     else
       on = 0;
-    if ( setsockopt ( m_sock, SOL_SOCKET, SO_REUSEADDR, 
+    if ( setsockopt ( m_sock, SOL_SOCKET, SO_REUSEADDR,
 		      ( const char* ) &on, sizeof ( on ) ) == -1 ) {
       perror("### ERROR: Sock::setOptReUse:setsockopt(SO_REUSEADDR) error");
       throw SockException("Sock::create setsockopt(SO_REUSEADDR) error");
@@ -707,7 +707,7 @@ namespace DAQMW {
       on = 1;
     else
       on = 0;
-    if( setsockopt ( m_sock, IPPROTO_TCP, TCP_NODELAY, 
+    if( setsockopt ( m_sock, IPPROTO_TCP, TCP_NODELAY,
 		     ( const char* ) &on, sizeof (on) ) == -1){
       perror("### ERROR: Sock::setOptNoDelay() error");
       throw SockException("Sock::create setsockopt(TCP_NODELAY) error");
@@ -725,7 +725,7 @@ namespace DAQMW {
       if(m_debug)
 	perror("### ERROR: Sock::setOptRecvTimeOut():float2timeval error");
     }
-    if ( (status = setsockopt ( m_sock, SOL_SOCKET, SO_RCVTIMEO, 
+    if ( (status = setsockopt ( m_sock, SOL_SOCKET, SO_RCVTIMEO,
 				&tv, sizeof(tv))) < 0) {
       perror("### ERROR: Sock::setOptRecvTimeOut:setsockopt error");
       throw SockException("### Sock::connect setsockopt(SO_RCVTIMEO) error");
@@ -742,7 +742,7 @@ namespace DAQMW {
     if ((status = float2timeval(m_timeout, &tv)) < 0) {
       perror("### ERROR: Sock::setOptSendTimeOut():float2timeval error");
     }
-    if ( (status = setsockopt ( m_sock, SOL_SOCKET, SO_SNDTIMEO, 
+    if ( (status = setsockopt ( m_sock, SOL_SOCKET, SO_SNDTIMEO,
 				&tv, sizeof(tv))) < 0) {
       perror("### ERROR: Sock::setOptSendTimeOut: fatal error");
       throw SockException("### Sock::connect setsockopt(SO_SNDTIMEO) error");
@@ -755,7 +755,7 @@ namespace DAQMW {
   int Sock::setOptRecvBuf(int value) const {
     int val = value;
     int status;
-    if ( (status = setsockopt ( m_sock, SOL_SOCKET, SO_RCVBUF, 
+    if ( (status = setsockopt ( m_sock, SOL_SOCKET, SO_RCVBUF,
 				&val, sizeof(val))) < 0) {
       perror("### ERROR: Sock::setOptRecvBuf: fatal error");
       throw SockException("### Sock::connect setsockopt(SO_RCVBUF) error");
@@ -768,7 +768,7 @@ namespace DAQMW {
   int Sock::setOptSendBuf(int value) const {
     int val = value;
     int status;
-    if ( (status = setsockopt ( m_sock, SOL_SOCKET, SO_SNDBUF, 
+    if ( (status = setsockopt ( m_sock, SOL_SOCKET, SO_SNDBUF,
 				&val, sizeof(val))) < 0){
       perror("### ERROR: Sock::setOptSendBuf: fatal error");
       throw SockException("### Sock::connect setsockopt(SO_SNDBUF) error");
@@ -782,18 +782,18 @@ namespace DAQMW {
     unsigned int i;
     unsigned long tv_sec;
     unsigned long tv_usec;
-    
+
     /* round to mili sec */
     i = static_cast<int>(sec) * 1000;
     tv_sec  = i / 1000;
     tv_usec = (static_cast<int>(sec) - tv_sec) * 1000000;
-    
+
     tv->tv_sec  = tv_sec;
     tv->tv_usec = tv_usec;
-    
+
     return SUCCESS;
   }
-  
+
   int Sock::getSockFd() const {
     return m_sock;
   }

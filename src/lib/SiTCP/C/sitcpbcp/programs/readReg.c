@@ -17,8 +17,8 @@ int main(int argc, char** argv) {
   }
 
   length = atoi(argv[2]);
-  offsetAddress = strtol(argv[3], (char**)NULL, 16);
-  
+  offsetAddress = strtol(argv[3], (char**)nullptr, 16);
+
   status = sitcpbcp_open(&header, argv[1], 4660, MAX_BUF);
   if(status < 0) {
     printf("sitcpbcp_open: error\n");
@@ -39,9 +39,9 @@ int main(int argc, char** argv) {
     exit(1);
   }
   printf("registers(offset:0x%x): ", offsetAddress);
-  for(i=0; i< length; i++) 
+  for(i=0; i< length; i++)
     printf("%02x ", buffer[i]);
   printf("\n");
-  
+
   sitcpbcp_close(&header);
 }

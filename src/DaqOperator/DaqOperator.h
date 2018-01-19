@@ -138,7 +138,7 @@ private:
     bool resFlag; // Restart flag
 
     /* Console viewer */
-    std::vector<std::string> compnames{};
+    std::vector<std::string> compnames;
     int m_new;
     int copy_compname();
 
@@ -164,7 +164,6 @@ private:
 
     /* Time measurement */
     int set_time();
-    int set_gettime(RTC::CorbaConsumer<DAQService> daqservice);
     int output_performance(int command);
 
     int check_done(RTC::CorbaConsumer<DAQService> daqservice);

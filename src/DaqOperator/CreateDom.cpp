@@ -1,7 +1,7 @@
 // -*- C++ -*-
 /*!
  * @file CreateDom.cpp
- * @brief 
+ * @brief
  * @date 1-January-2008
  * @author Kazuo Nakayoshi <kazuo.nakayoshi@kek.jp>
  *
@@ -64,12 +64,12 @@ std::string CreateDom::getOK(std::string command)
 	return buf;
 }
 
-std::string CreateDom::getNG(std::string command, int code, 
+std::string CreateDom::getNG(std::string command, int code,
 		std::string methodName, std::string messageEng, std::string messageJpn)
 {
 	char str[8];
 	sprintf(str, "%d", code);
-	
+
 	Result result;
 	result.code = str;
 	result.className = "DAQ";
@@ -131,7 +131,7 @@ std::string CreateDom::getLog(std::string command, groupStatusList status_list)
 	makeResultOK();
 	makeLogs();
 
-	for (std::vector< groupStatus >::iterator p = status_list.begin(); 
+	for (std::vector< groupStatus >::iterator p = status_list.begin();
 	     p != status_list.end(); ++p) {
 	    makeLog(*p);
 	}
@@ -140,7 +140,7 @@ std::string CreateDom::getLog(std::string command, groupStatusList status_list)
 	return buf;
 }
 
-std::string CreateDom::getLog(std::string command, groupStatusList status_list, 
+std::string CreateDom::getLog(std::string command, groupStatusList status_list,
 			      std::string err_msg)
 {
 	makeRoot();
@@ -154,8 +154,8 @@ std::string CreateDom::getLog(std::string command, groupStatusList status_list,
 	std::cerr << "getLog: " << err_msg << std::endl;
 	makeResult(result);
 	makeLogs();
-	
-	for (std::vector< groupStatus >::iterator p = status_list.begin(); 
+
+	for (std::vector< groupStatus >::iterator p = status_list.begin();
 	     p != status_list.end(); ++p) {
 	    makeLog(*p);
 	}
@@ -352,7 +352,7 @@ void CreateDom::makeLogs()
 }
 
 ///void CreateDom::makeLog(Status status)
-void CreateDom::makeLog(groupStatus status) 
+void CreateDom::makeLog(groupStatus status)
 {
 	m_logElem = m_doc->createElement(X("log"));
 	m_logsElem->appendChild(m_logElem);
@@ -454,7 +454,7 @@ bool CreateDom::check(std::string name, int *cnt, int *type, int *index)
 		if (nb != n) {
 			return false;
 		}
-	} else if (2 <= *type && *type <= 4) {	
+	} else if (2 <= *type && *type <= 4) {
 		if (nb == n) {
 			return false;
 		}
@@ -485,8 +485,8 @@ int CreateDom::checkDigit(std::string name, int index, int cnt)
 
 std::string CreateDom::getBuffer()
 {
-	if (m_impl == NULL) {
-		return NULL;
+	if (m_impl == nullptr) {
+		return nullptr;
 	}
 
 	MemBufFormatTarget target;

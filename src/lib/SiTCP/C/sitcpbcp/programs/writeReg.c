@@ -16,8 +16,8 @@ int main(int argc, char** argv) {
     exit(0);
   }
 
-  offsetAddress = strtol(argv[2], (char**)NULL, 16);
-  
+  offsetAddress = strtol(argv[2], (char**)nullptr, 16);
+
   status = sitcpbcp_open(&header, argv[1], 4660, MAX_BUF);
   if(status < 0) {
     printf("sitcpbcp_open: error\n");
@@ -33,10 +33,10 @@ int main(int argc, char** argv) {
 
   length = argc - 3;
   for(i=0;i<length;i++)
-    buffer[i] = strtol(argv[i+3], (char**)NULL, 16);
+    buffer[i] = strtol(argv[i+3], (char**)nullptr, 16);
 
   printf("registers(offset:0x%x) to be written: ", offsetAddress);
-  for(i=0; i< length; i++) 
+  for(i=0; i< length; i++)
     printf("%02x ", buffer[i]);
   printf("\n");
 
@@ -46,6 +46,6 @@ int main(int argc, char** argv) {
     printf("sitcpbcp_read_registers: error\n");
     exit(1);
   }
-  
+
   sitcpbcp_close(&header);
 }

@@ -31,7 +31,7 @@ class DaqLog: public std::ostream
                 // 01234567890123456789
 
                 struct timeval tv;
-                gettimeofday(&tv, NULL);
+                gettimeofday(&tv, nullptr);
 
                 struct tm tm;
                 localtime_r(&tv.tv_sec, &tm);
