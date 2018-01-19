@@ -74,13 +74,13 @@ namespace DAQMW
               m_debug(false),
               m_time(false)
         {
-            // mytimer = new Timer(STATUS_CYCLE_SEC);
+            // status_timer = new Timer(STATUS_CYCLE_SEC);
         }
 
         virtual ~DaqComponentBase()
         {
-            // delete mytimer;
-            // mytimer = nullptr;
+            // delete status_timer;
+            // status_timer = nullptr;
         }
 
         enum BufferStatus {BUF_FATAL = -1, BUF_SUCCESS, BUF_TIMEOUT, BUF_NODATA, BUF_NOBUF};
@@ -365,7 +365,7 @@ namespace DAQMW
 
         int reset_timer()
         {
-            mytimer->resetTimer();
+            status_timer->resetTimer();
             return 0;
         }
 
@@ -512,6 +512,7 @@ namespace DAQMW
             int ret = 0;
 
             get_command();
+            get_hb_from_operator_clockwork();
 
             bool status = true;
 
@@ -526,17 +527,17 @@ namespace DAQMW
                         usleep(0);
                         if ( !m_isOnError ) {
                             try {
-                                doAction(m_state_prev);
+                                doAction(m_state_prev); // daq_base_XX{}
                             }
                             catch(DaqCompDefinedException& e ) {
-                                std::cerr << mytimer->getDate() << " ";
+                                std::cerr << status_timer->getDate() << " ";
                                 FatalType::Enum mytype = e.type();
                                 int mycode             = e.reason();
                                 const char* mydesc     = e.what();
                                 fatal_report_to_operator(mytype, mydesc, mycode);
                             }
                             catch(DaqCompUserException& e) {
-                                std::cerr << mytimer->getDate() << " ";
+                                std::cerr << status_timer->getDate() << " ";
                                 FatalType::Enum mytype = e.type();
                                 int mycode             = e.reason();
                                 const char* mydesc     = e.what();
@@ -556,14 +557,14 @@ namespace DAQMW
                         ret = transAction(m_command);
                     }
                     catch(DaqCompDefinedException& e ) {
-                        std::cerr << mytimer->getDate() << " ";
+                        std::cerr << status_timer->getDate() << " ";
                         FatalType::Enum mytype = e.type();
                         int mycode             = e.reason();
                         const char* mydesc     = e.what();
                         fatal_report_to_operator(mytype, mydesc, mycode);
                     }
                     catch(DaqCompUserException& e) {
-                        std::cerr << mytimer->getDate() << " ";
+                        std::cerr << status_timer->getDate() << " ";
                         FatalType::Enum mytype = e.type();
                         int mycode             = e.reason();
                         const char* mydesc     = e.what();
@@ -592,14 +593,14 @@ namespace DAQMW
                         doAction(m_state);
                     }
                     catch(DaqCompDefinedException& e ) {
-                        std::cerr << mytimer->getDate() << " ";
+                        std::cerr << status_timer->getDate() << " ";
                         FatalType::Enum mytype = e.type();
                         int mycode             = e.reason();
                         const char* mydesc     = e.what();
                         fatal_report_to_operator(mytype, mydesc, mycode);
                     }
                     catch(DaqCompUserException& e) {
-                        std::cerr << mytimer->getDate() << " ";
+                        std::cerr << status_timer->getDate() << " ";
                         FatalType::Enum mytype = e.type();
                         int mycode             = e.reason();
                         const char* mydesc     = e.what();
@@ -614,11 +615,6 @@ namespace DAQMW
                 else {
                     daq_onError();
                 }
-            }
-
-            get_hb_from_operator();
-            if (m_hb == ONE) {
-                set_hb_done();
             }
 
             return ret;
@@ -638,7 +634,7 @@ namespace DAQMW
 
         int set_status(CompStatus comp_status)
         {
-            Status* mystatus = new Status;
+            std::unique_ptr<Status> mystatus(new Status);
             mystatus->comp_name = CORBA::string_dup(m_comp_name.c_str());
             mystatus->state = m_state;
             ///mystatus->event_num = m_totalEventNum;
@@ -646,8 +642,6 @@ namespace DAQMW
             mystatus->comp_status = comp_status;
 
             m_daq_service0.setStatus(*mystatus);
-
-            delete mystatus;
 
             return 0;
         }
@@ -657,6 +651,7 @@ namespace DAQMW
         static const int DAQ_STATE_SIZE     =  6;
         static const int DAQ_IDLE_TIME_USEC =  10000; // 10 m sec
         static const int STATUS_CYCLE_SEC   =  3; // default = 3
+        static const int HB_CHECK_CYCLE_SEC   =  1; // default = 3
 
         std::string m_comp_name;
         unsigned int m_runNumber;
@@ -669,8 +664,9 @@ namespace DAQMW
 
         RTC::CorbaPort m_DAQServicePort;
 
-        // Timer* mytimer;
-        std::unique_ptr<Timer> mytimer{new Timer(STATUS_CYCLE_SEC)};
+        // Timer* status_timer;
+        std::unique_ptr<Timer> status_timer{new Timer(STATUS_CYCLE_SEC)};
+        std::unique_ptr<Timer> hb_timer{new Timer(HB_CHECK_CYCLE_SEC)};
 
         // Heart beat
         HBMSG m_hb;
@@ -768,12 +764,18 @@ namespace DAQMW
             return 0;
         }
 
-        int get_hb_from_operator()
+        int get_hb_from_operator_clockwork()
         {
-            m_hb = m_daq_service0.getOperatorToComp();
-            // if (m_debug) {
-                std::cerr << "m_hb=" << m_hb << std::endl;
-            // }
+            if (hb_timer->checkTimer()) {
+                m_hb = m_daq_service0.getOperatorToComp();
+                if (m_hb == ONE) {
+                    set_hb_done();
+                }
+                if (m_hb) {
+                    std::cerr << "m_hb=" << m_hb << std::endl;
+                }
+                hb_timer->resetTimer();
+            }
             return 0;
         }
 
@@ -941,10 +943,10 @@ namespace DAQMW
 
         int clockwork_status_report()
         {
-            if (mytimer->checkTimer()) {
+            if (status_timer->checkTimer()) {
                 m_isTimerAlarm = true;
                 set_status(COMP_WORKING);
-                mytimer->resetTimer();
+                status_timer->resetTimer();
             }
             return 0;
         }

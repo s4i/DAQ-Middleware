@@ -465,6 +465,11 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 		Status_var status;
 		FatalErrorStatus_var errStatus;
 
+		if (m_new == 0) {
+			copy_compname();
+			m_new = 1;
+		}
+
 		std::cerr << " " << std::endl;
 		std::cerr << "\033[0;0H\033[2J";
 		std::cerr << "\033[8;0H";
@@ -474,11 +479,6 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 				  << std::setw(14) << std::right << "COMP_STATUS"
 				  << std::endl;
 		///std::cerr << "RUN NO: " << m_runNumber << std::endl;
-
-		if (m_new == 0) {
-			copy_compname();
-			m_new = 1;
-		}
 
 		for (int i = (m_comp_num - 1); i >= 0; i--) {
 			try {
