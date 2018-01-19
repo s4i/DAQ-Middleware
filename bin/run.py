@@ -27,7 +27,7 @@ else:
 # constants and parameters
 #
 
-progname = "%prog"
+progname = "run.py"
 
 # adjust the daq_lib_path to your own environment.
 daq_lib_path = '/usr/lib/daqmw:/kensdaq/root/lib'
@@ -109,6 +109,128 @@ def am_i_rhel_derived_and_running_on_vmware():
             return True
     else:
         return False
+
+
+# make clean
+def find_all_files(directory, target_file):
+    for root, dirs, files in os.walk(directory):
+        for file in files:
+            if (file == target_file):
+                yield os.path.join(root, file)
+
+
+def file_clean(path):
+    str_path = ''
+    file_path = []
+    view_result = []
+    comp_path = []
+    target_file = 'Makefile'
+    command = "rm -r omninames-*.bak omninames-*.log \
+             rtc.conf .confFilePath __pycache__ *.pyc"
+    flag = False
+    automake_flag = False
+    current = os.getcwd()
+    if re.match('make', path) != None:
+        print('Makefile execution')
+        while True:
+            automake = raw_input('Automake[y/N]: ').lower()
+            if automake in ['y', 'ye', 'yes', '']:
+                automake_flag = True
+                break
+            elif automake in ['n', 'no']:
+                break
+        for f in find_all_files(current, target_file):
+            os.chdir(f.strip(target_file)) # target dir
+            if not automake_flag:
+                print(os.getcwd()),
+                while True:
+                    choice = raw_input('[y/N]: ').lower()
+                    if choice in ['y', 'ye', 'yes', '']:
+                        comp_path += f + '`'
+                        view_result += f + '\n'
+                        break
+                    elif choice in ['n', 'no']:
+                        break
+                    else:
+                        print(os.getcwd()), # one more display
+            else:
+                view_result += f + '\n'
+                os.system('make') # all make
+            os.chdir(current) # current dir
+
+        if not automake_flag:
+            for f in comp_path:
+                file_path += f
+                if (f == '`'):
+                    str_path = ''.join(file_path)
+                    os.chdir(str_path.strip(target_file + '`'))
+                    os.system('make')
+                    os.chdir(current)
+                    file_path = ''
+
+        print(''.join(view_result)),
+        print('Make finished')
+        sys.exit(0)
+    elif re.match('rm', path) != None:
+        print('File clean execution'),
+        while True:
+            choice = raw_input('[y/N]: ').lower()
+            if choice in ['y', 'ye', 'yes', '']:
+                subprocess.call(command, shell=True)
+                print('Finish')
+                break
+            elif choice in ['n', 'no']:
+                print('Stopped')
+                break
+        sys.exit(0)
+    elif re.match('clean', path) != None:
+        print('Make clean execution')
+        for root, dirs, files in os.walk(current):
+            for dir in dirs:
+                if dir == 'autogen':
+                    file_path = os.path.join(root)
+                    os.chdir(file_path)
+                    print(os.getcwd()),
+                    while True:
+                        choice = raw_input('[y/N]: ').lower()
+                        if choice in ['y', 'ye', 'yes', '']:
+                            os.system('make clean')
+                            break
+                        elif choice in ['n', 'no']:
+                            break
+                        else:
+                            print(os.getcwd()),
+                    os.chdir(current)
+        if len(file_path) == 0:
+            print('Not found Makefile')
+        print('Make clean finished')
+        print('File clean execution')
+        for root, dirs, files in os.walk(current):
+            for dir in dirs:
+                for file in files:
+                    if re.match('omniname-*', str(file)) != None:
+                        file_path = os.path.join(root)
+                        os.chdir(file_path)
+                        print(os.getcwd()),
+                        while True:
+                            choice = raw_input('[y/N]: ').lower()
+                            if choice in ['y', 'ye', 'yes', '']:
+                                subprocess.call(command, shell=True)
+                                break
+                            elif choice in ['n', 'no']:
+                                break
+                            else:
+                                print(os.getcwd()),
+                        os.chdir(current)
+                        flag = True
+                        break
+                if flag:
+                    break
+        if len(file_path) == 0:
+            print('Not found target files')
+        else:
+            print('Finished')
+        sys.exit(0)
 
 
 def opt():
@@ -210,113 +332,6 @@ def opt():
         sys.exit(-1)
     if comps_invoke_interval > 0:
         print "Comps invoke interval: %4.1f sec" % (comps_invoke_interval)
-
-
-def find_all_files(directory, target_file):
-    for root, dirs, files in os.walk(directory):
-        for file in files:
-            if (file == target_file):
-                yield os.path.join(root, file)
-
-
-def file_clean(path):
-    file_path = []
-    make_result = []
-    target_file = 'Makefile'
-    command = "rm -r omninames-*.bak omninames-*.log \
-             rtc.conf .confFilePath __pycache__ *.pyc"
-    flag = False
-    automake_flag = False
-    current = os.getcwd()
-    if re.match('make', path) != None:
-        print('Makefile execution')
-        while True:
-            automake = raw_input('Automake[y/N]: ').lower()
-            if automake in ['y', 'ye', 'yes', '']:
-                automake_flag = True
-                break
-            elif automake in ['n', 'no']:
-                break
-        for file in find_all_files(current, target_file):
-            os.chdir(file.strip(target_file))
-            make_result += file + '\n'
-            if not automake_flag:
-                print(os.getcwd()),
-                while True:
-                    choice = raw_input('[y/N]: ').lower()
-                    if choice in ['y', 'ye', 'yes', '']:
-                        os.system('make')
-                        break
-                    elif choice in ['n', 'no']:
-                        break
-                    else:
-                        print(os.getcwd()),
-            else:
-                os.system('make')
-            os.chdir(current)
-        print(''.join(make_result)),
-        print('Make finished')
-        sys.exit(0)
-    elif re.match('rm', path) != None:
-        print('File clean execution'),
-        while True:
-            choice = raw_input('[y/N]: ').lower()
-            if choice in ['y', 'ye', 'yes', '']:
-                subprocess.call(command, shell=True)
-                print('Finish')
-                break
-            elif choice in ['n', 'no']:
-                print('Stopped')
-                break
-        sys.exit(0)
-    elif re.match('clean', path) != None:
-        print('Make clean execution')
-        for root, dirs, files in os.walk(current):
-            for dir in dirs:
-                if dir == 'autogen':
-                    file_path = os.path.join(root)
-                    os.chdir(file_path)
-                    print(os.getcwd()),
-                    while True:
-                        choice = raw_input('[y/N]: ').lower()
-                        if choice in ['y', 'ye', 'yes', '']:
-                            os.system('make clean')
-                            break
-                        elif choice in ['n', 'no']:
-                            break
-                        else:
-                            print(os.getcwd()),
-                    os.chdir(current)
-        if len(file_path) == 0:
-            print('Not found Makefile')
-        print('Make clean finished')
-        print('File clean execution')
-        for root, dirs, files in os.walk(current):
-            for dir in dirs:
-                for file in files:
-                    if re.match('omniname-*', str(file)) != None:
-                        file_path = os.path.join(root)
-                        os.chdir(file_path)
-                        print(os.getcwd()),
-                        while True:
-                            choice = raw_input('[y/N]: ').lower()
-                            if choice in ['y', 'ye', 'yes', '']:
-                                subprocess.call(command, shell=True)
-                                break
-                            elif choice in ['n', 'no']:
-                                break
-                            else:
-                                print(os.getcwd()),
-                        os.chdir(current)
-                        flag = True
-                        break
-                if flag:
-                    break
-        if len(file_path) == 0:
-            print('Not found target files')
-        else:
-            print('Finished')
-        sys.exit(0)
 
 
 def getVal(confile, path):
