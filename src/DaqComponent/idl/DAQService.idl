@@ -75,7 +75,8 @@ struct Status
 
 enum HBMSG {
     ZERO,
-    ONE
+    ONE,
+    END
 };
 
 enum HeartBeatDone {
@@ -105,6 +106,7 @@ interface DAQService
     FatalErrorStatus getFatalStatus();
 
     RTC::ReturnCode_t setOperatorToComp();
+    void stopDaqSystem();
     HBMSG getOperatorToComp();
     HeartBeatDone hb_checkDone();
     void   hb_setDone();

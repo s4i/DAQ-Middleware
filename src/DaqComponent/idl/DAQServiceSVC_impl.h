@@ -55,6 +55,7 @@ public:
 	FatalErrorStatus* getFatalStatus();
 
 	RTC::ReturnCode_t setOperatorToComp();
+    void stopDaqSystem();
 	HBMSG getOperatorToComp();
 	HeartBeatDone hb_checkDone();
 	void hb_setDone();

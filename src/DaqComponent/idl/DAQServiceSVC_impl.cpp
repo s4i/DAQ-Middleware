@@ -144,14 +144,12 @@ RTC::ReturnCode_t DAQServiceSVC_impl::setOperatorToComp()
 {
 #ifdef OLD
     if (m_done == HBDONE) {
-
-    m_oc = ONE;
-
-    m_hb_new = 1;
-    m_hb_done = HBUNDONE;
-    return RTC::RTC_OK;
+        m_oc = ONE;
+        m_hb_new = 1;
+        m_hb_done = HBUNDONE;
+        return RTC::RTC_OK;
     } else {
-    return RTC::RTC_ERROR;
+        return RTC::RTC_ERROR;
     }
 #endif
     m_oc = ONE;
@@ -159,6 +157,11 @@ RTC::ReturnCode_t DAQServiceSVC_impl::setOperatorToComp()
     m_hb_done = HBUNDONE;
     ///std::cerr << "HB_UNDONE\n";
     return RTC::RTC_OK;
+}
+
+void DAQServiceSVC_impl::stopDaqSystem()
+{
+    m_oc = END;
 }
 
 HBMSG DAQServiceSVC_impl::getOperatorToComp()

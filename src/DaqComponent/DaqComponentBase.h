@@ -17,6 +17,7 @@
 #define DAQCOMPONENTBASE_H
 
 #include <iostream>
+#include <cstdlib>
 #include <ctime>
 #include <fstream>
 #include <memory>
@@ -512,7 +513,6 @@ namespace DAQMW
             int ret = 0;
 
             get_command();
-            get_hb_from_operator_clockwork();
 
             bool status = true;
 
@@ -614,6 +614,15 @@ namespace DAQMW
                 }
                 else {
                     daq_onError();
+                }
+
+                get_hb_from_operator_clockwork();
+                if (m_hb == END) {
+                    if (m_command == CMD_START) {
+                        transAction(CMD_STOP);
+                    }
+                    std::cerr << "### shutdonw\n";
+                    _exit(1);
                 }
             }
 

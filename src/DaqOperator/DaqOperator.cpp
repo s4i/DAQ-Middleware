@@ -497,8 +497,8 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 							  << check_compStatus(status->comp_status)
 							  << "\033[39m" << std::endl;
 					/** Use error console display **/
-					d_compname.emplace_back(compnames[i]); // Don't std::move
-					d_message.emplace_back(std::move(errStatus));
+					d_compname.emplace_back(compnames[i]);
+					d_message.emplace_back(errStatus);
 					m_state = ERRORED;
 				}///if Fatal
 				else if (status->comp_status == COMP_RESTART) {
@@ -511,7 +511,7 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 							  << "\033[39m" << std::endl;
 					/** Use error console display **/
 					d_compname.emplace_back(compnames[i]);
-					d_message.emplace_back(std::move(errStatus));
+					d_message.emplace_back(errStatus);
 					m_state = ERRORED;
 					resFlag = true;
 				}///if Restart Request
@@ -524,8 +524,11 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 							  << "\033[39m" << std::endl;
 				}
 			} catch(...) {
-				std::cerr << " ### ERROR: " << compnames[i] << "  : cannot connect\n";
-				usleep(1000);
+				for (const auto& name : compnames) {
+					std::cerr << " ### ERROR: " << name << "  : cannot connect\n";
+				}
+				stop_heart_beat();
+				_exit(0);
 			}
 		}//for
 		std::cerr << std::endl;
@@ -533,7 +536,7 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 		/* Display Error Console */
 		if (m_state == ERRORED) {
 			int cnt = 0;
-			for (auto& compname : d_compname) {
+			for (const auto& compname : d_compname) {
 				++cnt;
 				std::cerr << " [ERROR" << cnt << "] "
 						<< compname << '\t'
@@ -541,21 +544,20 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 						<< "\033[39m" << std::endl;
 			}///for
 			if (deadFlag == true) {
-				for (auto& k_d : keep_dead) {
-					if (k_d == 1) {
-						std::cerr << "\033[31m"	<< " Heart beat return wait."
-								<< "\033[39m" << std::endl;
-					}
-				}
+				// for (const auto& k_d : keep_dead) {
+				// 	if (k_d == 1) {
+				std::cerr << " Heart beat return wait.\n";
+				// 	}
+				// }
 			}
 			else if (deadFlag == true && resFlag == true) {
-				for (auto& k_a : keep_alive) {
-					if (k_a == 1) {
-						std::cerr << "\033[36m" << "Heart beat re-acquisition."
-								<< "Push command 2:stop or 6:reboot"
-								<< "\033[39m" << std::endl;
-					}
-				}
+				// for (const auto& k_a : keep_alive) {
+				// 	if (k_a == 1) {
+				std::cerr << "\033[36m" << "Heart beat re-acquisition."
+						<< "Push command 2:stop or 6:reboot"
+						<< "\033[39m" << std::endl;
+				// 	}
+				// }
 			}
 		}
 		else {
@@ -662,14 +664,23 @@ int DaqOperator::set_command(RTC::CorbaConsumer<DAQService> daqservice,
 int DaqOperator::set_hb_to_component()
 {
 	try {
-		for (auto service : m_daqservices) {
-			set_hb(service);
-			check_hb_done(service);
+		for (const auto daqservice : m_daqservices) {
+			set_hb(daqservice);
+			check_hb_done(daqservice);
 		}
 	}
 	catch (...) {
 		std::cerr << "### ERROR: DaqOperator: Failed to set Heart Beat.\n";
 	}
+	return 0;
+}
+
+int DaqOperator::stop_heart_beat()
+{
+	for (auto& daqservice : m_daqservices) {
+		daqservice->stopDaqSystem();
+	}
+
 	return 0;
 }
 
