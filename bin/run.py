@@ -175,11 +175,11 @@ def file_clean(path):
         print('File clean execution'),
         while True:
             choice = raw_input('[y/N]: ').lower()
-            if choice in ['y', 'ye', 'yes', '']:
+            if choice in ['y', 'ye', 'yes']:
                 subprocess.call(command, shell=True)
                 print('Finish')
                 break
-            elif choice in ['n', 'no']:
+            elif choice in ['n', 'no', '']:
                 print('Stopped')
                 break
         sys.exit(0)

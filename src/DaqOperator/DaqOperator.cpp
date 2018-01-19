@@ -498,7 +498,7 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 							  << "\033[39m" << std::endl;
 					/** Use error console display **/
 					d_compname.emplace_back(compnames[i]);
-					d_message.emplace_back(errStatus);
+					d_message.emplace_back(std::move(errStatus));
 					m_state = ERRORED;
 				}///if Fatal
 				else if (status->comp_status == COMP_RESTART) {
@@ -511,7 +511,7 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 							  << "\033[39m" << std::endl;
 					/** Use error console display **/
 					d_compname.emplace_back(compnames[i]);
-					d_message.emplace_back(errStatus);
+					d_message.emplace_back(std::move(errStatus));
 					m_state = ERRORED;
 					resFlag = true;
 				}///if Restart Request
