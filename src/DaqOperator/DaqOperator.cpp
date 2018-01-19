@@ -322,8 +322,8 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 	int command;
 
 	/* console error display */
-	std::vector<std::string> d_compname{};
-	std::vector<FatalErrorStatus_var> d_message{};
+	std::vector<std::string> d_compname;
+	std::vector<FatalErrorStatus_var> d_message;
 
 	m_tout.tv_sec =  2;
 	m_tout.tv_usec = 0;
@@ -347,7 +347,7 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 			  << " stop at: " << m_stop_date << "\n\n";
 	std::cerr << "\033[0;11H";
 
-	select(1, &m_rset, nullptr, nullptr, &m_tout);
+	select(1, &m_rset, NULL, NULL, &m_tout);
 	if (m_com_completed == false) {
 		return RTC::RTC_OK;
 	}
@@ -482,14 +482,32 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 
 		for (int i = (m_comp_num - 1); i >= 0; i--) {
 			try {
-				status = m_daqservices[i]->getStatus();
+				try {
+					status = m_daqservices[i]->getStatus();
+				}
+				catch (CORBA::COMM_FAILURE ex){
+					std::cerr << "status\n";
+				}
+				catch (...) {
+					std::cerr << "status unknown\n";
+					throw;
+				}
 				std::cerr << " " << std::setw(22) << std::left
 						  << compnames[i]  << '\t'
 						  << std::setw(14) << std::right
 						  << status->event_size; // data size(byte)
 
 				if (status->comp_status == COMP_FATAL) {
-					errStatus = m_daqservices[i]->getFatalStatus();
+					try {
+						errStatus = m_daqservices[i]->getFatalStatus();
+					}
+					catch (CORBA::COMM_FAILURE ex) {
+						std::cerr << "fatal status\n";
+					}
+					catch (...) {
+						std::cerr << "fatal status unknown\n";
+						throw;
+					}
 					std::cerr << "\033[35m"
 							  << std::setw(12) << std::right
 							  << "__RUNNING__" << "\033[39m"
@@ -785,6 +803,7 @@ int DaqOperator::error_stop_procedure()
 		std::cerr << "### ERROR: Failed to restart(stop) Component.\n";
 		return 1;
 	}
+
 	keep_alive.clear();
 	keep_dead.clear();
 

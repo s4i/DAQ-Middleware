@@ -143,8 +143,8 @@ private:
     int copy_compname();
 
     /* HeartBeat */
-    std::vector<int> keep_alive{};
-    std::vector<int> keep_dead{};
+    std::vector<int> keep_alive;
+    std::vector<int> keep_dead;
     // int *keep_alive;
     // int *keep_dead;
     int set_hb_to_component();
