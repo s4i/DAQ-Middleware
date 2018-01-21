@@ -52,8 +52,8 @@
 using namespace RTC;
 
 // error code for dom
-static const int RET_CODE_IO_ERR		    = (-14);
-static const int RET_CODE_REQ_INV_IN_STS	= (-26);
+static constexpr int RET_CODE_IO_ERR		    = (-14);
+static constexpr int RET_CODE_REQ_INV_IN_STS	= (-26);
 
 struct serviceInfo {
     std::string comp_id;
@@ -125,7 +125,7 @@ protected:
     // std::list<RTC::CorbaConsumer<DAQService> > m_daqservices;
 
 private:
-    static const int PARAM_PORT = 30000;
+    static constexpr int PARAM_PORT = 30000;
     static DaqOperator* _instance;
 
     int m_comp_num;
@@ -150,11 +150,11 @@ private:
     int set_hb_to_component();
     int set_hb(RTC::CorbaConsumer<DAQService> daqservice);
     int check_hb_done(RTC::CorbaConsumer<DAQService> daqservice);
-    int stop_heart_beat();
+    int stop_heart_beat(int num);
 
     /* Heart beat timer */
     // Timer* mytimer;
-    static const int HB_CYCLE_SEC = 5;
+    static constexpr int HB_CYCLE_SEC = 5;
 	std::unique_ptr<Timer> mytimer{new Timer(HB_CYCLE_SEC)};
     int m_send_count;
     void reset_send_count();
@@ -230,9 +230,11 @@ private:
     bool m_time;
 };
 
+
 extern "C"
 {
     void DaqOperatorInit(RTC::Manager* manager);
 };
+
 
 #endif // DAQOPERATOR_H

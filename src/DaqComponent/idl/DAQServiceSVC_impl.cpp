@@ -140,7 +140,7 @@ FatalErrorStatus* DAQServiceSVC_impl::getFatalStatus()
     return myfatal;
 }
 
-RTC::ReturnCode_t DAQServiceSVC_impl::setOperatorToComp()
+RTC::ReturnCode_t DAQServiceSVC_impl::setHB()
 {
 #ifdef OLD
     if (m_done == HBDONE) {
@@ -152,6 +152,7 @@ RTC::ReturnCode_t DAQServiceSVC_impl::setOperatorToComp()
         return RTC::RTC_ERROR;
     }
 #endif
+
     m_oc = ONE;
     m_hb_new = 1;
     m_hb_done = HBUNDONE;
@@ -159,19 +160,15 @@ RTC::ReturnCode_t DAQServiceSVC_impl::setOperatorToComp()
     return RTC::RTC_OK;
 }
 
-void DAQServiceSVC_impl::stopDaqSystem()
-{
-    m_oc = END;
-}
-
-HBMSG DAQServiceSVC_impl::getOperatorToComp()
+HBMSG DAQServiceSVC_impl::getHB()
 {
     if (m_hb_new) {
     m_hb_new = 0;
     return m_oc;
     }
-    else
+    else {
     return ZERO;
+    }
 }
 
 HeartBeatDone DAQServiceSVC_impl::hb_checkDone()

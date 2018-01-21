@@ -133,26 +133,11 @@ DaqOperator::DaqOperator(RTC::Manager* manager)
 
 	m_tout.tv_sec =  3;
 	m_tout.tv_usec = 0;
-
-	/* Timer */
-	// mytimer = new Timer(HB_CYCLE_SEC);
-
-	// keep_alive = new int[m_comp_num];
-	// keep_dead = new int[m_comp_num];
-	// std::fill(keep_alive, keep_alive + m_comp_num, 0);
-	// std::fill(keep_dead, keep_dead + m_comp_num, 0);
 }
 
 DaqOperator::~DaqOperator()
 {
 	XMLPlatformUtils::Terminate();
-	// delete mytimer;
-	// mytimer = nullptr;
-
-	// delete keep_alive;
-	// keep_alive = nullptr;
-	// delete keep_dead;
-	// keep_dead = nullptr;
 }
 
 RTC::ReturnCode_t DaqOperator::onInitialize()
@@ -465,10 +450,7 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 		Status_var status;
 		FatalErrorStatus_var errStatus;
 
-		if (m_new == 0) {
-			copy_compname();
-			m_new = 1;
-		}
+		copy_compname();
 
 		std::cerr << " " << std::endl;
 		std::cerr << "\033[0;0H\033[2J";
@@ -482,32 +464,14 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 
 		for (int i = (m_comp_num - 1); i >= 0; i--) {
 			try {
-				try {
-					status = m_daqservices[i]->getStatus();
-				}
-				catch (CORBA::COMM_FAILURE ex){
-					std::cerr << "status\n";
-				}
-				catch (...) {
-					std::cerr << "status unknown\n";
-					throw;
-				}
+				status = m_daqservices[i]->getStatus();
 				std::cerr << " " << std::setw(22) << std::left
 						  << compnames[i]  << '\t'
 						  << std::setw(14) << std::right
 						  << status->event_size; // data size(byte)
 
 				if (status->comp_status == COMP_FATAL) {
-					try {
-						errStatus = m_daqservices[i]->getFatalStatus();
-					}
-					catch (CORBA::COMM_FAILURE ex) {
-						std::cerr << "fatal status\n";
-					}
-					catch (...) {
-						std::cerr << "fatal status unknown\n";
-						throw;
-					}
+					errStatus = m_daqservices[i]->getFatalStatus();
 					std::cerr << "\033[35m"
 							  << std::setw(12) << std::right
 							  << "__RUNNING__" << "\033[39m"
@@ -542,11 +506,8 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 							  << "\033[39m" << std::endl;
 				}
 			} catch(...) {
-				for (const auto& name : compnames) {
-					std::cerr << " ### ERROR: " << name << "  : cannot connect\n";
-				}
-				stop_heart_beat();
-				_exit(0);
+				std::cerr << " ### ERROR: " << compnames[i] << "  : cannot connect\n";
+				// stop_heart_beat(i);
 			}
 		}//for
 		std::cerr << std::endl;
@@ -554,7 +515,7 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 		/* Display Error Console */
 		if (m_state == ERRORED) {
 			int cnt = 0;
-			for (const auto& compname : d_compname) {
+			for (auto& compname : d_compname) {
 				++cnt;
 				std::cerr << " [ERROR" << cnt << "] "
 						<< compname << '\t'
@@ -562,14 +523,14 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 						<< "\033[39m" << std::endl;
 			}///for
 			if (deadFlag == true) {
-				// for (const auto& k_d : keep_dead) {
+				// for (auto& k_d : keep_dead) {
 				// 	if (k_d == 1) {
 				std::cerr << " Heart beat return wait.\n";
 				// 	}
 				// }
 			}
 			else if (deadFlag == true && resFlag == true) {
-				// for (const auto& k_a : keep_alive) {
+				// for (auto& k_a : keep_alive) {
 				// 	if (k_a == 1) {
 				std::cerr << "\033[36m" << "Heart beat re-acquisition."
 						<< "Push command 2:stop or 6:reboot"
@@ -592,11 +553,14 @@ int DaqOperator::copy_compname()
 	std::string compname;
 	RTC::ConnectorProfileList_var myprof;
 
-	for (int i = 0; i < m_comp_num; i++) {
-		myprof = m_DaqServicePorts[i]->get_connector_profiles();
-		compname = myprof[0].name;
-		compnames.emplace_back(compname);
+	if (m_new == 0) {
+		for (int i = (m_comp_num - 1); i >= 0; i--) {
+			myprof = m_DaqServicePorts[i]->get_connector_profiles();
+			compnames.emplace_back(myprof[0].name);
+		}
+		m_new = 1;
 	}
+
 	return 0;
 }
 
@@ -682,7 +646,7 @@ int DaqOperator::set_command(RTC::CorbaConsumer<DAQService> daqservice,
 int DaqOperator::set_hb_to_component()
 {
 	try {
-		for (const auto daqservice : m_daqservices) {
+		for (auto& daqservice : m_daqservices) {
 			set_hb(daqservice);
 			check_hb_done(daqservice);
 		}
@@ -693,10 +657,13 @@ int DaqOperator::set_hb_to_component()
 	return 0;
 }
 
-int DaqOperator::stop_heart_beat()
+int DaqOperator::stop_heart_beat(int num)
 {
-	for (auto& daqservice : m_daqservices) {
-		daqservice->stopDaqSystem();
+	try {
+		m_daqservices[num]->setStopDaqSystem();
+	}
+	catch (...) {
+		std::cerr << "stop_heart_beat\n";
 	}
 
 	return 0;
@@ -706,7 +673,7 @@ int DaqOperator::set_hb(RTC::CorbaConsumer<DAQService> daqservice)
 {
 	int status = 0;
 	try {
-		status = daqservice->setOperatorToComp();
+		status = daqservice->setHB();
 	}
 	catch(...) {
 		std::cerr << "### ERROR: set hb: exception occured\n";
@@ -804,9 +771,6 @@ int DaqOperator::error_stop_procedure()
 		return 1;
 	}
 
-	keep_alive.clear();
-	keep_dead.clear();
-
 	time_t now = time(0);
 	m_stop_date = asctime(localtime(&now));
 	m_stop_date[m_stop_date.length()-1] = ' ';
@@ -876,7 +840,7 @@ int DaqOperator::restart_procedure()
 
 	Status_var status;
 	try {
-		for (const auto& daqservice : m_daqservices) {
+		for (auto& daqservice : m_daqservices) {
 			// status = m_daqservices[i]->getStatus();
 			// if (status->state == CONFIGURED) {
 			set_runno(daqservice, m_runNumber);
@@ -884,7 +848,7 @@ int DaqOperator::restart_procedure()
 			// }
 		}
 
-		for (const auto& daqservice : m_daqservices) {
+		for (auto& daqservice : m_daqservices) {
 			// status = m_daqservices[i]->getStatus();
 			// 	if (status->state == CONFIGURED) {
 			set_command(daqservice, CMD_START);
@@ -1020,7 +984,7 @@ int DaqOperator::configure_procedure()
 			CORBA::string_free(id);
 		}
 
-		for (const auto& daqservice : m_daqservices) {
+		for (auto& daqservice : m_daqservices) {
 			set_command(daqservice, CMD_CONFIGURE);
 			check_done(daqservice);
 		}
@@ -1038,7 +1002,7 @@ int DaqOperator::unconfigure_procedure()
 {
 	m_com_completed = false;
 	try {
-		for (const auto& daqservice : m_daqservices) {
+		for (auto& daqservice : m_daqservices) {
 			set_command(daqservice, CMD_UNCONFIGURE);
 			check_done(daqservice);
 		}
@@ -1065,12 +1029,12 @@ int DaqOperator::start_procedure()
 			std::cerr << "start_parocedure: runno: " << m_runNumber << std::endl;
 		}
 
-		for (const auto& daqservice : m_daqservices) {
+		for (auto& daqservice : m_daqservices) {
 			set_runno(daqservice, m_runNumber);
 			check_done(daqservice);
 		}
 
-		for (const auto& daqservice : m_daqservices) {
+		for (auto& daqservice : m_daqservices) {
 			set_command(daqservice, CMD_START);
 			check_done(daqservice);
 
@@ -1131,7 +1095,7 @@ int DaqOperator::resume_procedure()
 	m_com_completed = false;
 	try {
 
-		for (const auto& daqservice : m_daqservices) {
+		for (auto& daqservice : m_daqservices) {
 			set_command(daqservice, CMD_RESUME);
 			check_done(daqservice);
 		}

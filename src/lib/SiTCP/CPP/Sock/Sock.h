@@ -43,7 +43,7 @@ namespace DAQMW {
   /*!
    * @class SockException
    * @brief SockException class
-   * 
+   *
    * This class supports Sock exception.
    *
    */
@@ -62,13 +62,13 @@ namespace DAQMW {
   /*!
    * @class Sock
    * @brief Sock class
-   * 
+   *
    * This class supports basic sock functions.
    *
    */
   class Sock {
   public:
-    /* 
+    /*
      * @brief constructor
      * network address structure wil be initialzed as zero.
      * socket is NOT created. connection timeout time and read/write timeout
@@ -82,11 +82,11 @@ namespace DAQMW {
      * @brief deconstructor
      */
     virtual ~Sock();
-    
+
     /*
      * @brief socket creation for Server
-     * creates a socket and then sets an option of SO_REUSEADDR. 
-     * if the return value is SUCCESS, success. 
+     * creates a socket and then sets an option of SO_REUSEADDR.
+     * if the return value is SUCCESS, success.
      * Otherwise, Fatal errors. Those will be thrown.
      */
     int create();
@@ -95,7 +95,7 @@ namespace DAQMW {
 
     /*
      * @brief binding socket for Server
-     * binds the socket. 
+     * binds the socket.
      * if the return value is SUCCESS, success.
      * Otherwise, Fatal errors. Those will be thrown.
      * bind(const int port) binds any clients while bind(const int port,
@@ -122,11 +122,11 @@ namespace DAQMW {
      * New socket should be specified.
      */
     int accept ( Sock& ) const;
-    
+
     /*
      * @brief connecting socket for client
      * connect method is for TCP connection.
-     * connectTCP method is for TCP connection. 
+     * connectTCP method is for TCP connection.
      * connectUDP method is for UDP connection.
      * It creates if socket is not created.
      * It creates network address structure and then connect.
@@ -150,10 +150,10 @@ namespace DAQMW {
      * @brief write data
      * The method sends data.
      * Exception is NOT thrown.
-     * The method will send data with the specified size in bytes. But, 
+     * The method will send data with the specified size in bytes. But,
      * it may not send the specified size of data. When fatal error occurred,
      * ERROR_FATAL will return. If timeout occurred, ERROR_TIMEOUT will return.
-     * Otherwise, the method returns size of the sent data in bytes.  
+     * Otherwise, the method returns size of the sent data in bytes.
      */
     int write(unsigned char* buffer, int nbytes) const;
 
@@ -161,11 +161,11 @@ namespace DAQMW {
      * @brief read data
      * The method receives data.
      * Exception is NOT thrown.
-     * The method will receive data with the specified size in bytes. But, 
+     * The method will receive data with the specified size in bytes. But,
      * it may not receive the specified size of data. When fatal error
-     * occurred, ERROR_FATAL will return. If timeout occurred, 
-     * ERROR_TIMEOUT will return. Otherwise, the method returns 
-     * size of the received data in bytes.  
+     * occurred, ERROR_FATAL will return. If timeout occurred,
+     * ERROR_TIMEOUT will return. Otherwise, the method returns
+     * size of the received data in bytes.
      */
     int read(unsigned char* buffer, int nbytes) const;
 
@@ -173,10 +173,10 @@ namespace DAQMW {
      * @brief write all of data
      * The method sends all of data.
      * Exception is NOT thrown.
-     * The method will send all of data with the specified size in bytes. 
-     * When fatal error occurred ERROR_FATAL will return. 
+     * The method will send all of data with the specified size in bytes.
+     * When fatal error occurred ERROR_FATAL will return.
      * If timeout occurred, ERROR_TIMEOUT will return.
-     * Otherwise, the method returns size of the sent data in bytes.  
+     * Otherwise, the method returns size of the sent data in bytes.
      */
     int writeAll(unsigned char* buffer, int nbytes) const;
 
@@ -184,8 +184,8 @@ namespace DAQMW {
      * @brief read all of data
      * The method receives all of data.
      * Exception is NOT thrown.
-     * The method will receive all of data with the specified size in bytes. 
-     * When fatal error occurred ERROR_FATAL will return. 
+     * The method will receive all of data with the specified size in bytes.
+     * When fatal error occurred ERROR_FATAL will return.
      * If timeout occurred, ERROR_TIMEOUT will return.
      * If SUCCESS returns, success.
      */
@@ -221,19 +221,19 @@ namespace DAQMW {
      * The method will send data with the specified size in bytes.
      * But, it may not send the specified size of data.
      * When fatal error occurred, an exception will be thrown.
-     * If timeout occurred, ERROR_TIMEOUT will return. 
-     * Otherwise, the method returns size of the sent data in bytes.  
+     * If timeout occurred, ERROR_TIMEOUT will return.
+     * Otherwise, the method returns size of the sent data in bytes.
      */
     int send ( const unsigned int* , int ) const;
-    
+
     /*
      * @brief receive data
      * The method receives data.
      * The method will receive data with the specified size in bytes.
      * But, it may not receive the specified size of data.
      * When fatal error occurred, an exception will be thrown.
-     * If timeout occurred, ERROR_TIMEOUT will return. 
-     * Otherwise, the method returns size of the received data in bytes.  
+     * If timeout occurred, ERROR_TIMEOUT will return.
+     * Otherwise, the method returns size of the received data in bytes.
      */
     int recv ( unsigned int* , int ) const;
 
@@ -241,29 +241,29 @@ namespace DAQMW {
      * @brief send all of data
      * The method sends data.
      * Exception IS thrown.
-     * The method will send all of characters in the specified string. 
+     * The method will send all of characters in the specified string.
      * When fatal error occurred, an exception will be thrown.
      * If timeout occurred, ERROR_TIMEOUT will return.
      * If SUCCESS returns, success.
      */
     int sendAll ( const std::string ) const;
-    
+
     /*
      * @brief send all of data
      * The method sends all of data.
      * Exception IS thrown.
      * The method will send all of data with the specified size in bytes.
      * When fatal error occurred, an exception will be thrown.
-     * If timeout occurred, ERROR_TIMEOUT will return. 
+     * If timeout occurred, ERROR_TIMEOUT will return.
      * If SUCCESS returns, success.
      */
     int sendAll ( const unsigned int* , int ) const;
-    
+
     /*
      * @brief receive all of data
      * The method receives all of data.
      * Exception IS thrown.
-     * The method will receive the specified size of characters in the string. 
+     * The method will receive the specified size of characters in the string.
      * When fatal error occurred, an exception will be thrown.
      * If timeout occurred, ERROR_TIMEOUT will return.
      * Otherwise, the method returns number of the received characters.
@@ -276,8 +276,8 @@ namespace DAQMW {
      * Exception IS thrown.
      * The method will receive all of data with the specified size in bytes.
      * When fatal error occurred, an exception will be thrown.
-     * If timeout occurred, ERROR_TIMEOUT will return. 
-     * Otherwise, the method returns size of the received data in bytes.  
+     * If timeout occurred, ERROR_TIMEOUT will return.
+     * Otherwise, the method returns size of the received data in bytes.
      */
     int recvAll ( unsigned int* , int ) const;
 
@@ -299,7 +299,7 @@ namespace DAQMW {
      * if SUCCESS returns, success. Oterwise, fatal error will be thrown.
      */
     int setOptNonBlocking ( const bool ) const;
-    
+
     /*
      * @brief set/reset ReUse flag
      * The method sets or resets ReUse flag.If bool is true, it sets.
@@ -316,8 +316,8 @@ namespace DAQMW {
 
     /*
      * @brief set/reset receive/read timeout
-     * The method sets or resets receive/read timeout. 
-     * If the specified value is 0, it resets the timeout. 
+     * The method sets or resets receive/read timeout.
+     * If the specified value is 0, it resets the timeout.
      * Otherwise, it sets the timeout value in seconds.
      * if SUCCESS returns, success. Oterwise, fatal error will be thrown.
      */
@@ -325,8 +325,8 @@ namespace DAQMW {
 
     /*
      * @brief set/reset send/write timeout
-     * The method sets or resets send/write timeout. 
-     * If the specified value is 0, it resets the timeout. 
+     * The method sets or resets send/write timeout.
+     * If the specified value is 0, it resets the timeout.
      * Otherwise, it sets the timeout value in seconds.
      * if SUCCESS returns, success. Oterwise, fatal error will be thrown.
      */
@@ -385,7 +385,7 @@ namespace DAQMW {
     static const int MAXHOSTNAME = 200;
     static const int MAXCONNECTIONS = 1;
     static const int MAXRECV = 8000;
-    
+
   };
 };
 

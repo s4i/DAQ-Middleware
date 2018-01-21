@@ -23,8 +23,8 @@ namespace DAQMW
   /*!
    * @class FatalType
    * @brief FatalType class
-   * 
-   * 
+   *
+   *
    *
    */
     namespace FatalType
@@ -79,7 +79,7 @@ namespace DAQMW
             ///user defined fatal error (user defined error1 - error20)
             ///users can choose a below error and its description by string.
             ///fatal_error_report(FatalTypes types, std::string desc, int code)
-            /// e.g. 
+            /// e.g.
             /// fatal_error_report(USER_DEFINED_ERROR1,
             ///                                "My fatal error detail", -1)
             USER_DEFINED_ERROR1,

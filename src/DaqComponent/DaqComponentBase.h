@@ -91,11 +91,11 @@ namespace DAQMW
         DAQServiceSVC_impl m_daq_service0;
         Status m_status;
 
-        static const unsigned int  HEADER_BYTE_SIZE = 8;
-        static const unsigned int  FOOTER_BYTE_SIZE = 8;
-        static const unsigned char HEADER_MAGIC     = 0xe7;
-        static const unsigned char FOOTER_MAGIC     = 0xcc;
-        static const unsigned int  EVENT_BUF_OFFSET = HEADER_BYTE_SIZE;
+        static constexpr unsigned int  HEADER_BYTE_SIZE = 8;
+        static constexpr unsigned int  FOOTER_BYTE_SIZE = 8;
+        static constexpr unsigned char HEADER_MAGIC     = 0xe7;
+        static constexpr unsigned char FOOTER_MAGIC     = 0xcc;
+        static constexpr unsigned int  EVENT_BUF_OFFSET = HEADER_BYTE_SIZE;
 
         /**
          *  The data structure transferring between DAQ-Components is
@@ -617,13 +617,9 @@ namespace DAQMW
                 }
 
                 get_hb_from_operator_clockwork();
-                if (m_hb == END) {
-                    if (m_command == CMD_START) {
-                        transAction(CMD_STOP);
-                    }
-                    std::cerr << "### shutdonw\n";
-                    _exit(1);
-                }
+                // std::cerr << m_command <<std::endl;
+                // std::cerr << m_state_prev << std::endl;
+                // std::cerr << m_state <<std::endl;
             }
 
             return ret;
@@ -656,11 +652,11 @@ namespace DAQMW
         }
 
     private:
-        static const int DAQ_CMD_SIZE       = 10;
-        static const int DAQ_STATE_SIZE     =  6;
-        static const int DAQ_IDLE_TIME_USEC =  10000; // 10 m sec
-        static const int STATUS_CYCLE_SEC   =  3; // default = 3
-        static const int HB_CHECK_CYCLE_SEC   =  1; // default = 3
+        static constexpr int DAQ_CMD_SIZE       = 10;
+        static constexpr int DAQ_STATE_SIZE     =  6;
+        static constexpr int DAQ_IDLE_TIME_USEC =  10000; // 10 m sec
+        static constexpr int STATUS_CYCLE_SEC   =  3; // default = 3
+        static constexpr int HB_CHECK_CYCLE_SEC   =  1; // default = 3
 
         std::string m_comp_name;
         unsigned int m_runNumber;
@@ -775,22 +771,29 @@ namespace DAQMW
 
         int get_hb_from_operator_clockwork()
         {
-            if (hb_timer->checkTimer()) {
-                m_hb = m_daq_service0.getOperatorToComp();
-                if (m_hb == ONE) {
-                    set_hb_done();
-                }
-                if (m_hb) {
-                    std::cerr << "m_hb=" << m_hb << std::endl;
-                }
-                hb_timer->resetTimer();
+            // if (hb_timer->checkTimer()) {
+            m_hb = m_daq_service0.getHB();
+            if (m_hb == ONE) {
+                set_hb_done();
             }
+            if (m_hb == END) {
+                if (m_state_prev == CONFIGURED && m_state == RUNNING) {
+                    transAction(CMD_STOP);
+                }
+                std::cerr << "### shutdonw\n";
+                _exit(1);
+            }
+            if (m_hb) {
+                std::cerr << "m_hb=" << m_hb << std::endl;
+            }
+            // hb_timer->resetTimer();
+            // }
             return 0;
         }
 
         int get_time_performance(int command)
         {
-            char fname_inline[] = "s4i-file-inline";
+            constexpr char fname_inline[] = "s4i-file-inline";
 
             TimeVal st;
             struct timeval end_time;
@@ -855,7 +858,7 @@ namespace DAQMW
 
         int output_time_performance(int command)
         {
-            char fname_output[] = "s4i-file-inline";
+            constexpr char fname_output[] = "s4i-file-inline";
 
             struct timeval end_time;
             struct timezone tz;

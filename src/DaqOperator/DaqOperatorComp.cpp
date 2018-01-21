@@ -81,8 +81,8 @@ std::string xml_file = "";         //initial value
 int port_param_server = 30000;     //initial value
 std::string host_ns = "localhost"; //initial value
 std::string port_ns = "9876";      //initial value
-const int port_no = 30000;
-const int FIND_COMP_RETRY_MAX_CNTS = 20;
+constexpr int port_no = 30000;
+constexpr int FIND_COMP_RETRY_MAX_CNTS = 20;
 
 CorbaNaming* init_orb(const char* hostname, CORBA::ORB_var orb)
 {
@@ -272,7 +272,7 @@ int find_comps(CorbaNaming* naming, CompGroupList* daq_group_list)
                         }
 
                         inport_info.inport_ptr  = port;
-                        inport_list.push_back(inport_info);
+                        inport_list.emplace_back(inport_info);
                         inport_count++;
                     }
                 }
@@ -283,7 +283,7 @@ int find_comps(CorbaNaming* naming, CompGroupList* daq_group_list)
                         std::cerr << "    myOutport:" << myOutport[outport_count] << std::endl;
                         outport_info.outport_name = gid + p.getId() + ":" + myOutport[outport_count];
                         outport_info.outport_ptr  = port;
-                        outport_list.push_back(outport_info);
+                        outport_list.emplace_back(outport_info);
                         outport_count++;
                     }
                 }
@@ -291,7 +291,7 @@ int find_comps(CorbaNaming* naming, CompGroupList* daq_group_list)
                     service_info.comp_id = gid + ":" +p.getId();
                     service_info.startup_order = atoi(p.getStartupOrder().c_str());
                     service_info.service_ptr = port;
-                    service_list.push_back(service_info);
+                    service_list.emplace_back(service_info);
                 }
             }
         }
@@ -309,19 +309,19 @@ int connect_data_ports()
     if (debug) {
         std::cerr << "*** connect comps" << std::endl;
         std::cerr << "--------------------------------------------------------\n";
-        for(int i=0; i< (int)inport_list.size(); i++) {
+        for(int i = 0; i < (int)inport_list.size(); i++) {
             std::cerr << "inport name: " << inport_list[i].inport_name << std::endl;
             std::cerr << "from name: "   << inport_list[i].from_name << std::endl;
         }
 
-        for(int i=0; i< (int)outport_list.size(); i++) {
+        for(int i = 0; i < (int)outport_list.size(); i++) {
             std::cerr << "outport name: " << outport_list[i].outport_name << std::endl;
         }
         std::cerr << "--------------------------------------------------------\n";
     }
 
    ///connect OutPorts to InPorts respectively
-    for(int index = 0; index < (int)inport_list.size(); index ++) {
+    for(int index = 0; index < (int)inport_list.size(); index++) {
         if (debug) {
             std::cerr << "InPort name:" << inport_list[index].inport_name << std::endl;
         }
@@ -578,7 +578,7 @@ void MyModuleInit(RTC::Manager* manager)
 
        if (port_type == "CorbaPort") {
            operator_service_info.service_ptr = port;
-           operator_service_list.push_back(operator_service_info);
+           operator_service_list.emplace_back(operator_service_info);
        }
 
        NVUtil::dump(port->get_port_profile()->properties);

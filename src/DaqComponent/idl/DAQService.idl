@@ -105,9 +105,9 @@ interface DAQService
     void setFatalStatus(in FatalErrorStatus fatalStaus);
     FatalErrorStatus getFatalStatus();
 
-    RTC::ReturnCode_t setOperatorToComp();
-    void stopDaqSystem();
-    HBMSG getOperatorToComp();
+    RTC::ReturnCode_t setHB();
+    HBMSG getHB();
+    void setStopDaqSystem();
     HeartBeatDone hb_checkDone();
     void   hb_setDone();
 

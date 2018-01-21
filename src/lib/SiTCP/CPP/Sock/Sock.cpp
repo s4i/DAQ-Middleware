@@ -41,7 +41,7 @@ namespace DAQMW {
     memset ( &m_addr, 0, sizeof ( m_addr ) );
     if(m_debug) {
       std::cerr << "Sock::Sock:ipaddress = "<<  m_ipAddress
-		<< "  port = " << m_port << std::endl;
+                << "  port = " << m_port << std::endl;
     }
     // for sendTo(UDP)
     memset(&m_addr_other, 0, sizeof (m_addr_other));
@@ -207,7 +207,7 @@ namespace DAQMW {
       return ERROR_FATAL;
     } else if(status == 0) { // specified by hostname not ip
       struct hostent *hostinfo = gethostbyname(host.c_str());
-      if(hostinfo != nullptr) {
+      if(hostinfo != NULL) {
 	m_addr.sin_addr.s_addr = *(unsigned int*)hostinfo->h_addr_list[0];
       } else {
 	std:: cerr << "### ERROR: Sock::connect(string, int) gethostbyname" << std::endl;
