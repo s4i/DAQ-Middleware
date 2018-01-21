@@ -574,7 +574,7 @@ namespace DAQMW
                               << std::endl;
                 }
                 set_done();
-                get_time_performance(m_command);
+                // get_time_performance(m_command);
             }
             else {
                 ///same command as previous, stay same state, do same action
@@ -780,65 +780,65 @@ namespace DAQMW
         //    return 0;
         //}
 
-        int get_time_performance(int command)
-        {
-            TimeVal st;
-            struct timeval end_time;
-            struct timezone tz;
-            long result;
+        // int get_time_performance(int command)
+        // {
+        //     TimeVal st;
+        //     struct timeval end_time;
+        //     struct timezone tz;
+        //     long result;
 
-            char date[64];
-            char fname[64];
+        //     char date[64];
+        //     char fname[64];
 
 
-            /* end time */
-            gettimeofday(&end_time, &tz);
+        //     /* end time */
+        //     gettimeofday(&end_time, &tz);
 
-            /* start time */
-            st = m_daq_service0.getTime();
+        //     /* start time */
+        //     st = m_daq_service0.getTime();
 
-            /* calc */
-            result = (end_time.tv_sec - st.sec) * 1000000
-                    + (end_time.tv_usec - st.usec);
+        //     /* calc */
+        //     result = (end_time.tv_sec - st.sec) * 1000000
+        //             + (end_time.tv_usec - st.usec);
 
-            if (result < 0) {
-                result = (st.sec - end_time.tv_sec) * 1000000
-                        + (st.usec - end_time.tv_usec);
-            }
+        //     if (result < 0) {
+        //         result = (st.sec - end_time.tv_sec) * 1000000
+        //                 + (st.usec - end_time.tv_usec);
+        //     }
 
-            time_t t = time(NULL);
-            strftime(date, sizeof(date), "/home/sai/%Y-%m-%d", localtime(&t));
-            sprintf(fname, "%s.cvs", date);
-            std::ofstream csv_file(fname, std::ios::app);
+        //     time_t t = time(NULL);
+        //     strftime(date, sizeof(date), "/home/sai/%Y-%m-%d", localtime(&t));
+        //     sprintf(fname, "%s.cvs", date);
+        //     std::ofstream csv_file(fname, std::ios::app);
 
-            result *= 1000;
+        //     result *= 1000;
 
-            switch (command) {
-            case CMD_CONFIGURE:
-                csv_file << "Configure," << result << std::endl;
-                break;
-            case CMD_START:
-                csv_file << "Start," << result << std::endl;
-                break;
-            case CMD_STOP:
-                csv_file << "Stop," << result << std::endl;
-                break;
-            case CMD_UNCONFIGURE:
-                csv_file << "Unconfigure," << result << std::endl;
-                break;
-            case CMD_PAUSE:
-                csv_file << "Pause," << result << std::endl;
-                break;
-            case CMD_RESUME:
-                csv_file << "Resume," << result << std::endl;
-                break;
-            case CMD_RESTART:
-                csv_file << "Restart," << result << std::endl;
-                break;
-            }
-            csv_file.close();
-            return 0;
-        }
+        //     switch (command) {
+        //     case CMD_CONFIGURE:
+        //         csv_file << "Configure," << result << std::endl;
+        //         break;
+        //     case CMD_START:
+        //         csv_file << "Start," << result << std::endl;
+        //         break;
+        //     case CMD_STOP:
+        //         csv_file << "Stop," << result << std::endl;
+        //         break;
+        //     case CMD_UNCONFIGURE:
+        //         csv_file << "Unconfigure," << result << std::endl;
+        //         break;
+        //     case CMD_PAUSE:
+        //         csv_file << "Pause," << result << std::endl;
+        //         break;
+        //     case CMD_RESUME:
+        //         csv_file << "Resume," << result << std::endl;
+        //         break;
+        //     case CMD_RESTART:
+        //         csv_file << "Restart," << result << std::endl;
+        //         break;
+        //     }
+        //     csv_file.close();
+        //     return 0;
+        // }
 
         int set_done()
         {
