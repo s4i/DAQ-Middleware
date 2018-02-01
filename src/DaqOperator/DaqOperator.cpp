@@ -554,7 +554,7 @@ int DaqOperator::copy_compname()
 	RTC::ConnectorProfileList_var myprof;
 
 	if (m_new == 0) {
-		for (int i = (m_comp_num - 1); i >= 0; i--) {
+		for (int i = 0; i < m_comp_num; i++) {
 			myprof = m_DaqServicePorts[i]->get_connector_profiles();
 			compnames.emplace_back(myprof[0].name);
 		}
@@ -783,6 +783,24 @@ int DaqOperator::error_stop_procedure()
 				set_command(daqservice, CMD_UNCONFIGURE);
 				check_done(daqservice);
 			}
+		}
+
+		ParamList paramList;
+		for (int i = 0; i < (int)m_daqservices.size(); i++) {
+            RTC::ConnectorProfileList_var myprof
+                = m_DaqServicePorts[i]->get_connector_profiles();
+
+            char * id = CORBA::string_dup(myprof[0].name);
+
+            for (int j = 0; j < (int)paramList.size(); j++) {
+                if (paramList[j].getId() == id) {
+					int len = paramList[j].getList().length();
+					::NVList mylist(len);
+					mylist = paramList[j].getList();
+					m_daqservices[i]->setCompParams( paramList[j].getList() );
+                }
+            }
+            CORBA::string_free(id);
 		}
 
 		for (auto& daqservice : m_daqservices) {
