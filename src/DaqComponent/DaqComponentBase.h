@@ -656,7 +656,8 @@ namespace DAQMW
         static constexpr int DAQ_STATE_SIZE     =  6;
         static constexpr int DAQ_IDLE_TIME_USEC =  10000; // 10 m sec
         static constexpr int STATUS_CYCLE_SEC   =  3; // default = 3
-        static constexpr int HB_CHECK_CYCLE_SEC   =  1; // default = 3
+        static constexpr int HB_CHECK_CYCLE_SEC =  1; // default = 3
+        static const int DAQ_HB_SIZE            =  5;
 
         std::string m_comp_name;
         unsigned int m_runNumber;
@@ -693,6 +694,7 @@ namespace DAQMW
 
         DAQFunc m_daq_trans_func[DAQ_CMD_SIZE];
         DAQFunc m_daq_do_func[DAQ_STATE_SIZE];
+        DAQFunc m_daq_hb_func[DAQ_HB_SIZE];
 
         int transAction(int command) {
             return (this->*m_daq_trans_func[command])();

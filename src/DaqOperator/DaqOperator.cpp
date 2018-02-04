@@ -450,7 +450,7 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 		Status_var status;
 		FatalErrorStatus_var errStatus;
 
-		copy_compname();
+		// copy_compname();
 
 		std::cerr << " " << std::endl;
 		std::cerr << "\033[0;0H\033[2J";
@@ -462,11 +462,18 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 				  << std::endl;
 		///std::cerr << "RUN NO: " << m_runNumber << std::endl;
 
+		std::string compname;
 		for (int i = (m_comp_num - 1); i >= 0; i--) {
 			try {
+				// Danger zone
+				RTC::ConnectorProfileList_var myprof
+					= m_DaqServicePorts[i]->get_connector_profiles();
+				compname = myprof[0].name;
+
 				status = m_daqservices[i]->getStatus();
 				std::cerr << " " << std::setw(22) << std::left
-						  << compnames[i]  << '\t'
+						  << myprof[0].name // compnames[i]
+						  << '\t'
 						  << std::setw(14) << std::right
 						  << status->event_size; // data size(byte)
 
@@ -479,7 +486,7 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 							  << check_compStatus(status->comp_status)
 							  << "\033[39m" << std::endl;
 					/** Use error console display **/
-					d_compname.emplace_back(compnames[i]);
+					d_compname.emplace_back(compname); // compnames[i]);
 					d_message.emplace_back(std::move(errStatus));
 					m_state = ERRORED;
 				}///if Fatal
@@ -492,7 +499,7 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 							  << check_compStatus(status->comp_status)
 							  << "\033[39m" << std::endl;
 					/** Use error console display **/
-					d_compname.emplace_back(compnames[i]);
+					d_compname.emplace_back(compname); // compnames[i]);
 					d_message.emplace_back(std::move(errStatus));
 					m_state = ERRORED;
 					resFlag = true;
@@ -506,7 +513,7 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 							  << "\033[39m" << std::endl;
 				}
 			} catch(...) {
-				std::cerr << " ### ERROR: " << compnames[i] << "  : cannot connect\n";
+				//std::cerr << " ### ERROR: " << compnames[i] << "  : cannot connect\n";
 				// stop_heart_beat(i);
 			}
 		}//for
@@ -525,14 +532,16 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 			if (deadFlag == true) {
 				// for (auto& k_d : keep_dead) {
 				// 	if (k_d == 1) {
-				std::cerr << " Heart beat return wait.\n";
+				std::cerr << "\033[31m"
+						  << " dead flag\n"; //Heart beat return wait.\n";
+						  << "\033[39m";
 				// 	}
 				// }
 			}
 			else if (deadFlag == true && resFlag == true) {
 				// for (auto& k_a : keep_alive) {
 				// 	if (k_a == 1) {
-				std::cerr << "\033[36m" << "Heart beat re-acquisition."
+				std::cerr << "\033[36m" << "Heart beat reacquisition."
 						<< "Push command 2:stop or 6:reboot"
 						<< "\033[39m" << std::endl;
 				// 	}
