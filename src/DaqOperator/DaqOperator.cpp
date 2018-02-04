@@ -434,7 +434,7 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 				std::cerr << "\033[5;62H";
 				std::cin >> srunNo;
 				m_runNumber = atoi(srunNo.c_str());
-				restart_procedure();
+				start_procedure();
 				std::cerr << "\033[0;13H" << "\033[34m"
 						  << "Send reboot command"
 						  << "\033[39m" << std::endl;
@@ -851,41 +851,6 @@ int DaqOperator::other_stop_procedure()
 		return 1;
 	}
 
-	m_com_completed = true;
-	return 0;
-}
-
-int DaqOperator::restart_procedure()
-{
-	m_com_completed = false;
-
-	time_t now = time(0);
-	m_start_date = asctime(localtime(&now));
-	m_start_date[m_start_date.length()-1] = ' ';
-	m_start_date.erase(0, 4);
-	m_stop_date = "";
-
-	Status_var status;
-	try {
-		for (auto& daqservice : m_daqservices) {
-			// status = m_daqservices[i]->getStatus();
-			// if (status->state == CONFIGURED) {
-			set_runno(daqservice, m_runNumber);
-			check_done(daqservice);
-			// }
-		}
-
-		for (auto& daqservice : m_daqservices) {
-			// status = m_daqservices[i]->getStatus();
-			// 	if (status->state == CONFIGURED) {
-			set_command(daqservice, CMD_START);
-			check_done(daqservice);
-			// }
-		}
-	} catch (...) {
-		std::cerr << "### ERROR: DaqOperator: Failed to start Component.\n";
-		return 1;
-	}
 	m_com_completed = true;
 	return 0;
 }
