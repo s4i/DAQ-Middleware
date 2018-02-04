@@ -450,8 +450,6 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 		Status_var status;
 		FatalErrorStatus_var errStatus;
 
-		copy_compname();
-
 		std::cerr << " " << std::endl;
 		std::cerr << "\033[0;0H\033[2J";
 		std::cerr << "\033[8;0H";
@@ -462,11 +460,20 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 				  << std::endl;
 		///std::cerr << "RUN NO: " << m_runNumber << std::endl;
 
+		copy_compname();
 		for (int i = (m_comp_num - 1); i >= 0; i--) {
 			try {
+				// Danger zone
+				std::string compname;
+				RTC::ConnectorProfileList_var myprof
+					= m_DaqServicePorts[i]->get_connector_profiles();
+				compname = myprof[0].name;
+				// Danger zone
+
 				status = m_daqservices[i]->getStatus();
 				std::cerr << " " << std::setw(22) << std::left
-						  << compnames[i]  << '\t'
+						  << myprof[0].name // compnames[i]
+						  << '\t'
 						  << std::setw(14) << std::right
 						  << status->event_size; // data size(byte)
 
@@ -515,24 +522,26 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 		/* Display Error Console */
 		if (m_state == ERRORED) {
 			int cnt = 0;
-			for (auto& compname : d_compname) {
+			for (auto& cpn : d_compname) {
 				++cnt;
 				std::cerr << " [ERROR" << cnt << "] "
-						<< compname << '\t'
+						<< cpn << '\t'
 						<< "\033[31m" << "<- " << d_message[cnt-1]->description
 						<< "\033[39m" << std::endl;
 			}///for
 			if (deadFlag == true) {
 				// for (auto& k_d : keep_dead) {
 				// 	if (k_d == 1) {
-				std::cerr << " Heart beat return wait.\n";
+				std::cerr << "\033[31m"
+						  << " dead flag\n" //Heart beat return wait.\n";
+						  << "\033[39m";
 				// 	}
 				// }
 			}
 			else if (deadFlag == true && resFlag == true) {
 				// for (auto& k_a : keep_alive) {
 				// 	if (k_a == 1) {
-				std::cerr << "\033[36m" << "Heart beat re-acquisition."
+				std::cerr << "\033[36m" << "Heart beat reacquisition."
 						<< "Push command 2:stop or 6:reboot"
 						<< "\033[39m" << std::endl;
 				// 	}
