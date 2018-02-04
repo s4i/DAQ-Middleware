@@ -833,7 +833,7 @@ int DaqOperator::other_stop_procedure()
 		for (auto& daqservice : m_daqservices) {
 			status = daqservice->getStatus();
 			if (status->state == RUNNING) {
-				set_runno(daqservice, CMD_STOP);
+				set_command(daqservice, CMD_STOP);
 				check_done(daqservice);
 			}
 		}
