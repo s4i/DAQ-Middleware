@@ -43,12 +43,14 @@ DAQServiceSVC_impl::~DAQServiceSVC_impl()
  */
 
 DAQLifeCycleState DAQServiceSVC_impl::getState()
+    throw(CORBA::SystemException)
 {
     return m_state;
 }
 
 
 RTC::ReturnCode_t DAQServiceSVC_impl::setCommand(DAQCommand command)
+    throw(CORBA::SystemException)
 {
 #ifdef OLD
     if (m_done == DONE) {
@@ -72,6 +74,7 @@ RTC::ReturnCode_t DAQServiceSVC_impl::setCommand(DAQCommand command)
 }
 
 DAQCommand DAQServiceSVC_impl::getCommand()
+    throw(CORBA::SystemException)
 {
     if ( m_new ) {
 	///std::cerr << "new command\n";
@@ -84,22 +87,26 @@ DAQCommand DAQServiceSVC_impl::getCommand()
 }
 
 DAQDone DAQServiceSVC_impl::checkDone()
+    throw(CORBA::SystemException)
 {
     return m_done;
 }
 
 void DAQServiceSVC_impl::setDone()
+    throw(CORBA::SystemException)
 {
     m_done = DONE;
     ///std::cerr << "set DONE\n";///
 }
 
 void DAQServiceSVC_impl::setStatus(const Status& stat)
+    throw(CORBA::SystemException)
 {
     m_status = stat;
 }
 
 Status* DAQServiceSVC_impl::getStatus()
+    throw(CORBA::SystemException)
 {
     Status* mystatus = new Status;
     *mystatus = m_status;
@@ -108,32 +115,38 @@ Status* DAQServiceSVC_impl::getStatus()
 }
 
 void DAQServiceSVC_impl::setCompParams(const NVList& comp_params)
+    throw(CORBA::SystemException)
 {
     m_comp_params = comp_params;
 }
 
 NVList* DAQServiceSVC_impl::getCompParams()
+    throw(CORBA::SystemException)
 {
     return &m_comp_params;
 }
 
 void DAQServiceSVC_impl::setRunNo(const CORBA::Long run_no)
+    throw(CORBA::SystemException)
 {
     m_run_no = run_no;
 }
 
 CORBA::Long DAQServiceSVC_impl::getRunNo()
+    throw(CORBA::SystemException)
 {
     return m_run_no;
 }
 
 void DAQServiceSVC_impl::setFatalStatus(const FatalErrorStatus& fatalStatus)
+    throw(CORBA::SystemException)
 {
     std::cerr << "### setFatalStatus:" << fatalStatus.fatalTypes << std::endl;
     m_fatalStatus = fatalStatus;
 }
 
 FatalErrorStatus* DAQServiceSVC_impl::getFatalStatus()
+    throw(CORBA::SystemException)
 {
     FatalErrorStatus* myfatal = new FatalErrorStatus;
     *myfatal = m_fatalStatus;
@@ -141,6 +154,7 @@ FatalErrorStatus* DAQServiceSVC_impl::getFatalStatus()
 }
 
 RTC::ReturnCode_t DAQServiceSVC_impl::setHB()
+    throw(CORBA::SystemException)
 {
 #ifdef OLD
     if (m_done == HBDONE) {
@@ -161,6 +175,7 @@ RTC::ReturnCode_t DAQServiceSVC_impl::setHB()
 }
 
 HBMSG DAQServiceSVC_impl::getHB()
+    throw(CORBA::SystemException)
 {
     if (m_hb_new) {
     m_hb_new = 0;
@@ -172,22 +187,26 @@ HBMSG DAQServiceSVC_impl::getHB()
 }
 
 HeartBeatDone DAQServiceSVC_impl::hb_checkDone()
+    throw(CORBA::SystemException)
 {
     return m_hb_done;
 }
 
 void DAQServiceSVC_impl::hb_setDone()
+    throw(CORBA::SystemException)
 {
     m_hb_done = HBDONE;
 }
 
 RTC::ReturnCode_t DAQServiceSVC_impl::setTime(const TimeVal& now)
+    throw(CORBA::SystemException)
 {
 	m_start = now;
     return RTC::RTC_OK;
 }
 
 TimeVal DAQServiceSVC_impl::getTime()
+    throw(CORBA::SystemException)
 {
     TimeVal* start_time = new TimeVal;
     *start_time = m_start;

@@ -460,19 +460,16 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 				  << std::endl;
 		///std::cerr << "RUN NO: " << m_runNumber << std::endl;
 
-		copy_compname();
+		// copy_compname();
+		std::string compname;
 		for (int i = (m_comp_num - 1); i >= 0; i--) {
 			try {
-				// Danger zone
-				std::string compname;
-				RTC::ConnectorProfileList_var myprof
-					= m_DaqServicePorts[i]->get_connector_profiles();
+				RTC::ConnectorProfileList_var myprof = m_DaqServicePorts[i]->get_connector_profiles();
 				compname = myprof[0].name;
-				// Danger zone
 
 				status = m_daqservices[i]->getStatus();
 				std::cerr << " " << std::setw(22) << std::left
-						  << myprof[0].name // compnames[i]
+						  << compname
 						  << '\t'
 						  << std::setw(14) << std::right
 						  << status->event_size; // data size(byte)
@@ -513,7 +510,9 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 							  << "\033[39m" << std::endl;
 				}
 			} catch(...) {
-				std::cerr << " ### ERROR: " << compnames[i] << "  : cannot connect\n";
+				std::cerr << " ### ERROR: "
+						  << std::setw(22) << std::right
+						  << compname << " : cannot connect\n";
 				// stop_heart_beat(i);
 			}
 		}//for
@@ -522,10 +521,10 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 		/* Display Error Console */
 		if (m_state == ERRORED) {
 			int cnt = 0;
-			for (auto& cpn : d_compname) {
+			for (auto& compname : d_compname) {
 				++cnt;
 				std::cerr << " [ERROR" << cnt << "] "
-						<< cpn << '\t'
+						<< compname << '\t'
 						<< "\033[31m" << "<- " << d_message[cnt-1]->description
 						<< "\033[39m" << std::endl;
 			}///for

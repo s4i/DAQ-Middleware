@@ -39,32 +39,32 @@ public:
 	DAQServiceSVC_impl();
 	virtual ~DAQServiceSVC_impl();
 
-	DAQLifeCycleState getState();
-	RTC::ReturnCode_t setCommand(DAQCommand command);
-	DAQCommand getCommand();
-	DAQDone checkDone();
-	void setDone();
-	void setStatus(const Status& stat);
-	Status* getStatus();
-	void setCompParams(const NVList& comp_params);
-	NVList* getCompParams();
-	void setRunNo(const CORBA::Long run_no);
-	CORBA::Long getRunNo();
-	void setFatalStatus(const FatalErrorStatus& fatalStaus);
+	DAQLifeCycleState getState() throw(CORBA::SystemException);
+	RTC::ReturnCode_t setCommand(DAQCommand command) throw(CORBA::SystemException);
+	DAQCommand getCommand() throw(CORBA::SystemException);
+	DAQDone checkDone() throw(CORBA::SystemException);
+	void setDone() throw(CORBA::SystemException);
+	void setStatus(const Status& stat) throw(CORBA::SystemException);
+	Status* getStatus() throw(CORBA::SystemException);
+	void setCompParams(const NVList& comp_params) throw(CORBA::SystemException);
+	NVList* getCompParams() throw(CORBA::SystemException);
+	void setRunNo(const CORBA::Long run_no) throw(CORBA::SystemException);
+	CORBA::Long getRunNo() throw(CORBA::SystemException);
+	void setFatalStatus(const FatalErrorStatus& fatalStaus) throw(CORBA::SystemException);
 
-	FatalErrorStatus* getFatalStatus();
+	FatalErrorStatus* getFatalStatus() throw(CORBA::SystemException);
 
-	RTC::ReturnCode_t setHB();
-	HBMSG getHB();
-	void setStopDaqSystem()
+	RTC::ReturnCode_t setHB() throw(CORBA::SystemException);
+	HBMSG getHB() throw(CORBA::SystemException);
+	void setStopDaqSystem() throw(CORBA::SystemException)
 	{
 		this->m_oc = END;
 	}
-	HeartBeatDone hb_checkDone();
-	void hb_setDone();
+	HeartBeatDone hb_checkDone() throw(CORBA::SystemException);
+	void hb_setDone() throw(CORBA::SystemException);
 
-	RTC::ReturnCode_t setTime(const TimeVal& now);
-	TimeVal getTime();
+	RTC::ReturnCode_t setTime(const TimeVal& now) throw(CORBA::SystemException);
+	TimeVal getTime() throw(CORBA::SystemException);
 
 private:
 	DAQCommand m_command;

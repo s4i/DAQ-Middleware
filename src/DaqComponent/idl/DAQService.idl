@@ -114,3 +114,16 @@ interface DAQService
     RTC::ReturnCode_t setTime(in TimeVal now);
     TimeVal getTime();
 };
+
+/*
+module BiDirPolicy {
+    typedef unsigned short BidirectionalPolicyValue;
+    const BidirectionalPolicyValue NORMAL = 0;
+    const BidirectionalPolicyValue BOTH = 1;
+    const CORBA::PolicyType BIDIRECTIONAL_POLICY_TYPE = 37;
+
+    interface BidirectionalPolicy : CORBA::Policy {
+        readonly attribute BidirectionalPolicyValue value;
+    };
+};
+*/
