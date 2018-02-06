@@ -27,7 +27,7 @@ else:
 # constants and parameters
 #
 
-progname = "run.py"
+progname = os.path.basename(sys.argv[0])
 
 # adjust the daq_lib_path to your own environment.
 daq_lib_path = '/usr/lib/daqmw:/kensdaq/root/lib'
@@ -248,7 +248,7 @@ def opt():
     global append_datetime_to_log
     global append_ip_address_to_log
 
-    usage = "%prog [OPTIONS] [CONFIG_FILE]"
+    usage = "run.py [OPTIONS] [CONFIG_FILE]"
     parser = OptionParser(usage)
     parser.set_defaults(console=False)
     parser.set_defaults(local=False)
@@ -307,6 +307,7 @@ def opt():
     append_datetime_to_log = options.append_datetime_to_log
     append_ip_address_to_log = options.append_ip_address_to_log
 
+    # XXX
     # We have to sleep some seconds not to cause core file
     # when running on RHEL derived OS (SL, CentOS etc)
     # AND running on VMware Player.
@@ -551,6 +552,7 @@ def kill_proc_exact(proc_name, sleep_sec=1, max_retry=60):
                         # print 'info: try another process if exists'
                         pass
                     else:
+                        # XXX
                         #sys.exit('%s %s' % (proc_name, strerror))
                         # sys.stderr.write('err\n')
                         #sys.stderr.write('error: %s %s' % (proc_name, strerror))
@@ -1066,11 +1068,13 @@ def DaqOperatorBooting():
 
 
 def main():
-    file_clean(sys.argv[1])
+    file_clean(sys.argv[1]) # run.py make/clean/rm
+
     #
     # get command line options
     #
     opt()
+
     #
     # validation of configuration file using XML schema config.xsd
     #
