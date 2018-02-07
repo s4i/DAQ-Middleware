@@ -185,7 +185,7 @@ HBMSG DAQServiceSVC_impl::getHB()
     return ZERO;
     }
 }
-
+/*
 HeartBeatDone DAQServiceSVC_impl::hb_checkDone()
     throw(CORBA::SystemException)
 {
@@ -197,7 +197,7 @@ void DAQServiceSVC_impl::hb_setDone()
 {
     m_hb_done = HBDONE;
 }
-
+*/
 RTC::ReturnCode_t DAQServiceSVC_impl::setTime(const TimeVal& now)
     throw(CORBA::SystemException)
 {

@@ -582,8 +582,8 @@ namespace DAQMW
                 set_done();
 
                 if (m_time) {
-                    get_time_performance(m_command);
-                    output_time_performance(m_command);
+                    get_time_inline(m_command);
+                    get_time_output(m_command);
                 }
             }
             else {
@@ -656,8 +656,8 @@ namespace DAQMW
         static constexpr int DAQ_STATE_SIZE     =  6;
         static constexpr int DAQ_IDLE_TIME_USEC =  10000; // 10 m sec
         static constexpr int STATUS_CYCLE_SEC   =  3; // default = 3
-        static constexpr int HB_CHECK_CYCLE_SEC =  1; // default = 3
-        static const int DAQ_HB_SIZE            =  5;
+        static constexpr int CHECK_HB_CYCLE_SEC =  1; // default = 3
+        // static const int DAQ_HB_SIZE            =  5;
 
         std::string m_comp_name;
         unsigned int m_runNumber;
@@ -694,7 +694,7 @@ namespace DAQMW
 
         DAQFunc m_daq_trans_func[DAQ_CMD_SIZE];
         DAQFunc m_daq_do_func[DAQ_STATE_SIZE];
-        DAQFunc m_daq_hb_func[DAQ_HB_SIZE];
+        // DAQFunc m_daq_hb_func[DAQ_HB_SIZE];
 
         int transAction(int command) {
             return (this->*m_daq_trans_func[command])();
@@ -773,27 +773,27 @@ namespace DAQMW
 
         int get_hb_from_operator_clockwork()
         {
-            // if (hb_timer->checkTimer()) {
-            m_hb = m_daq_service0.getHB();
-            if (m_hb == ONE) {
-                set_hb_done();
-            }
-            if (m_hb == END) {
-                if (m_state_prev == CONFIGURED && m_state == RUNNING) {
-                    transAction(CMD_STOP);
+            if (hb_timer->checkTimer()) {
+                m_hb = m_daq_service0.getHB();
+                if (m_hb == ONE) {
+                    set_hb_done();
                 }
-                std::cerr << "### shutdonw\n";
-                _exit(1);
+                // if (m_hb == END) {
+                //     if (m_state_prev == CONFIGURED && m_state == RUNNING) {
+                //         transAction(CMD_STOP);
+                //     }
+                //     std::cerr << "### shutdonw\n";
+                //     _exit(1);
+                // }
+                hb_timer->resetTimer();
             }
             if (m_hb) {
                 std::cerr << "m_hb=" << m_hb << std::endl;
             }
-            // hb_timer->resetTimer();
-            // }
             return 0;
         }
 
-        int get_time_performance(int command)
+        int get_time_inline(int command)
         {
             constexpr char fname_inline[] = "s4i-file-inline";
 
@@ -858,7 +858,7 @@ namespace DAQMW
             return 0;
         }
 
-        int output_time_performance(int command)
+        int get_time_output(int command)
         {
             constexpr char fname_output[] = "s4i-file-inline";
 
@@ -922,6 +922,7 @@ namespace DAQMW
             return 0;
         }
 
+        /*
         int set_hb_done()
         {
             m_daq_service0.hb_setDone();
@@ -930,6 +931,7 @@ namespace DAQMW
             }
             return 0;
         }
+        */
 
         virtual int daq_onError(){
             // m_isOnError = true; // will be set on fatal_error_report()

@@ -385,7 +385,7 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 
 				/* set time */
 				if (m_time) {
-					set_time();
+					//set_time();
 					output_performance(command);
 				}
 
@@ -656,7 +656,7 @@ int DaqOperator::set_hb_to_component()
 	try {
 		for (auto& daqservice : m_daqservices) {
 			set_hb(daqservice);
-			check_hb_done(daqservice);
+			// check_hb_done(daqservice);
 		}
 	}
 	catch (...) {
@@ -704,6 +704,7 @@ int DaqOperator::check_done(RTC::CorbaConsumer<DAQService> daqservice)
 	return 0;
 }
 
+/*
 int DaqOperator::check_hb_done(RTC::CorbaConsumer<DAQService> daqservice)
 {
 	int status = 0;
@@ -733,7 +734,7 @@ int DaqOperator::check_hb_done(RTC::CorbaConsumer<DAQService> daqservice)
 	}
 	return 0;
 }
-
+*/
 int DaqOperator::set_time()
 {
 	TimeVal *st = new TimeVal;
