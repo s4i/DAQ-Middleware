@@ -56,12 +56,14 @@ public:
 
 	RTC::ReturnCode_t setHB() throw(CORBA::SystemException);
 	HBMSG getHB() throw(CORBA::SystemException);
+	/*
 	void setStopDaqSystem() throw(CORBA::SystemException)
 	{
 		this->m_oc = END;
 	}
 	HeartBeatDone hb_checkDone() throw(CORBA::SystemException);
 	void hb_setDone() throw(CORBA::SystemException);
+	*/
 
 	RTC::ReturnCode_t setTime(const TimeVal& now) throw(CORBA::SystemException);
 	TimeVal getTime() throw(CORBA::SystemException);

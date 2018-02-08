@@ -76,7 +76,7 @@ struct Status
 
 enum HBMSG {
     ZERO,
-    ONE,
+    ONE
 };
 
 enum HeartBeatDone {
@@ -107,9 +107,9 @@ interface DAQService
 
     RTC::ReturnCode_t setHB();
     HBMSG getHB();
-    void setStopDaqSystem();
-    HeartBeatDone hb_checkDone();
-    void   hb_setDone();
+    //void setStopDaqSystem();
+    //HeartBeatDone hb_checkDone();
+    //void   hb_setDone();
 
     RTC::ReturnCode_t setTime(in TimeVal now);
     TimeVal getTime();

@@ -704,6 +704,7 @@ int DaqOperator::set_hb_to_component()
 	return 0;
 }
 
+/*
 int DaqOperator::stop_heart_beat(int num)
 {
 	try {
@@ -715,6 +716,7 @@ int DaqOperator::stop_heart_beat(int num)
 
 	return 0;
 }
+*/
 
 int DaqOperator::set_hb(RTC::CorbaConsumer<DAQService> daqservice)
 {
