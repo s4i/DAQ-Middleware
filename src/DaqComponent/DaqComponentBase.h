@@ -582,7 +582,7 @@ namespace DAQMW
                 set_done();
 
                 if (m_time) {
-                    get_time_inline(m_command);
+                    // get_time_inline(m_command);
                     get_time_output(m_command);
                 }
             }
