@@ -652,7 +652,7 @@ namespace DAQMW
         }
 
     private:
-        static constexpr int DAQ_CMD_SIZE       = 10;
+        static constexpr int DAQ_CMD_SIZE       = 12;
         static constexpr int DAQ_STATE_SIZE     =  6;
         static constexpr int DAQ_IDLE_TIME_USEC =  10000; // 10 m sec
         static constexpr int STATUS_CYCLE_SEC   =  3; // default = 3

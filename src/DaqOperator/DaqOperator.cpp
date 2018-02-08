@@ -46,8 +46,6 @@ DaqOperator* DaqOperator::Instance()
 	return _instance;
 }
 
-std::string fout = "s4i-file-output";
-
 DaqOperator::DaqOperator(RTC::Manager* manager)
   : RTC::DataFlowComponentBase(manager),
 	m_comp_num(0),
@@ -56,6 +54,8 @@ DaqOperator::DaqOperator(RTC::Manager* manager)
 	resFlag(false),
 	m_new(0),
     m_send_count(0),
+	m_loop(2),
+	fout("output-2"),
 	m_state(LOADED),
 	m_runNumber(0),
 	m_start_date(" "),
@@ -346,10 +346,10 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 		command = (int)(comm[0] - '0');
 
 		/* set time */
-		if (m_time) {
-			set_time();
-			output_performance(command);
-		}
+		// if (m_time) {
+		// 	set_time();
+		// 	output_performance(command);
+		// }
 
 		std::cerr << "\033[0;10H";
 		switch (m_state) {	// m_state init (LOADED)
@@ -370,11 +370,50 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 				configure_procedure();
 				m_state = CONFIGURED;
 				break;
+			case CMD_AUTOMATON:
+				for (int loop = 0; loop < m_loop; loop++) {
+					if (m_time) {
+						// set_time();
+						output_performance(command);
+					}
+					configure_procedure();
+					sleep(2);
+					if (m_time) {
+						// set_time();
+						output_performance(command);
+					}
+					start_procedure();
+					sleep(2);
+					if (m_time) {
+						// set_time();
+						output_performance(command);
+					}
+					pause_procedure();
+					sleep(2);
+					if (m_time) {
+						// set_time();
+						output_performance(command);
+					}
+					resume_procedure();
+					sleep(2);
+					if (m_time) {
+						// set_time();
+						output_performance(command);
+					}
+					stop_procedure();
+					sleep(3);
+					if (m_time) {
+						// set_time();
+						output_performance(command);
+					}
+					unconfigure_procedure();
+					sleep(2);
+				}
+				break;
 			default:
 				std::cerr << "   Bad Command:" << command << std::endl;
 				break;
 			}
-			break;
 		case CONFIGURED:
 			switch ((DAQCommand)command) {
 			case CMD_START:

@@ -154,6 +154,7 @@ private:
     // Timer* mytimer;
     static constexpr int HB_CYCLE_SEC = 5;
 	std::unique_ptr<Timer> mytimer{new Timer(HB_CYCLE_SEC)};
+
     int m_send_count;
     void reset_send_count();
     void inc_send_count();
@@ -162,6 +163,8 @@ private:
     int clockwork_hb_recv();
 
     /* Time measurement */
+    int m_loop;
+    std::string fout;
     int set_time();
     int output_performance(int command);
 
