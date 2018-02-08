@@ -73,7 +73,7 @@ namespace DAQMW
               m_isTimerAlarm(false),
               m_has_printed_error_log(false),
               m_debug(false),
-              m_time(false)
+			  m_time(true)
         {
             // status_timer = new Timer(STATUS_CYCLE_SEC);
         }
@@ -672,7 +672,7 @@ namespace DAQMW
 
         // Timer* status_timer;
         std::unique_ptr<Timer> status_timer{new Timer(STATUS_CYCLE_SEC)};
-        std::unique_ptr<Timer> hb_timer{new Timer(HB_CHECK_CYCLE_SEC)};
+        std::unique_ptr<Timer> hb_timer{new Timer(CHECK_HB_CYCLE_SEC)};
 
         // Heart beat
         HBMSG m_hb;
@@ -775,9 +775,9 @@ namespace DAQMW
         {
             if (hb_timer->checkTimer()) {
                 m_hb = m_daq_service0.getHB();
-                if (m_hb == ONE) {
-                    set_hb_done();
-                }
+                // if (m_hb == ONE) {
+                    // set_hb_done();
+                // }
                 // if (m_hb == END) {
                 //     if (m_state_prev == CONFIGURED && m_state == RUNNING) {
                 //         transAction(CMD_STOP);
@@ -793,6 +793,7 @@ namespace DAQMW
             return 0;
         }
 
+        /*
         int get_time_inline(int command)
         {
             constexpr char fname_inline[] = "s4i-file-inline";
@@ -808,13 +809,13 @@ namespace DAQMW
             char date[128];
             char fname[128];
 
-            /* end time */
+            // end time
             gettimeofday(&end_time, &tz);
 
-            /* start time */
+            // start time
             st = m_daq_service0.getTime();
 
-            /* calc */
+            // calc
             result = (end_time.tv_sec - st.sec) * 1000000
                     + (end_time.tv_usec - st.usec);
 
@@ -857,10 +858,11 @@ namespace DAQMW
 
             return 0;
         }
+        */
 
         int get_time_output(int command)
         {
-            constexpr char fname_output[] = "s4i-file-inline";
+            std::string fname_output = "s4i-output";
 
             struct timeval end_time;
             struct timezone tz;
@@ -880,11 +882,10 @@ namespace DAQMW
 
             uid = getuid();
             if ((pw = getpwuid (uid))) {
-                sprintf(date, "/home/%s/DAQ-Middleware/csv/s4i/%s", pw->pw_name, fname_output);
+                sprintf(date, "/home/%s/DAQ-Middleware/csv/s4i/%s", pw->pw_name, fname_output.c_str());
             }
             sprintf(fname, "%s.csv", date);
             std::ofstream csv_file(fname, std::ios::app);
-
             switch (command) {
             case CMD_CONFIGURE:
                 csv_file << "et,Configure," << gt[0] << ',' << gt[1] << std::endl;

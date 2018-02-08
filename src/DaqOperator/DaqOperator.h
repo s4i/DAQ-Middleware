@@ -164,7 +164,7 @@ private:
 
     /* Time measurement */
     int m_loop;
-    std::string fout;
+    bool m_performe;
     int set_time();
     int output_performance(int command);
 

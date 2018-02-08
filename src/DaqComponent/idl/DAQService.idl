@@ -40,7 +40,6 @@ enum DAQCommand
     CMD_PAUSE,
     CMD_RESUME,
     CMD_RESTART,
-    CMP_AUTOMATON
     CMD_NOP
 };
 
@@ -102,17 +101,17 @@ interface DAQService
     NVList getCompParams();
     void setRunNo(in long run_no);
     long getRunNo();
-    void setFatalStatus(in FatalErrorStatus fatalStaus);
+    void setFatalStatus(in FatalErrorStatus fatalStatus);
     FatalErrorStatus getFatalStatus();
 
-    RTC::ReturnCode_t setHB();
+    RTC::ReturnCode_t setHB(in HBMSG hbs);
     HBMSG getHB();
     //void setStopDaqSystem();
     //HeartBeatDone hb_checkDone();
     //void   hb_setDone();
 
-    RTC::ReturnCode_t setTime(in TimeVal now);
-    TimeVal getTime();
+    // RTC::ReturnCode_t setTime(in TimeVal now);
+    // TimeVal getTime();
 };
 
 /*

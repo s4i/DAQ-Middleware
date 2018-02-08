@@ -50,11 +50,11 @@ public:
 	NVList* getCompParams() throw(CORBA::SystemException);
 	void setRunNo(const CORBA::Long run_no) throw(CORBA::SystemException);
 	CORBA::Long getRunNo() throw(CORBA::SystemException);
-	void setFatalStatus(const FatalErrorStatus& fatalStaus) throw(CORBA::SystemException);
+	void setFatalStatus(const FatalErrorStatus& fatalStatus) throw(CORBA::SystemException);
 
 	FatalErrorStatus* getFatalStatus() throw(CORBA::SystemException);
 
-	RTC::ReturnCode_t setHB() throw(CORBA::SystemException);
+	RTC::ReturnCode_t setHB(const HBMSG hbs) throw(CORBA::SystemException);
 	HBMSG getHB() throw(CORBA::SystemException);
 	/*
 	void setStopDaqSystem() throw(CORBA::SystemException)
@@ -65,8 +65,8 @@ public:
 	void hb_setDone() throw(CORBA::SystemException);
 	*/
 
-	RTC::ReturnCode_t setTime(const TimeVal& now) throw(CORBA::SystemException);
-	TimeVal getTime() throw(CORBA::SystemException);
+	// RTC::ReturnCode_t setTime(const TimeVal& now) throw(CORBA::SystemException);
+	// TimeVal getTime() throw(CORBA::SystemException);
 
 private:
 	DAQCommand m_command;
@@ -78,11 +78,11 @@ private:
 	NVList m_comp_params;
 	CORBA::Long   m_run_no;
 
-	HBMSG m_oc;
+	HBMSG m_otoc;
 	int m_hb_new;
-	HeartBeatDone m_hb_done;
+	// HeartBeatDone m_hb_done;
 
-	TimeVal m_start;
+	// TimeVal m_start;
 };
 
 #endif // DAQSERVICESVC_IMPL_H

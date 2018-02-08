@@ -24,9 +24,7 @@ DAQServiceSVC_impl::DAQServiceSVC_impl()
       m_done(DONE),
       m_state(LOADED),
       m_run_no(0),
-      m_oc(ZERO),
-      m_hb_new(0),
-      m_hb_done(HBDONE)
+      m_hb_new(0)
 {
     // Please add extra constructor code here.
 }
@@ -153,23 +151,12 @@ FatalErrorStatus* DAQServiceSVC_impl::getFatalStatus()
     return myfatal;
 }
 
-RTC::ReturnCode_t DAQServiceSVC_impl::setHB()
+RTC::ReturnCode_t DAQServiceSVC_impl::setHB(const HBMSG hbs)
     throw(CORBA::SystemException)
 {
-#ifdef OLD
-    if (m_done == HBDONE) {
-        m_oc = ONE;
-        m_hb_new = 1;
-        m_hb_done = HBUNDONE;
-        return RTC::RTC_OK;
-    } else {
-        return RTC::RTC_ERROR;
-    }
-#endif
-
-    m_oc = ONE;
+    m_otoc = hbs;
     m_hb_new = 1;
-    m_hb_done = HBUNDONE;
+    // m_hb_done = HBUNDONE;
     ///std::cerr << "HB_UNDONE\n";
     return RTC::RTC_OK;
 }
@@ -178,13 +165,14 @@ HBMSG DAQServiceSVC_impl::getHB()
     throw(CORBA::SystemException)
 {
     if (m_hb_new) {
-    m_hb_new = 0;
-    return m_oc;
+        m_hb_new = 0;
+        return m_otoc;
     }
     else {
-    return ZERO;
+        return ZERO;
     }
 }
+
 /*
 HeartBeatDone DAQServiceSVC_impl::hb_checkDone()
     throw(CORBA::SystemException)
@@ -197,7 +185,7 @@ void DAQServiceSVC_impl::hb_setDone()
 {
     m_hb_done = HBDONE;
 }
-*/
+
 RTC::ReturnCode_t DAQServiceSVC_impl::setTime(const TimeVal& now)
     throw(CORBA::SystemException)
 {
@@ -214,7 +202,6 @@ TimeVal DAQServiceSVC_impl::getTime()
     return *start_time;
 }
 
-/*
 void DAQServiceSVC_impl::setMessage(const char* message) {
     std::cerr << "setMessage:" << message << std::endl;
     m_message = (char*)message;
