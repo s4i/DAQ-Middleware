@@ -55,7 +55,6 @@ DaqOperator::DaqOperator(RTC::Manager* manager)
 	m_new(0),
     m_send_count(0),
 	m_loop(100),
-	m_performe(true),
 	m_state(LOADED),
 	m_runNumber(0),
 	m_start_date(" "),
@@ -339,63 +338,53 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 		return RTC::RTC_OK;
 	}
 
-	if (loop_count == 6 * m_loop)
+	// output time performance
+	if (loop_count == 6 * m_loop) {
 		std::exit(0);
+	}
 	loop_count++;
-	if (m_performe) {
+	if (m_time) {
 		// command check
 		std::cerr << "automation\n";
 
 		if (state_management > 5) state_management = 0;
 		if (state_management == 0) {
-			if (m_time) {
-				output_performance(0);
-			}
+			output_performance(0);
 			configure_procedure();
 			sleep(2);
 			state_management++;
 		}
 
 		if (state_management == 1) {
-			if (m_time) {
-				output_performance(1);
-			}
+			output_performance(1);
 			start_procedure();
 			sleep(2);
 			state_management++;
 		}
 
 		if (state_management == 2) {
-			if (m_time) {
-				output_performance(4);
-			}
+			output_performance(4);
 			pause_procedure();
 			sleep(2);
 			state_management++;
 		}
 
 		if (state_management == 3) {
-			if (m_time) {
-				output_performance(5);
-			}
+			output_performance(5);
 			resume_procedure();
 			sleep(1);
 			state_management++;
 		}
 
 		if (state_management == 4) {
-			if (m_time) {
-				output_performance(2);
-			}
+			output_performance(2);
 			stop_procedure();
 			sleep(2);
 			state_management++;
 		}
 
 		if (state_management == 5) {
-			if (m_time) {
-				output_performance(3);
-			}
+			output_performance(3);
 			unconfigure_procedure();
 			sleep(1);
 			state_management++;
@@ -409,7 +398,6 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 		}
 		command = (int)(comm[0] - '0');
 
-		/* set time */
 		// if (m_time) {
 		// 	set_time();
 		// 	output_performance(command);
@@ -510,111 +498,112 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 			break;
 		}// switch (m_state)
 	}
-	else {
-		Status_var status;
-		FatalErrorStatus_var errStatus;
 
-		std::cerr << " " << std::endl;
-		std::cerr << "\033[0;0H\033[2J";
-		std::cerr << "\033[8;0H";
-		std::cerr << std::setw(16) << std::right << "GROUP:COMP_NAME"
-					<< std::setw(22) << std::right << "EVENT_SIZE"
-					<< std::setw(12) << std::right << "STATE"
-					<< std::setw(14) << std::right << "COMP_STATUS"
-					<< std::endl;
-		///std::cerr << "RUN NO: " << m_runNumber << std::endl;
+	// Console memu
+	Status_var status;
+	FatalErrorStatus_var errStatus;
 
-		// copy_compname();
-		std::string compname;
-		for (int i = (m_comp_num - 1); i >= 0; i--) {
-			try {
-				RTC::ConnectorProfileList_var myprof = m_DaqServicePorts[i]->get_connector_profiles();
-				compname = myprof[0].name;
+	std::cerr << " " << std::endl;
+	std::cerr << "\033[0;0H\033[2J";
+	std::cerr << "\033[8;0H";
+	std::cerr << std::setw(16) << std::right << "GROUP:COMP_NAME"
+				<< std::setw(22) << std::right << "EVENT_SIZE"
+				<< std::setw(12) << std::right << "STATE"
+				<< std::setw(14) << std::right << "COMP_STATUS"
+				<< std::endl;
+	///std::cerr << "RUN NO: " << m_runNumber << std::endl;
 
-				status = m_daqservices[i]->getStatus();
-				std::cerr << " " << std::setw(22) << std::left
-							<< compname
-							<< '\t'
+	// copy_compname();
+	std::string compname;
+	for (int i = (m_comp_num - 1); i >= 0; i--) {
+		try {
+			RTC::ConnectorProfileList_var myprof = m_DaqServicePorts[i]->get_connector_profiles();
+			compname = myprof[0].name;
+
+			status = m_daqservices[i]->getStatus();
+			std::cerr << " " << std::setw(22) << std::left
+						<< compname
+						<< '\t'
+						<< std::setw(14) << std::right
+						<< status->event_size; // data size(byte)
+
+			if (status->comp_status == COMP_FATAL) {
+				errStatus = m_daqservices[i]->getFatalStatus();
+				std::cerr << "\033[35m"
+							<< std::setw(12) << std::right
+							<< "__RUNNING__" << "\033[39m"
+							<< "\033[31m" << std::setw(14) << std::right
+							<< check_compStatus(status->comp_status)
+							<< "\033[39m" << std::endl;
+				/** Use error console display **/
+				d_compname.emplace_back(compnames[i]);
+				d_message.emplace_back(std::move(errStatus));
+				m_state = ERRORED;
+			}///if Fatal
+			else if (status->comp_status == COMP_RESTART) {
+				errStatus = m_daqservices[i]->getFatalStatus();
+				std::cerr << "\033[35m"
+							<< std::setw(12) << std::right
+							<< "__RUNNING__" << "\033[39m"
+							<< "\033[33m" << std::setw(14) << std::right
+							<< check_compStatus(status->comp_status)
+							<< "\033[39m" << std::endl;
+				/** Use error console display **/
+				d_compname.emplace_back(compnames[i]);
+				d_message.emplace_back(std::move(errStatus));
+				m_state = ERRORED;
+				resFlag = true;
+			}///if Restart Request
+			else {
+				std::cerr << std::setw(12) << std::right
+							<< check_state(status->state)
+							<< "\033[32m"
 							<< std::setw(14) << std::right
-							<< status->event_size; // data size(byte)
-
-				if (status->comp_status == COMP_FATAL) {
-					errStatus = m_daqservices[i]->getFatalStatus();
-					std::cerr << "\033[35m"
-								<< std::setw(12) << std::right
-								<< "__RUNNING__" << "\033[39m"
-								<< "\033[31m" << std::setw(14) << std::right
-								<< check_compStatus(status->comp_status)
-								<< "\033[39m" << std::endl;
-					/** Use error console display **/
-					d_compname.emplace_back(compnames[i]);
-					d_message.emplace_back(std::move(errStatus));
-					m_state = ERRORED;
-				}///if Fatal
-				else if (status->comp_status == COMP_RESTART) {
-					errStatus = m_daqservices[i]->getFatalStatus();
-					std::cerr << "\033[35m"
-								<< std::setw(12) << std::right
-								<< "__RUNNING__" << "\033[39m"
-								<< "\033[33m" << std::setw(14) << std::right
-								<< check_compStatus(status->comp_status)
-								<< "\033[39m" << std::endl;
-					/** Use error console display **/
-					d_compname.emplace_back(compnames[i]);
-					d_message.emplace_back(std::move(errStatus));
-					m_state = ERRORED;
-					resFlag = true;
-				}///if Restart Request
-				else {
-					std::cerr << std::setw(12) << std::right
-								<< check_state(status->state)
-								<< "\033[32m"
-								<< std::setw(14) << std::right
-								<< check_compStatus(status->comp_status)
-								<< "\033[39m" << std::endl;
-				}
-			} catch(...) {
-				std::cerr << " ### ERROR: "
-							<< std::setw(22) << std::right
-							<< compname << " : cannot connect\n";
-				// stop_heart_beat(i);
+							<< check_compStatus(status->comp_status)
+							<< "\033[39m" << std::endl;
 			}
-		}//for
-		std::cerr << std::endl;
-
-		/* Display Error Console */
-		if (m_state == ERRORED) {
-			int cnt = 0;
-			for (auto& compname : d_compname) {
-				++cnt;
-				std::cerr << " [ERROR" << cnt << "] "
-						<< compname << '\t'
-						<< "\033[31m" << "<- " << d_message[cnt-1]->description
-						<< "\033[39m" << std::endl;
-			}///for
-			if (deadFlag == true) {
-				// for (auto& k_d : keep_dead) {
-				// 	if (k_d == 1) {
-				std::cerr << "\033[31m"
-							<< " dead flag\n" //Heart beat return wait.\n";
-							<< "\033[39m";
-				// 	}
-				// }
-			}
-			else if (deadFlag == true && resFlag == true) {
-				// for (auto& k_a : keep_alive) {
-				// 	if (k_a == 1) {
-				std::cerr << "\033[36m" << "Heart beat reacquisition."
-						<< "Push command 2:stop or 6:reboot"
-						<< "\033[39m" << std::endl;
-				// 	}
-				// }
-			}
+		} catch(...) {
+			std::cerr << " ### ERROR: "
+						<< std::setw(22) << std::right
+						<< compname << " : cannot connect\n";
+			// stop_heart_beat(i);
+			// std::exit(1);
 		}
-		else {
-			resFlag = false;
-			deadFlag = false;
-		}/// if
+	}//for
+	std::cerr << std::endl;
+
+	/* Display Error Console */
+	if (m_state == ERRORED) {
+		int cnt = 0;
+		for (auto& compname : d_compname) {
+			++cnt;
+			std::cerr << " [ERROR" << cnt << "] "
+					<< compname << '\t'
+					<< "\033[31m" << "<- " << d_message[cnt-1]->description
+					<< "\033[39m" << std::endl;
+		}///for
+		if (deadFlag == true) {
+			// for (auto& k_d : keep_dead) {
+			// 	if (k_d == 1) {
+			std::cerr << "\033[31m"
+						<< " dead flag\n" //Heart beat return wait.\n";
+						<< "\033[39m";
+			// 	}
+			// }
+		}
+		else if (deadFlag == true && resFlag == true) {
+			// for (auto& k_a : keep_alive) {
+			// 	if (k_a == 1) {
+			std::cerr << "\033[36m" << "Heart beat reacquisition."
+					<< "Push command 2:stop or 6:reboot"
+					<< "\033[39m" << std::endl;
+			// 	}
+			// }
+		}
+	}
+	else {
+		resFlag = false;
+		deadFlag = false;
 	}/// if
 
 	return RTC::RTC_OK;
@@ -628,7 +617,7 @@ int DaqOperator::copy_compname()
 	if (m_new == 0) {
 		for (int i = 0; i < m_comp_num; i++) {
 			myprof = m_DaqServicePorts[i]->get_connector_profiles();
-			compnames.emplace_back(myprof[0].name);
+			compnames.emplace_back(std::move(myprof[0].name));
 		}
 		m_new = 1;
 	}
@@ -703,10 +692,8 @@ int DaqOperator::set_runno(RTC::CorbaConsumer<DAQService> daqservice, unsigned r
 int DaqOperator::set_command(RTC::CorbaConsumer<DAQService> daqservice,
 							 DAQCommand daqcom)
 {
-	int status = 0;
-
 	try {
-		status = daqservice->setCommand(daqcom);
+		daqservice->setCommand(daqcom);
 	}
 	catch(...) {
 		std::cerr << "### ERROR: set command: exception occured\n ";
@@ -720,7 +707,6 @@ int DaqOperator::set_hb_to_component()
 	try {
 		for (auto& daqservice : m_daqservices) {
 			set_hb(daqservice);
-			// check_hb_done(daqservice);
 		}
 	}
 	catch (...) {
@@ -738,17 +724,15 @@ int DaqOperator::stop_heart_beat(int num)
 	catch (...) {
 		std::cerr << "stop_heart_beat\n";
 	}
-
 	return 0;
 }
 */
 
 int DaqOperator::set_hb(RTC::CorbaConsumer<DAQService> daqservice)
 {
-	int status = 0;
 	HBMSG hbmsg = ONE;
 	try {
-		status = daqservice->setHB(hbmsg);
+		daqservice->setHB(hbmsg);
 	}
 	catch(...) {
 		std::cerr << "### ERROR: set hb: exception occured\n";
@@ -758,11 +742,8 @@ int DaqOperator::set_hb(RTC::CorbaConsumer<DAQService> daqservice)
 
 int DaqOperator::check_done(RTC::CorbaConsumer<DAQService> daqservice)
 {
-	int status = 0;
-
 	try {
-		status = daqservice->checkDone();
-        if (status == 0) {
+        if (daqservice->checkDone()	== 0) {
             usleep(0);
         }
 	} catch(...) {
@@ -1526,6 +1507,7 @@ extern "C"
 	}
 };
 
+// Add
 void DaqOperator::reset_send_count() {
 	m_send_count = 0;
 }
