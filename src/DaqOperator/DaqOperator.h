@@ -189,6 +189,9 @@ private:
     std::string m_config_file_tmp;
 
     bool m_debug;
+    int m_loop;
+    bool m_performe;
+    bool m_time;
 };
 
 extern "C"

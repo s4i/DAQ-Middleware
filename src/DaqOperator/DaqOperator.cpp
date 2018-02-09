@@ -59,7 +59,10 @@ DaqOperator::DaqOperator(RTC::Manager* manager)
     m_isConsoleMode(true),
     m_msg(" "),
     m_err_msg(" "),
-    m_debug(false)
+    m_debug(false),
+	m_loop(100),
+	m_performe(true),
+    m_time(true)
 {
     if (m_debug) {
         std::cerr << "Create DaqOperator\n";
@@ -323,14 +326,77 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
         return RTC::RTC_OK;
     }
 
+	static int loop_count = 1;
+	static int state_management = 0;
+	if (loop_count == 6 * m_loop)
+		std::exit(0);
+	loop_count++;
+	if (m_performe) {
+		// command check
+		std::cerr << "automation\n";
+
+		if (state_management > 5) state_management = 0;
+		if (state_management == 0) {
+			if (m_time) {
+				output_performance(0);
+			}
+			configure_procedure();
+			sleep(2);
+			state_management++;
+		}
+
+		if (state_management == 1) {
+			if (m_time) {
+				output_performance(1);
+			}
+			start_procedure();
+			sleep(2);
+			state_management++;
+		}
+
+		if (state_management == 2) {
+			if (m_time) {
+				output_performance(4);
+			}
+			pause_procedure();
+			sleep(2);
+			state_management++;
+		}
+
+		if (state_management == 3) {
+			if (m_time) {
+				output_performance(5);
+			}
+			resume_procedure();
+			sleep(1);
+			state_management++;
+		}
+
+		if (state_management == 4) {
+			if (m_time) {
+				output_performance(2);
+			}
+			stop_procedure();
+			sleep(2);
+			state_management++;
+		}
+
+		if (state_management == 5) {
+			if (m_time) {
+				output_performance(3);
+			}
+			unconfigure_procedure();
+			sleep(1);
+			state_management++;
+		}
+	}
+
     if (FD_ISSET(0, &m_rset)) {
         char comm[2];
         if ( read(0, comm, sizeof(comm)) == -1) {
             return RTC::RTC_OK;
         }
         command = (int)(comm[0] - '0');
-        set_time();
-        output_performance(command);
 
         switch (m_state) {
         case PAUSED:
@@ -364,7 +430,6 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
                 std::cin >> srunNo;
 
 				/* set time */
-				set_time();
 				output_performance(command);
 
                 m_runNumber = atoi( srunNo.c_str());
@@ -1217,7 +1282,7 @@ int DaqOperator::output_performance(int command)
 
 	uid = getuid();
 	if ((pw = getpwuid (uid))) {
-		sprintf(date, "/home/%s/DAQ-Middleware/csv/h-sendai/h-sendai-file-output",
+		sprintf(date, "/home/%s/DAQ-Middleware/csv/h-sendai/h-sendai-output",
 				pw->pw_name);
 	}
 	sprintf(fname, "%s.csv", date);

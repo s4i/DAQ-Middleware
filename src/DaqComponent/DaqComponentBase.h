@@ -576,7 +576,7 @@ namespace DAQMW
                               << std::endl;
                 }
                 set_done();
-                get_time_performance(m_command);
+                // get_time_performance(m_command);
                 output_time_performance(m_command);
             }
             else {
@@ -829,7 +829,7 @@ namespace DAQMW
 
             uid = getuid();
             if ((pw = getpwuid (uid))) {
-                sprintf(date, "/home/%s/DAQ-Middleware/csv/h-sendai/h-sendai-file-output", pw->pw_name);
+                sprintf(date, "/home/%s/DAQ-Middleware/csv/h-sendai/h-sendai-output", pw->pw_name);
             }
             sprintf(fname, "%s.csv", date);
             std::ofstream csv_file(fname, std::ios::app);
