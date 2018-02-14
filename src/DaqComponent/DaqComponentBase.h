@@ -73,7 +73,7 @@ namespace DAQMW
               m_isTimerAlarm(false),
               m_has_printed_error_log(false),
               m_debug(false),
-			  m_time(true)
+			  m_time(false)
         {
             // status_timer = new Timer(STATUS_CYCLE_SEC);
         }
@@ -581,10 +581,10 @@ namespace DAQMW
                 }
                 set_done();
 
-                if (m_time) {
+                // if (m_time) {
                     // get_time_inline(m_command);
-                    get_time_output(m_command);
-                }
+                    // get_time_output(m_command);
+                // }
             }
             else {
                 ///same command as previous, stay same state, do same action
@@ -673,9 +673,6 @@ namespace DAQMW
         // Timer* status_timer;
         std::unique_ptr<Timer> status_timer{new Timer(STATUS_CYCLE_SEC)};
         std::unique_ptr<Timer> hb_timer{new Timer(CHECK_HB_CYCLE_SEC)};
-
-        // Heart beat
-        HBMSG m_hb;
 
         DAQCommand m_command;
         DAQLifeCycleState m_state;
@@ -774,21 +771,20 @@ namespace DAQMW
         int get_hb_from_operator_clockwork()
         {
             if (hb_timer->checkTimer()) {
+                HBMSG m_hb = ZERO;
                 m_hb = m_daq_service0.getHB();
-                // if (m_hb == ONE) {
-                    // set_hb_done();
-                // }
+                std::cerr << "m_hb=" << m_hb << std::endl;
+                if (m_hb == ONE) {
+                    m_daq_service0.upHB();
+                }
                 // if (m_hb == END) {
                 //     if (m_state_prev == CONFIGURED && m_state == RUNNING) {
                 //         transAction(CMD_STOP);
                 //     }
                 //     std::cerr << "### shutdonw\n";
-                //     _exit(1);
+                //     std::exit(1);
                 // }
                 hb_timer->resetTimer();
-            }
-            if (m_hb) {
-                std::cerr << "m_hb=" << m_hb << std::endl;
             }
             return 0;
         }

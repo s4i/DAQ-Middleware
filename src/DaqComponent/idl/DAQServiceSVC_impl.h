@@ -39,38 +39,40 @@ public:
 	DAQServiceSVC_impl();
 	virtual ~DAQServiceSVC_impl();
 
-	DAQLifeCycleState getState() throw(CORBA::SystemException);
-	RTC::ReturnCode_t setCommand(DAQCommand command) throw(CORBA::SystemException);
-	DAQCommand getCommand() throw(CORBA::SystemException);
-	DAQDone checkDone() throw(CORBA::SystemException);
-	void setDone() throw(CORBA::SystemException);
-	void setStatus(const Status& stat) throw(CORBA::SystemException);
-	Status* getStatus() throw(CORBA::SystemException);
-	void setCompParams(const NVList& comp_params) throw(CORBA::SystemException);
-	NVList* getCompParams() throw(CORBA::SystemException);
-	void setRunNo(const CORBA::Long run_no) throw(CORBA::SystemException);
-	CORBA::Long getRunNo() throw(CORBA::SystemException);
-	void setFatalStatus(const FatalErrorStatus& fatalStatus) throw(CORBA::SystemException);
+	DAQLifeCycleState getState();
+	RTC::ReturnCode_t setCommand(DAQCommand command);
+	DAQCommand getCommand();
+	DAQDone checkDone();
+	void setDone();
+	void setStatus(const Status& stat);
+	Status* getStatus();
+	void setCompParams(const NVList& comp_params);
+	NVList* getCompParams();
+	void setRunNo(const CORBA::Long run_no);
+	CORBA::Long getRunNo();
+	void setFatalStatus(const FatalErrorStatus& fatalStatus);
 
-	FatalErrorStatus* getFatalStatus() throw(CORBA::SystemException);
+	FatalErrorStatus* getFatalStatus();
 
-	RTC::ReturnCode_t setHB(const HBMSG hbs) throw(CORBA::SystemException);
-	HBMSG getHB() throw(CORBA::SystemException);
+	void setHB();
+    HBMSG getHB();
+	void upHB();
+
 	/*
 	void setStopDaqSystem() throw(CORBA::SystemException)
 	{
 		this->m_oc = END;
 	}
-	HeartBeatDone hb_checkDone() throw(CORBA::SystemException);
-	void hb_setDone() throw(CORBA::SystemException);
+	HeartBeatDone hb_checkDone();
+	void hb_setDone();
 	*/
 
-	// RTC::ReturnCode_t setTime(const TimeVal& now) throw(CORBA::SystemException);
-	// TimeVal getTime() throw(CORBA::SystemException);
+	// RTC::ReturnCode_t setTime(const TimeVal& now);
+	// TimeVal getTime();
 
 private:
 	DAQCommand m_command;
-	int m_new;
+	short m_new;
 	DAQDone m_done;
 	DAQLifeCycleState m_state;
 	Status m_status;
@@ -78,8 +80,9 @@ private:
 	NVList m_comp_params;
 	CORBA::Long   m_run_no;
 
-	HBMSG m_otoc;
-	int m_hb_new;
+	HBMSG m_hb_msg;
+	short m_hb_new;
+
 	// HeartBeatDone m_hb_done;
 
 	// TimeVal m_start;

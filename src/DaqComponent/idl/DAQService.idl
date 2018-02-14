@@ -104,8 +104,10 @@ interface DAQService
     void setFatalStatus(in FatalErrorStatus fatalStatus);
     FatalErrorStatus getFatalStatus();
 
-    RTC::ReturnCode_t setHB(in HBMSG hbs);
+    void setHB();
     HBMSG getHB();
+    void upHB();
+
     //void setStopDaqSystem();
     //HeartBeatDone hb_checkDone();
     //void   hb_setDone();
@@ -113,16 +115,3 @@ interface DAQService
     // RTC::ReturnCode_t setTime(in TimeVal now);
     // TimeVal getTime();
 };
-
-/*
-module BiDirPolicy {
-    typedef unsigned short BidirectionalPolicyValue;
-    const BidirectionalPolicyValue NORMAL = 0;
-    const BidirectionalPolicyValue BOTH = 1;
-    const CORBA::PolicyType BIDIRECTIONAL_POLICY_TYPE = 37;
-
-    interface BidirectionalPolicy : CORBA::Policy {
-        readonly attribute BidirectionalPolicyValue value;
-    };
-};
-*/

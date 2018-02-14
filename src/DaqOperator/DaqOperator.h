@@ -34,7 +34,6 @@
 #include <fstream>
 #include <cstdlib>
 #include <pwd.h>
-#include <unistd.h>
 #include <sys/select.h>
 #include <sys/time.h>
 
@@ -143,10 +142,9 @@ private:
     int copy_compname();
 
     /* HeartBeat */
-    std::vector<int> keep_alive;
-    std::vector<int> keep_dead;
-    int set_hb_to_component();
-    int set_hb(RTC::CorbaConsumer<DAQService> daqservice);
+    // std::vector<int> keep_alive;
+    // std::vector<int> keep_dead;
+    // int set_hb(RTC::CorbaConsumer<DAQService> daqservice);
     // int check_hb_done(RTC::CorbaConsumer<DAQService> daqservice);
     int stop_heart_beat(int num);
 
