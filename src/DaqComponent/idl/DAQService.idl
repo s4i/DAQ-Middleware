@@ -75,7 +75,8 @@ struct Status
 
 enum HBMSG {
     ZERO,
-    ONE
+    ONE,
+    END
 };
 
 enum HeartBeatDone {
@@ -103,7 +104,6 @@ interface DAQService
     long getRunNo();
     void setFatalStatus(in FatalErrorStatus fatalStatus);
     FatalErrorStatus getFatalStatus();
-
     void setHB();
     HBMSG getHB();
     void upHB();

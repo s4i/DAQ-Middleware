@@ -771,19 +771,22 @@ namespace DAQMW
         int get_hb_from_operator_clockwork()
         {
             if (hb_timer->checkTimer()) {
-                HBMSG m_hb = ZERO;
+                HBMSG m_hb = ZERO; // init
                 m_hb = m_daq_service0.getHB();
                 std::cerr << "m_hb=" << m_hb << std::endl;
                 if (m_hb == ONE) {
                     m_daq_service0.upHB();
                 }
-                // if (m_hb == END) {
-                //     if (m_state_prev == CONFIGURED && m_state == RUNNING) {
-                //         transAction(CMD_STOP);
-                //     }
-                //     std::cerr << "### shutdonw\n";
-                //     std::exit(1);
-                // }
+                /*
+                if (m_hb == END) {
+                    if (m_state_prev == CONFIGURED && m_state == RUNNING) {
+                        transAction(CMD_STOP);
+                    }
+                    sleep(0);
+                    std::cerr << "### Shutdonw\n";
+                    std::exit(1);
+                }
+                */
                 hb_timer->resetTimer();
             }
             return 0;

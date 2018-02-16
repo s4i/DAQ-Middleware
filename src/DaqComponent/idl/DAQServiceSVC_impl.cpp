@@ -51,19 +51,16 @@ RTC::ReturnCode_t DAQServiceSVC_impl::setCommand(DAQCommand command)
 {
 #ifdef OLD
     if (m_done == DONE) {
-
-	m_command = command;
-
-	m_new = 1;
-	m_done = UNDONE;
-	///std::cerr << "UNDONE\n";
-	return RTC::RTC_OK;
+        m_command = command;
+        m_new = 1;
+        m_done = UNDONE;
+        ///std::cerr << "UNDONE\n";
+        return RTC::RTC_OK;
     } else {
-	return RTC::RTC_ERROR;
+        return RTC::RTC_ERROR;
     }
 #endif
     m_command = command;
-
     m_new = 1;
     m_done = UNDONE;
     ///std::cerr << "UNDONE\n";
@@ -73,12 +70,12 @@ RTC::ReturnCode_t DAQServiceSVC_impl::setCommand(DAQCommand command)
 DAQCommand DAQServiceSVC_impl::getCommand()
 {
     if ( m_new ) {
-	///std::cerr << "new command\n";
-	m_new = 0;
-	return m_command;
+        ///std::cerr << "new command\n";
+        m_new = 0;
+        return m_command;
     }
     else
-	return CMD_NOP;
+        return CMD_NOP;
 }
 
 DAQDone DAQServiceSVC_impl::checkDone()
@@ -153,7 +150,7 @@ HBMSG DAQServiceSVC_impl::getHB()
 
 void DAQServiceSVC_impl::upHB()
 {
-    if (m_hb_new) {
+    if (m_hb_new && m_hb_msg) {
         m_hb_new = 0;
         m_hb_msg = ZERO;
     }

@@ -58,11 +58,12 @@ public:
     HBMSG getHB();
 	void upHB();
 
-	/*
-	void setStopDaqSystem() throw(CORBA::SystemException)
+	void setStopDaqSystem()
 	{
-		this->m_oc = END;
+		this->m_hb_msg = END;
 	}
+
+	/*
 	HeartBeatDone hb_checkDone();
 	void hb_setDone();
 	*/

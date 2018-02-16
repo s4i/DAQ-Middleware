@@ -161,8 +161,6 @@ private:
     int clockwork_hb_recv();
 
     /* Time measurement */
-    int m_loop;
-    bool m_performe;
     int set_time();
     int output_performance(int command);
 

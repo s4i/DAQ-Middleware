@@ -54,7 +54,6 @@ DaqOperator::DaqOperator(RTC::Manager* manager)
 	resFlag(false),
 	m_new(0),
     m_send_count(0),
-	m_loop(100),
 	m_state(LOADED),
 	m_runNumber(0),
 	m_start_date(" "),
@@ -337,14 +336,7 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 	}
 
 	if (m_time) {
-		static int loop_count = 1;
 		static int state_management = 0;
-
-		// output time performance
-		if (loop_count == 6 * m_loop) {
-			std::exit(0);
-		}
-		loop_count++;
 
 		// command check
 		if (state_management > 5) state_management = 0;
@@ -711,10 +703,12 @@ int DaqOperator::clockwork_hb_recv()
 			for (auto& daqservice : m_daqservices) {
 				// set_hb(daqservice);
 				daqservice->setHB();
-				try {
+				/**/
+				try
+				{
 					inc_send_count();
 					HBMSG hb_msg = daqservice->getHB();
-					if (hb_msg == ZERO) {
+					if (hb_msg == 0) {
 						if (deadFlag == false) {
 							recv_count = get_send_count();
 							if (recv_count >= 4) {
@@ -724,7 +718,7 @@ int DaqOperator::clockwork_hb_recv()
 							}
 						}
 						else if (deadFlag == true) {
-							if (hb_msg == ONE) {
+							if (hb_msg == 1) {
 								// keep_alive.emplace_back(1);
 								resFlag = true;
 							}
@@ -733,6 +727,7 @@ int DaqOperator::clockwork_hb_recv()
 				} catch(...) {
 					std::cerr << "### hb_checkHB: failed" << std::endl;
 				}
+				/*  */
 			}
 		}
 		catch (...) {
