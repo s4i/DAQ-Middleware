@@ -337,7 +337,6 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 
 	if (m_time) {
 		static int state_management = 0;
-
 		// command check
 		if (state_management > 5) state_management = 0;
 		if (state_management == 0) {
@@ -530,7 +529,7 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 								<< check_compStatus(status->comp_status)
 								<< "\033[39m" << std::endl;
 					/** Use error console display **/
-					d_compname.emplace_back(compnames[i]);
+					d_compname.emplace_back(compname);
 					d_message.emplace_back(std::move(errStatus));
 					m_state = ERRORED;
 				}///if Fatal
@@ -538,12 +537,12 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 					errStatus = m_daqservices[i]->getFatalStatus();
 					std::cerr << "\033[35m"
 								<< std::setw(12) << std::right
-								<< "__RUNNING__" << "\033[39m"
+								<< "RUNNING" << "\033[39m"
 								<< "\033[33m" << std::setw(14) << std::right
 								<< check_compStatus(status->comp_status)
 								<< "\033[39m" << std::endl;
 					/** Use error console display **/
-					d_compname.emplace_back(compnames[i]);
+					d_compname.emplace_back(compname);
 					d_message.emplace_back(std::move(errStatus));
 					m_state = ERRORED;
 					resFlag = true;
@@ -573,7 +572,7 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 				++cnt;
 				std::cerr << " [ERROR" << cnt << "] "
 						<< compname << '\t'
-						<< "\033[31m" << "<- " << d_message[cnt-1]->description
+						<< "\033[31m" << "<- " << d_message[cnt - 1]->description
 						<< "\033[39m" << std::endl;
 			}///for
 			if (deadFlag == true) {
