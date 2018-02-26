@@ -104,11 +104,12 @@ interface DAQService
     long getRunNo();
     void setFatalStatus(in FatalErrorStatus fatalStatus);
     FatalErrorStatus getFatalStatus();
+
     void setHB();
     HBMSG getHB();
     void upHB();
+    void setStopDaqSystem();
 
-    //void setStopDaqSystem();
     //HeartBeatDone hb_checkDone();
     //void   hb_setDone();
 

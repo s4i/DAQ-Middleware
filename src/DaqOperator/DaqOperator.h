@@ -146,7 +146,6 @@ private:
     // std::vector<int> keep_dead;
     // int set_hb(RTC::CorbaConsumer<DAQService> daqservice);
     // int check_hb_done(RTC::CorbaConsumer<DAQService> daqservice);
-    int stop_heart_beat(int num);
 
     /* Heart beat timer */
     // Timer* mytimer;
@@ -163,6 +162,7 @@ private:
     /* Time measurement */
     int set_time();
     int output_performance(int command);
+    int state_change_automation();
 
     int check_done(RTC::CorbaConsumer<DAQService> daqservice);
     int set_sitcp_num(int sitcp_num);

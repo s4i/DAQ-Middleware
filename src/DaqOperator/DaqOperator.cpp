@@ -258,7 +258,6 @@ std::string DaqOperator::check_compStatus(CompStatus compStatus)
 	return comp_status;
 }
 
-
 void DaqOperator::run_data()
 {
 	std::cerr << "\033[;H\033[2J";
@@ -335,51 +334,9 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 		return RTC::RTC_OK;
 	}
 
+	// Time
 	if (m_time) {
-		static int state_management = 0;
-		// command check
-		if (state_management > 5) state_management = 0;
-		if (state_management == 0) {
-			output_performance(0);
-			configure_procedure();
-			sleep(2);
-			state_management++;
-		}
-
-		if (state_management == 1) {
-			output_performance(1);
-			start_procedure();
-			sleep(2);
-			state_management++;
-		}
-
-		if (state_management == 2) {
-			output_performance(4);
-			pause_procedure();
-			sleep(2);
-			state_management++;
-		}
-
-		if (state_management == 3) {
-			output_performance(5);
-			resume_procedure();
-			sleep(1);
-			state_management++;
-		}
-
-		if (state_management == 4) {
-			output_performance(2);
-			stop_procedure();
-			sleep(2);
-			state_management++;
-		}
-
-		if (state_management == 5) {
-			output_performance(3);
-			unconfigure_procedure();
-			sleep(1);
-			state_management++;
-		}
+		state_change_automation();
 	}
 
 	if (FD_ISSET(0, &m_rset)) {
@@ -389,6 +346,7 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 		}
 		command = (int)(comm[0] - '0');
 
+		// set time1
 		// if (m_time) {
 		// 	set_time();
 		// 	output_performance(command);
@@ -426,7 +384,7 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 				std::cerr << "\033[5;62H";
 				std::cin >> srunNo;
 
-				// set time
+				// set time2
 				// if (m_time) {
 					// set_time();
 					// output_performance(command);
@@ -505,12 +463,13 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 					<< std::endl;
 		///std::cerr << "RUN NO: " << m_runNumber << std::endl;
 
-		// copy_compname();
 		std::string compname;
 		for (int i = (m_comp_num - 1); i >= 0; i--) {
 			try {
+				// copy_compname();
+
 				RTC::ConnectorProfileList_var myprof =
-					m_DaqServicePorts[i]->get_connector_profiles();
+				 	m_DaqServicePorts[i]->get_connector_profiles();
 				compname = myprof[0].name;
 
 				status = m_daqservices[i]->getStatus();
@@ -524,10 +483,11 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 					errStatus = m_daqservices[i]->getFatalStatus();
 					std::cerr << "\033[35m"
 								<< std::setw(12) << std::right
-								<< "__RUNNING__" << "\033[39m"
+								<< "RUNNING" << "\033[39m"
 								<< "\033[31m" << std::setw(14) << std::right
 								<< check_compStatus(status->comp_status)
 								<< "\033[39m" << std::endl;
+
 					/** Use error console display **/
 					d_compname.emplace_back(compname);
 					d_message.emplace_back(std::move(errStatus));
@@ -541,6 +501,7 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 								<< "\033[33m" << std::setw(14) << std::right
 								<< check_compStatus(status->comp_status)
 								<< "\033[39m" << std::endl;
+
 					/** Use error console display **/
 					d_compname.emplace_back(compname);
 					d_message.emplace_back(std::move(errStatus));
@@ -559,8 +520,7 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 				std::cerr << " ### ERROR: "
 							<< std::setw(22) << std::right
 							<< compname << " : cannot connect\n";
-				// stop_heart_beat(i);
-				// std::exit(1);
+				// m_daqservices[i]->setStopDaqSystem();
 			}
 		}//for
 		std::cerr << std::endl;
@@ -1584,6 +1544,56 @@ int DaqOperator::output_performance(int command)
 		break;
 	}
 	csv_file.close();
+
+	return 0;
+}
+
+int DaqOperator::state_change_automation()
+{
+	static int state_management = 0;
+	// command check
+	if (state_management > 5) state_management = 0;
+	if (state_management == 0) {
+		output_performance(0);
+		configure_procedure();
+		sleep(2);
+		state_management++;
+	}
+
+	if (state_management == 1) {
+		output_performance(1);
+		start_procedure();
+		sleep(2);
+		state_management++;
+	}
+
+	if (state_management == 2) {
+		output_performance(4);
+		pause_procedure();
+		sleep(2);
+		state_management++;
+	}
+
+	if (state_management == 3) {
+		output_performance(5);
+		resume_procedure();
+		sleep(1);
+		state_management++;
+	}
+
+	if (state_management == 4) {
+		output_performance(2);
+		stop_procedure();
+		sleep(2);
+		state_management++;
+	}
+
+	if (state_management == 5) {
+		output_performance(3);
+		unconfigure_procedure();
+		sleep(1);
+		state_management++;
+	}
 
 	return 0;
 }

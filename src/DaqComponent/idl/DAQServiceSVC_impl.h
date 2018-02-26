@@ -57,11 +57,7 @@ public:
 	void setHB();
     HBMSG getHB();
 	void upHB();
-
-	void setStopDaqSystem()
-	{
-		this->m_hb_msg = END;
-	}
+	void setStopDaqSystem();
 
 	/*
 	HeartBeatDone hb_checkDone();

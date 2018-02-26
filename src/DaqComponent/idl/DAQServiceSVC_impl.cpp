@@ -156,6 +156,12 @@ void DAQServiceSVC_impl::upHB()
     }
 }
 
+void DAQServiceSVC_impl::setStopDaqSystem()
+{
+    m_hb_msg = END;
+    m_hb_new = 1;
+}
+
 /*
 HeartBeatDone DAQServiceSVC_impl::hb_checkDone()
 {
