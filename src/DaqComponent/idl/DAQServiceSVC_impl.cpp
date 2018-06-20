@@ -30,12 +30,10 @@ DAQServiceSVC_impl::DAQServiceSVC_impl()
     // Please add extra constructor code here.
 }
 
-
 DAQServiceSVC_impl::~DAQServiceSVC_impl()
 {
     // Please add extra destructor code here.
 }
-
 
 /*
  * Methods corresponding to IDL attributes and operations
@@ -46,17 +44,19 @@ DAQLifeCycleState DAQServiceSVC_impl::getState()
     return m_state;
 }
 
-
 RTC::ReturnCode_t DAQServiceSVC_impl::setCommand(DAQCommand command)
 {
 #ifdef OLD
-    if (m_done == DONE) {
+    if (m_done == DONE)
+    {
         m_command = command;
         m_new = 1;
         m_done = UNDONE;
         ///std::cerr << "UNDONE\n";
         return RTC::RTC_OK;
-    } else {
+    }
+    else
+    {
         return RTC::RTC_ERROR;
     }
 #endif
@@ -69,7 +69,8 @@ RTC::ReturnCode_t DAQServiceSVC_impl::setCommand(DAQCommand command)
 
 DAQCommand DAQServiceSVC_impl::getCommand()
 {
-    if ( m_new ) {
+    if (m_new)
+    {
         ///std::cerr << "new command\n";
         m_new = 0;
         return m_command;
@@ -89,25 +90,25 @@ void DAQServiceSVC_impl::setDone()
     ///std::cerr << "set DONE\n";///
 }
 
-void DAQServiceSVC_impl::setStatus(const Status& stat)
+void DAQServiceSVC_impl::setStatus(const Status &stat)
 {
     m_status = stat;
 }
 
-Status* DAQServiceSVC_impl::getStatus()
+Status *DAQServiceSVC_impl::getStatus()
 {
-    Status* mystatus = new Status;
+    Status *mystatus = new Status;
     *mystatus = m_status;
 
     return mystatus;
 }
 
-void DAQServiceSVC_impl::setCompParams(const NVList& comp_params)
+void DAQServiceSVC_impl::setCompParams(const NVList &comp_params)
 {
     m_comp_params = comp_params;
 }
 
-NVList* DAQServiceSVC_impl::getCompParams()
+NVList *DAQServiceSVC_impl::getCompParams()
 {
     return &m_comp_params;
 }
@@ -122,15 +123,15 @@ CORBA::Long DAQServiceSVC_impl::getRunNo()
     return m_run_no;
 }
 
-void DAQServiceSVC_impl::setFatalStatus(const FatalErrorStatus& fatalStatus)
+void DAQServiceSVC_impl::setFatalStatus(const FatalErrorStatus &fatalStatus)
 {
     std::cerr << "### setFatalStatus:" << fatalStatus.fatalTypes << std::endl;
     m_fatalStatus = fatalStatus;
 }
 
-FatalErrorStatus* DAQServiceSVC_impl::getFatalStatus()
+FatalErrorStatus *DAQServiceSVC_impl::getFatalStatus()
 {
-    FatalErrorStatus* myfatal = new FatalErrorStatus;
+    FatalErrorStatus *myfatal = new FatalErrorStatus;
     *myfatal = m_fatalStatus;
     return myfatal;
 }
@@ -150,7 +151,8 @@ HBMSG DAQServiceSVC_impl::getHB()
 
 void DAQServiceSVC_impl::upHB()
 {
-    if (m_hb_new && m_hb_msg) {
+    if (m_hb_new && m_hb_msg)
+    {
         m_hb_new = 0;
         m_hb_msg = ZERO;
     }
@@ -162,7 +164,6 @@ void DAQServiceSVC_impl::setStopDaqSystem()
     m_hb_new = 1;
 }
 
-/*
 HeartBeatDone DAQServiceSVC_impl::hb_checkDone()
 {
     return m_hb_done;
@@ -173,6 +174,7 @@ void DAQServiceSVC_impl::hb_setDone()
     m_hb_done = HBDONE;
 }
 
+/*
 RTC::ReturnCode_t DAQServiceSVC_impl::setTime(const TimeVal& now)
 {
 	m_start = now;

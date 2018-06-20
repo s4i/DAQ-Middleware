@@ -51,15 +51,16 @@
 using namespace RTC;
 
 // error code for dom
-static constexpr int RET_CODE_IO_ERR		    = (-14);
-static constexpr int RET_CODE_REQ_INV_IN_STS	= (-26);
+static constexpr int RET_CODE_IO_ERR = (-14);
+static constexpr int RET_CODE_REQ_INV_IN_STS = (-26);
 
-struct serviceInfo {
+struct serviceInfo
+{
     std::string comp_id;
     RTC::CorbaConsumer<DAQService> daqService;
 };
 
-typedef std::vector< serviceInfo > DaqServiceList;
+typedef std::vector<serviceInfo> DaqServiceList;
 
 /*!
  * @class DaqOperator
@@ -71,10 +72,10 @@ typedef std::vector< serviceInfo > DaqServiceList;
 class DaqOperator
     : public RTC::DataFlowComponentBase
 {
-public:
-    static DaqOperator* Instance();
+  public:
+    static DaqOperator *Instance();
 
-    DaqOperator(RTC::Manager* manager);
+    DaqOperator(RTC::Manager *manager);
     ~DaqOperator();
 
     // The initialize action (on CREATED->ALIVE transition)
@@ -94,10 +95,10 @@ public:
     std::string getMsg();
     std::string getBody();
     ///bool parse_body(const char* buf);
-    bool parse_body(const char* buf, const std::string tagname);
+    bool parse_body(const char *buf, const std::string tagname);
 
     // for callback
-	int command_configure();
+    int command_configure();
     int command_unconfigure();
     int command_start();
     int command_stop();
@@ -118,23 +119,23 @@ public:
     void set_port_no(int port);
     std::string getConfFilePath();
 
-protected:
+  protected:
     std::vector<RTC::CorbaPort *> m_DaqServicePorts;
-    std::vector<RTC::CorbaConsumer<DAQService> > m_daqservices;
+    std::vector<RTC::CorbaConsumer<DAQService>> m_daqservices;
     // std::list<RTC::CorbaConsumer<DAQService> > m_daqservices;
 
-private:
+  private:
     static constexpr int PARAM_PORT = 30000;
-    static DaqOperator* _instance;
+    static DaqOperator *_instance;
 
     int m_comp_num;
     int m_service_num;
     int set_runno(RTC::CorbaConsumer<DAQService> daqservice, unsigned runno);
     int set_command(RTC::CorbaConsumer<DAQService> daqservice, DAQCommand daqcom);
 
-	/* Add flags */
+    /* Add flags */
     bool deadFlag; // Dead flag
-    bool resFlag; // Restart flag
+    bool resFlag;  // Restart flag
 
     /* Console viewer */
     std::vector<std::string> compnames;
@@ -144,13 +145,13 @@ private:
     /* HeartBeat */
     // std::vector<int> keep_alive;
     // std::vector<int> keep_dead;
-    // int set_hb(RTC::CorbaConsumer<DAQService> daqservice);
-    // int check_hb_done(RTC::CorbaConsumer<DAQService> daqservice);
+    int set_hb(RTC::CorbaConsumer<DAQService> daqservice);
+    int check_hb_done(RTC::CorbaConsumer<DAQService> daqservice);
 
     /* Heart beat timer */
-    // Timer* mytimer;
+    // Timer *mytimer;
     static constexpr int HB_CYCLE_SEC = 5;
-	std::unique_ptr<Timer> mytimer{new Timer(HB_CYCLE_SEC)};
+    std::unique_ptr<Timer> mytimer{new Timer(HB_CYCLE_SEC)};
 
     int m_send_count;
     void reset_send_count();
@@ -194,16 +195,16 @@ private:
 #endif
     void createDom_ok(std::string name);
     void createDom_ng(std::string name);
-    void createDom_ng(std::string name, int code, char* str_e, char* str_j);
+    void createDom_ng(std::string name, int code, char *str_e, char *str_j);
 
     int m_curState;
     CORBA::Long m_status;
     CompInfoList m_compInfoList;
-    DaqServiceList  m_daqServiceList;
+    DaqServiceList m_daqServiceList;
 
-    fd_set    m_allset;
-    fd_set    m_rset;
-    int       m_maxfd;
+    fd_set m_allset;
+    fd_set m_rset;
+    int m_maxfd;
     struct timeval m_tout;
     DAQLifeCycleState m_state;
 
@@ -216,7 +217,7 @@ private:
     bool m_com_completed;
     bool m_isConsoleMode;
 
-    std::vector< ::NVList> m_nv_list;
+    std::vector<::NVList> m_nv_list;
     std::string m_msg;
     std::string m_err_msg;
     std::string m_body;
@@ -228,11 +229,9 @@ private:
     bool m_time;
 };
 
-
 extern "C"
 {
-    void DaqOperatorInit(RTC::Manager* manager);
+    void DaqOperatorInit(RTC::Manager *manager);
 };
-
 
 #endif // DAQOPERATOR_H

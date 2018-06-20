@@ -59,11 +59,10 @@ public:
 	void upHB();
 	void setStopDaqSystem();
 
-	/*
 	HeartBeatDone hb_checkDone();
 	void hb_setDone();
-	*/
 
+	// Mesure Time
 	// RTC::ReturnCode_t setTime(const TimeVal& now);
 	// TimeVal getTime();
 
@@ -80,7 +79,7 @@ private:
 	HBMSG m_hb_msg;
 	short m_hb_new;
 
-	// HeartBeatDone m_hb_done;
+	HeartBeatDone m_hb_done;
 
 	// TimeVal m_start;
 };
