@@ -48,6 +48,7 @@
 
 #include "Timer.h"
 
+using namespace std;
 using namespace RTC;
 
 // error code for dom
@@ -56,18 +57,15 @@ static constexpr int RET_CODE_REQ_INV_IN_STS = (-26);
 
 struct serviceInfo
 {
-    std::string comp_id;
+    string comp_id;
     RTC::CorbaConsumer<DAQService> daqService;
 };
 
-typedef std::vector<serviceInfo> DaqServiceList;
+typedef vector<serviceInfo> DaqServiceList;
 
 /*!
  * @class DaqOperator
  * @brief DaqOperator class
- *
- *
- *
  */
 class DaqOperator
     : public RTC::DataFlowComponentBase
@@ -79,23 +77,19 @@ class DaqOperator
     ~DaqOperator();
 
     // The initialize action (on CREATED->ALIVE transition)
-    // former rtc_init_entry()
     virtual RTC::ReturnCode_t onInitialize();
 
     // The startup action when ExecutionContext startup
-    // former rtc_starting_entry()
     virtual RTC::ReturnCode_t onStartup(RTC::UniqueId ec_id);
 
     virtual RTC::ReturnCode_t onActivated(RTC::UniqueId ec_id);
 
     // The execution action that is invoked periodically
-    // former rtc_active_do()
     virtual RTC::ReturnCode_t onExecute(RTC::UniqueId ec_id);
 
-    std::string getMsg();
-    std::string getBody();
-    ///bool parse_body(const char* buf);
-    bool parse_body(const char *buf, const std::string tagname);
+    string getMsg();
+    string getBody();
+    bool parse_body(const char *buf, const string tagname);
 
     // for callback
     int command_configure();
@@ -117,12 +111,11 @@ class DaqOperator
 
     void set_console_flag(bool console);
     void set_port_no(int port);
-    std::string getConfFilePath();
+    string getConfFilePath();
 
   protected:
-    std::vector<RTC::CorbaPort *> m_DaqServicePorts;
-    std::vector<RTC::CorbaConsumer<DAQService>> m_daqservices;
-    // std::list<RTC::CorbaConsumer<DAQService> > m_daqservices;
+    vector<RTC::CorbaPort *> m_DaqServicePorts;
+    vector<RTC::CorbaConsumer<DAQService>> m_daqservices;
 
   private:
     static constexpr int PARAM_PORT = 30000;
@@ -138,27 +131,21 @@ class DaqOperator
     bool resFlag;  // Restart flag
 
     /* Console viewer */
-    std::vector<std::string> compnames;
+    vector<string> compnames;
     int m_new;
     int copy_compname();
 
     /* HeartBeat */
-    // std::vector<int> keep_alive;
-    // std::vector<int> keep_dead;
-    int set_hb(RTC::CorbaConsumer<DAQService> daqservice);
+    // vector<int> keep_alive;
+    // vector<int> keep_dead;
     int check_hb_done(RTC::CorbaConsumer<DAQService> daqservice);
 
     /* Heart beat timer */
     // Timer *mytimer;
     static constexpr int HB_CYCLE_SEC = 5;
-    std::unique_ptr<Timer> mytimer{new Timer(HB_CYCLE_SEC)};
-
-    int m_send_count;
-    void reset_send_count();
-    void inc_send_count();
-    int get_send_count();
-    int reset_mytimer();
+    unique_ptr<Timer> mytimer{new Timer(HB_CYCLE_SEC)};
     int clockwork_hb_recv();
+    int reset_mytimer();
 
     /* Time measurement */
     int set_time();
@@ -185,17 +172,17 @@ class DaqOperator
 
     RTC::ReturnCode_t run_console_mode();
     RTC::ReturnCode_t run_http_mode();
-    ///std::string check_fatal(FatalErrorStatus errStatus);
-    std::string check_state(DAQLifeCycleState compState);
-    std::string check_compStatus(CompStatus compStatus);
+    ///string check_fatal(FatalErrorStatus errStatus);
+    string check_state(DAQLifeCycleState compState);
+    string check_compStatus(CompStatus compStatus);
     void run_data();
 #ifdef NOUSE
     void addCorbaPort();
     void delCorbaPort();
 #endif
-    void createDom_ok(std::string name);
-    void createDom_ng(std::string name);
-    void createDom_ng(std::string name, int code, char *str_e, char *str_j);
+    void createDom_ok(string name);
+    void createDom_ng(string name);
+    void createDom_ng(string name, int code, char *str_e, char *str_j);
 
     int m_curState;
     CORBA::Long m_status;
@@ -209,29 +196,27 @@ class DaqOperator
     DAQLifeCycleState m_state;
 
     unsigned int m_runNumber;
-    std::string m_start_date;
-    std::string m_stop_date;
-    std::string m_conf_file;
+    string m_start_date;
+    string m_stop_date;
+    string m_conf_file;
     int m_param_port;
 
     bool m_com_completed;
     bool m_isConsoleMode;
 
-    std::vector<::NVList> m_nv_list;
-    std::string m_msg;
-    std::string m_err_msg;
-    std::string m_body;
+    vector<::NVList> m_nv_list;
+    string m_msg;
+    string m_err_msg;
+    string m_body;
 
-    std::string m_config_file;
-    std::string m_config_file_tmp;
+    string m_config_file;
+    string m_config_file_tmp;
 
     bool m_debug;
     bool m_time;
 };
-
 extern "C"
 {
     void DaqOperatorInit(RTC::Manager *manager);
 };
-
 #endif // DAQOPERATOR_H

@@ -38,6 +38,8 @@
 #include "DaqComponentException.h"
 #include "Timer.h"
 
+using namespace std;
+
 /*!
  * @namespace DAQMW
  * @brief common namespace of DAQ-Middleware
@@ -74,13 +76,10 @@ class DaqComponentBase : public RTC::DataFlowComponentBase
           m_debug(false),
           m_time(false)
     {
-        // status_timer = new Timer(STATUS_CYCLE_SEC);
     }
 
     virtual ~DaqComponentBase()
     {
-        // delete status_timer;
-        // status_timer = nullptr;
     }
 
     enum BufferStatus
@@ -157,18 +156,18 @@ class DaqComponentBase : public RTC::DataFlowComponentBase
             }
             else
             {
-                std::cerr << "### ERROR: Event byte size missmatch" << '\n';
-                std::cerr << "event_size in header: " << event_size
-                          << "  received data size: " << received_byte << '\n';
+                cerr << "### ERROR: Event byte size missmatch" << '\n';
+                cerr << "event_size in header: " << event_size
+                     << "  received data size: " << received_byte << '\n';
             }
         }
         else
         {
-            std::cerr << "### ERROR: Bad Magic Num:"
-                      << std::hex << (unsigned)header[0] << " " << (unsigned)header[1]
-                      << '\n';
+            cerr << "### ERROR: Bad Magic Num:"
+                 << hex << (unsigned)header[0] << " " << (unsigned)header[1]
+                 << '\n';
         }
-        std::cerr << std::dec;
+        cerr << dec;
         return ret;
     }
 
@@ -184,9 +183,9 @@ class DaqComponentBase : public RTC::DataFlowComponentBase
             }
             else
             {
-                std::cerr << "### ERROR: Sequence No. missmatch" << '\n';
-                std::cerr << "sequece no. in footer :" << seq_num << '\n';
-                std::cerr << "loop cnts at component:" << m_loop << '\n';
+                cerr << "### ERROR: Sequence No. missmatch" << '\n';
+                cerr << "sequece no. in footer :" << seq_num << '\n';
+                cerr << "loop cnts at component:" << m_loop << '\n';
             }
         }
         return ret;
@@ -198,7 +197,7 @@ class DaqComponentBase : public RTC::DataFlowComponentBase
             block_byte_size - HEADER_BYTE_SIZE - FOOTER_BYTE_SIZE;
         if (m_debug)
         {
-            std::cerr << "event_byte_size: " << event_byte_size << '\n';
+            cerr << "event_byte_size: " << event_byte_size << '\n';
         }
 
         ////////// Check Header and Footer in received data /////////
@@ -211,8 +210,8 @@ class DaqComponentBase : public RTC::DataFlowComponentBase
         }
         if (check_header(header, event_byte_size) == false)
         {
-            std::cerr << "### ERROR: header invalid in loop" << m_loop
-                      << '\n';
+            cerr << "### ERROR: header invalid in loop" << m_loop
+                 << '\n';
             fatal_error_report(FatalType::HEADER_DATA_MISMATCH);
         }
 
@@ -222,7 +221,7 @@ class DaqComponentBase : public RTC::DataFlowComponentBase
         }
         if (check_footer(footer) == false)
         {
-            std::cerr << "### ERROR: footer invalid" << '\n';
+            cerr << "### ERROR: footer invalid" << '\n';
             fatal_error_report(FatalType::FOOTER_DATA_MISMATCH);
         }
         return true;
@@ -256,9 +255,9 @@ class DaqComponentBase : public RTC::DataFlowComponentBase
 
     int set_run_number()
     {
-        std::cerr << "set_run_number" << '\n';
+        cerr << "set_run_number" << '\n';
         m_runNumber = m_daq_service0.getRunNo();
-        std::cerr << "m_runNumber: " << m_runNumber << '\n';
+        cerr << "m_runNumber: " << m_runNumber << '\n';
         return 0;
     }
 
@@ -409,9 +408,9 @@ class DaqComponentBase : public RTC::DataFlowComponentBase
         RTC::DataPortStatus::Enum out_status = myOutPort.getStatus(index);
         if (m_debug)
         {
-            std::cerr << "OutPort status: "
-                      << RTC::DataPortStatus::toString(out_status)
-                      << '\n';
+            cerr << "OutPort status: "
+                 << RTC::DataPortStatus::toString(out_status)
+                 << '\n';
         }
         switch (out_status)
         {
@@ -428,9 +427,9 @@ class DaqComponentBase : public RTC::DataFlowComponentBase
         case RTC::DataPortStatus::UNKNOWN_ERROR:
         case RTC::DataPortStatus::PRECONDITION_NOT_MET:
         case RTC::DataPortStatus::CONNECTION_LOST:
-            std::cerr << "OutPort status: "
-                      << RTC::DataPortStatus::toString(out_status)
-                      << '\n';
+            cerr << "OutPort status: "
+                 << RTC::DataPortStatus::toString(out_status)
+                 << '\n';
             ret = BUF_FATAL;
             break;
             /*** Could never happen in this case ***/
@@ -441,9 +440,9 @@ class DaqComponentBase : public RTC::DataFlowComponentBase
         case RTC::DataPortStatus::RECV_EMPTY:
         case RTC::DataPortStatus::BUFFER_ERROR:
         case RTC::DataPortStatus::INVALID_ARGS:
-            std::cerr << "Impossible OutPort status: "
-                      << RTC::DataPortStatus::toString(out_status)
-                      << '\n';
+            cerr << "Impossible OutPort status: "
+                 << RTC::DataPortStatus::toString(out_status)
+                 << '\n';
             ret = BUF_FATAL;
             break;
         }
@@ -466,9 +465,9 @@ class DaqComponentBase : public RTC::DataFlowComponentBase
         RTC::DataPortStatus::Enum in_status = myInPort.getStatus(index);
         if (m_debug)
         {
-            std::cerr << "InPort status: "
-                      << RTC::DataPortStatus::toString(in_status)
-                      << '\n';
+            cerr << "InPort status: "
+                 << RTC::DataPortStatus::toString(in_status)
+                 << '\n';
         }
         switch (in_status)
         {
@@ -483,9 +482,9 @@ class DaqComponentBase : public RTC::DataFlowComponentBase
             break;
         case RTC::DataPortStatus::PORT_ERROR:
         case RTC::DataPortStatus::PRECONDITION_NOT_MET:
-            std::cerr << "InPort status: "
-                      << RTC::DataPortStatus::toString(in_status)
-                      << '\n';
+            cerr << "InPort status: "
+                 << RTC::DataPortStatus::toString(in_status)
+                 << '\n';
             ret = BUF_FATAL;
             break;
         /*** Could never happen in this case ***/
@@ -498,9 +497,9 @@ class DaqComponentBase : public RTC::DataFlowComponentBase
         case RTC::DataPortStatus::INVALID_ARGS:
         case RTC::DataPortStatus::CONNECTION_LOST:
         case RTC::DataPortStatus::UNKNOWN_ERROR:
-            std::cerr << "Impossible InPort status: "
-                      << RTC::DataPortStatus::toString(in_status)
-                      << '\n';
+            cerr << "Impossible InPort status: "
+                 << RTC::DataPortStatus::toString(in_status)
+                 << '\n';
             ret = BUF_FATAL;
             break;
         }
@@ -532,10 +531,9 @@ class DaqComponentBase : public RTC::DataFlowComponentBase
     int daq_do()
     {
         int ret = 0;
+        bool status = true;
 
         get_command();
-
-        bool status = true;
 
         if (m_command != CMD_NOP)
         {                                  // got other command
@@ -547,7 +545,7 @@ class DaqComponentBase : public RTC::DataFlowComponentBase
                 { // check if transition is locked
                     if (m_debug)
                     {
-                        std::cerr << "### trans locked" << '\n';
+                        cerr << "### trans locked" << '\n';
                     }
                     usleep(0);
                     if (!m_isOnError)
@@ -558,7 +556,7 @@ class DaqComponentBase : public RTC::DataFlowComponentBase
                         }
                         catch (DaqCompDefinedException &e)
                         {
-                            std::cerr << status_timer->getDate() << " ";
+                            cerr << status_timer->getDate() << " ";
                             FatalType::Enum mytype = e.type();
                             int mycode = e.reason();
                             const char *mydesc = e.what();
@@ -566,7 +564,7 @@ class DaqComponentBase : public RTC::DataFlowComponentBase
                         }
                         catch (DaqCompUserException &e)
                         {
-                            std::cerr << status_timer->getDate() << " ";
+                            cerr << status_timer->getDate() << " ";
                             FatalType::Enum mytype = e.type();
                             int mycode = e.reason();
                             const char *mydesc = e.what();
@@ -574,7 +572,7 @@ class DaqComponentBase : public RTC::DataFlowComponentBase
                         }
                         catch (...)
                         {
-                            std::cerr << "### got unknown exception at transition\n";
+                            cerr << "### got unknown exception at transition\n";
                         }
                     }
                     else
@@ -590,7 +588,7 @@ class DaqComponentBase : public RTC::DataFlowComponentBase
                 }
                 catch (DaqCompDefinedException &e)
                 {
-                    std::cerr << status_timer->getDate() << " ";
+                    cerr << status_timer->getDate() << " ";
                     FatalType::Enum mytype = e.type();
                     int mycode = e.reason();
                     const char *mydesc = e.what();
@@ -598,7 +596,7 @@ class DaqComponentBase : public RTC::DataFlowComponentBase
                 }
                 catch (DaqCompUserException &e)
                 {
-                    std::cerr << status_timer->getDate() << " ";
+                    cerr << status_timer->getDate() << " ";
                     FatalType::Enum mytype = e.type();
                     int mycode = e.reason();
                     const char *mydesc = e.what();
@@ -606,21 +604,22 @@ class DaqComponentBase : public RTC::DataFlowComponentBase
                 }
                 catch (...)
                 {
-                    std::cerr << "### got unknown exception at transition\n";
+                    cerr << "### got unknown exception at transition\n";
                 }
                 set_status(COMP_WORKING);
             }
             else
             {
-                std::cerr << "daq_do: transAction call: illegal command"
-                          << '\n';
+                cerr << "daq_do: transAction call: illegal command"
+                     << '\n';
             }
             set_done();
 
-            // if (m_time) {
-            // get_time_inline(m_command);
-            // get_time_output(m_command);
-            // }
+            if (m_time)
+            {
+                get_time_inline(m_command);
+                get_time_output(m_command);
+            }
         }
         else
         {
@@ -633,7 +632,7 @@ class DaqComponentBase : public RTC::DataFlowComponentBase
                 }
                 catch (DaqCompDefinedException &e)
                 {
-                    std::cerr << status_timer->getDate() << " ";
+                    cerr << status_timer->getDate() << " ";
                     FatalType::Enum mytype = e.type();
                     int mycode = e.reason();
                     const char *mydesc = e.what();
@@ -641,7 +640,7 @@ class DaqComponentBase : public RTC::DataFlowComponentBase
                 }
                 catch (DaqCompUserException &e)
                 {
-                    std::cerr << status_timer->getDate() << " ";
+                    cerr << status_timer->getDate() << " ";
                     FatalType::Enum mytype = e.type();
                     int mycode = e.reason();
                     const char *mydesc = e.what();
@@ -649,7 +648,7 @@ class DaqComponentBase : public RTC::DataFlowComponentBase
                 }
                 catch (...)
                 {
-                    std::cerr << "### caught unknown exception on DaqComponentBase\n";
+                    cerr << "### caught unknown exception on DaqComponentBase\n";
                     return ret;
                 }
                 clockwork_status_report();
@@ -658,11 +657,11 @@ class DaqComponentBase : public RTC::DataFlowComponentBase
             {
                 daq_onError();
             }
-
             get_hb_from_operator_clockwork();
-            // std::cerr << m_command <<'\n';
-            // std::cerr << m_state_prev << '\n';
-            // std::cerr << m_state <<'\n';
+
+            // cerr << m_command <<'\n';
+            // cerr << m_state_prev << '\n';
+            // cerr << m_state <<'\n';
         }
 
         return ret;
@@ -682,7 +681,7 @@ class DaqComponentBase : public RTC::DataFlowComponentBase
 
     int set_status(CompStatus comp_status)
     {
-        std::unique_ptr<Status> mystatus(new Status);
+        unique_ptr<Status> mystatus(new Status);
         mystatus->comp_name = CORBA::string_dup(m_comp_name.c_str());
         mystatus->state = m_state;
         ///mystatus->event_num = m_totalEventNum;
@@ -702,7 +701,7 @@ class DaqComponentBase : public RTC::DataFlowComponentBase
     static constexpr int CHECK_HB_CYCLE_SEC = 1;     // default = 3
     // static const int DAQ_HB_SIZE            =  5;
 
-    std::string m_comp_name;
+    string m_comp_name;
     unsigned int m_runNumber;
     unsigned int m_eventByteSize;
     unsigned long long m_loop;
@@ -714,14 +713,14 @@ class DaqComponentBase : public RTC::DataFlowComponentBase
     RTC::CorbaPort m_DAQServicePort;
 
     // Timer* status_timer;
-    std::unique_ptr<Timer> status_timer{new Timer(STATUS_CYCLE_SEC)};
-    std::unique_ptr<Timer> hb_timer{new Timer(CHECK_HB_CYCLE_SEC)};
+    unique_ptr<Timer> status_timer{new Timer(STATUS_CYCLE_SEC)};
+    unique_ptr<Timer> hb_timer{new Timer(CHECK_HB_CYCLE_SEC)};
 
     DAQCommand m_command;
     DAQLifeCycleState m_state;
     DAQLifeCycleState m_state_prev;
 
-    std::string m_err_message;
+    string m_err_message;
 
     bool m_isOnError;
     bool m_isTimerAlarm;
@@ -795,7 +794,7 @@ class DaqComponentBase : public RTC::DataFlowComponentBase
         set_status(COMP_WORKING);
         daq_stop();
 
-        std::cerr << "event byte size = " << m_totalDataSize << '\n';
+        cerr << "event byte size = " << m_totalDataSize << '\n';
         return 0;
     }
 
@@ -811,7 +810,7 @@ class DaqComponentBase : public RTC::DataFlowComponentBase
         m_command = m_daq_service0.getCommand();
         if (m_debug)
         {
-            std::cerr << "m_command=" << m_command << '\n';
+            cerr << "m_command=" << m_command << '\n';
         }
         return 0;
     }
@@ -820,96 +819,80 @@ class DaqComponentBase : public RTC::DataFlowComponentBase
     {
         if (hb_timer->checkTimer())
         {
-            int m_hb = 0; // init
-            m_hb = m_daq_service0.getHB();
-            std::cerr << "m_hb=" << m_hb << '\n';
-
-            if (m_hb == 1)
-            {
-                m_daq_service0.upHB();
-            }
-            // if (m_hb == 2)
-            // {
-            //     std::cerr << "### Shutdonw\n";
-            //     if (m_state_prev == CONFIGURED && m_state == RUNNING)
-            //     {
-            //         transAction(CMD_STOP);
-            //     }
-            //     std::exit(1);
-            // }
+            m_daq_service0.setHB();
+            // set_hb_done();
             hb_timer->resetTimer();
         }
         return 0;
     }
-    /*
-        int get_time_inline(int command)
+    int get_time_inline(int command)
+    {
+        constexpr char fname_inline[] = "s4i-file-inline";
+
+        TimeVal st;
+        struct timeval end_time;
+        struct timezone tz;
+        long result;
+
+        struct passwd *pw;
+        uid_t uid;
+
+        char date[128];
+        char fname[128];
+
+        // end time
+        gettimeofday(&end_time, &tz);
+
+        // start time
+        st = m_daq_service0.getTime();
+
+        // calc
+        result = (end_time.tv_sec - st.sec) * 1000000 + (end_time.tv_usec - st.usec);
+
+        if (result < 0)
         {
-            constexpr char fname_inline[] = "s4i-file-inline";
-
-            TimeVal st;
-            struct timeval end_time;
-            struct timezone tz;
-            long result;
-
-            struct passwd *pw;
-            uid_t uid;
-
-            char date[128];
-            char fname[128];
-
-            // end time
-            gettimeofday(&end_time, &tz);
-
-            // start time
-            st = m_daq_service0.getTime();
-
-            // calc
-            result = (end_time.tv_sec - st.sec) * 1000000
-                    + (end_time.tv_usec - st.usec);
-
-            if (result < 0) {
-                result = (st.sec - end_time.tv_sec) * 1000000
-                        + (st.usec - end_time.tv_usec);
-            }
-
-            uid = getuid();
-            if ((pw = getpwuid (uid))) {
-                sprintf(date, "/home/%s/DAQ-Middleware/csv/s4i/%s", pw->pw_name, fname_inline);
-            }
-            sprintf(fname, "%s.csv", date);
-            std::ofstream csv_file(fname, std::ios::app);
-
-            switch (command) {
-            case CMD_CONFIGURE:
-                csv_file << "Configure," << result << '\n';
-                break;
-            case CMD_START:
-                csv_file << "Start," << result << '\n';
-                break;
-            case CMD_STOP:
-                csv_file << "Stop," << result << '\n';
-                break;
-            case CMD_UNCONFIGURE:
-                csv_file << "Unconfigure," << result << '\n';
-                break;
-            case CMD_PAUSE:
-                csv_file << "Pause," << result << '\n';
-                break;
-            case CMD_RESUME:
-                csv_file << "Resume," << result << '\n';
-                break;
-            case CMD_RESTART:
-                csv_file << "Restart," << result << '\n';
-                break;
-            }
-            csv_file.close();
-
-            return 0;
+            result = (st.sec - end_time.tv_sec) * 1000000 + (st.usec - end_time.tv_usec);
         }
-        */
+
+        uid = getuid();
+        if ((pw = getpwuid(uid)))
+        {
+            sprintf(date, "/home/%s/DAQ-Middleware/csv/s4i/%s", pw->pw_name, fname_inline);
+        }
+        sprintf(fname, "%s.csv", date);
+        ofstream csv_file(fname, ios::app);
+
+        switch (command)
+        {
+        case CMD_CONFIGURE:
+            csv_file << "Configure," << result << '\n';
+            break;
+        case CMD_START:
+            csv_file << "Start," << result << '\n';
+            break;
+        case CMD_STOP:
+            csv_file << "Stop," << result << '\n';
+            break;
+        case CMD_UNCONFIGURE:
+            csv_file << "Unconfigure," << result << '\n';
+            break;
+        case CMD_PAUSE:
+            csv_file << "Pause," << result << '\n';
+            break;
+        case CMD_RESUME:
+            csv_file << "Resume," << result << '\n';
+            break;
+        case CMD_RESTART:
+            csv_file << "Restart," << result << '\n';
+            break;
+        }
+        csv_file.close();
+
+        return 0;
+    }
     int get_time_output(int command)
     {
-        std::string fname_output = "s4i-output";
+        string fname_output = "s4i-output";
 
         struct timeval end_time;
         struct timezone tz;
@@ -933,7 +916,7 @@ class DaqComponentBase : public RTC::DataFlowComponentBase
             sprintf(date, "/home/%s/DAQ-Middleware/csv/s4i/%s", pw->pw_name, fname_output.c_str());
         }
         sprintf(fname, "%s.csv", date);
-        std::ofstream csv_file(fname, std::ios::app);
+        ofstream csv_file(fname, ios::app);
         switch (command)
         {
         case CMD_CONFIGURE:
@@ -967,7 +950,7 @@ class DaqComponentBase : public RTC::DataFlowComponentBase
         m_daq_service0.setDone();
         if (m_debug)
         {
-            std::cerr << "set_done()\n";
+            cerr << "set_done()\n";
         }
         return 0;
     }
@@ -977,22 +960,20 @@ class DaqComponentBase : public RTC::DataFlowComponentBase
         m_daq_service0.hb_setDone();
         if (m_debug)
         {
-            std::cerr << "set_hb_done()\n";
+            cerr << "set_hb_done()\n";
         }
         return 0;
     }
 
     virtual int daq_onError()
     {
-        // m_isOnError = true; // will be set on fatal_error_report()
         if (check_trans_lock())
         {
             set_trans_unlock();
         }
         if (!m_has_printed_error_log)
         {
-            std::cerr << "### daq_onError(): ERROR Occured\n";
-            // std::cerr << m_err_message << '\n';
+            cerr << "### daq_onError(): ERROR Occured\n";
             set_status(COMP_FATAL);
             m_has_printed_error_log = true;
         }
@@ -1059,7 +1040,6 @@ class DaqComponentBase : public RTC::DataFlowComponentBase
         }
         return ret;
     }
-
 }; /// class
 } // namespace DAQMW
 
