@@ -74,9 +74,8 @@ struct Status
 };
 
 enum HBMSG {
-    ZERO,
-    ONE,
-    END
+    DEAD,
+    LIVE
 };
 
 enum HeartBeatDone {
@@ -105,14 +104,16 @@ interface DAQService
     void setFatalStatus(in FatalErrorStatus fatalStatus);
     FatalErrorStatus getFatalStatus();
 
+    // Send message
     void setHB();
     HBMSG getHB();
-    void upHB();
-    void setStopDaqSystem();
 
-    //HeartBeatDone hb_checkDone();
-    //void   hb_setDone();
+    // Send message count
+    void reset_send_count();
+    void inc_send_count();
+    short get_send_count();
 
-    // RTC::ReturnCode_t setTime(in TimeVal now);
-    // TimeVal getTime();
+    // Mesure time
+    RTC::ReturnCode_t setTime(in TimeVal now);
+    TimeVal getTime();
 };
