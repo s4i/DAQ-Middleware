@@ -107,14 +107,12 @@ interface DAQService
     // Send message
     void setHB();
     HBMSG getHB();
-    void resetHB();
+
     // Send message count
     void reset_send_count();
     void inc_send_count();
     short get_send_count();
-    // Return message
-    void hb_setDone();
-    HeartBeatDone hb_checkDone();
+
     // Mesure time
     RTC::ReturnCode_t setTime(in TimeVal now);
     TimeVal getTime();

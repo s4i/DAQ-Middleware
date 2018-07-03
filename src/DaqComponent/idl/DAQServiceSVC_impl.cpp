@@ -42,20 +42,6 @@ DAQLifeCycleState DAQServiceSVC_impl::getState()
 }
 RTC::ReturnCode_t DAQServiceSVC_impl::setCommand(DAQCommand command)
 {
-#ifdef OLD
-    if (m_done == DONE)
-    {
-        m_command = command;
-        m_new = 1;
-        m_done = UNDONE;
-        ///std::cerr << "UNDONE\n";
-        return RTC::RTC_OK;
-    }
-    else
-    {
-        return RTC::RTC_ERROR;
-    }
-#endif
     m_command = command;
     m_new = 1;
     m_done = UNDONE;
@@ -119,28 +105,17 @@ FatalErrorStatus *DAQServiceSVC_impl::getFatalStatus()
 }
 void DAQServiceSVC_impl::setHB() // Usually zero
 {
-    if (m_hb_new)
-    {
-        m_hb_msg = LIVE;
-        m_hb_new = false;
-    }
+    m_hb_new = 1;
+    m_hb_msg = LIVE;
 }
 HBMSG DAQServiceSVC_impl::getHB()
 {
-    m_hb_new = true;
-    return m_hb_msg;
-}
-void DAQServiceSVC_impl::resetHB()
-{
-    m_hb_msg = DEAD;
-}
-HeartBeatDone DAQServiceSVC_impl::hb_checkDone()
-{
-    return m_hb_done;
-}
-void DAQServiceSVC_impl::hb_setDone()
-{
-    m_hb_done = HBDONE;
+    if (m_hb_new)
+    {
+        m_hb_new = 0;
+        return m_hb_msg;
+    }
+    return DEAD;
 }
 RTC::ReturnCode_t DAQServiceSVC_impl::setTime(const TimeVal &now)
 {

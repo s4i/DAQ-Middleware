@@ -698,7 +698,7 @@ class DaqComponentBase : public RTC::DataFlowComponentBase
     static constexpr int DAQ_STATE_SIZE = 6;
     static constexpr int DAQ_IDLE_TIME_USEC = 10000; // 10 m sec
     static constexpr int STATUS_CYCLE_SEC = 3;       // default = 3
-    static constexpr int CHECK_HB_CYCLE_SEC = 1;     // default = 3
+    static constexpr int CHECK_HB_CYCLE_SEC = 4;     // default = 3
     // static const int DAQ_HB_SIZE            =  5;
 
     string m_comp_name;

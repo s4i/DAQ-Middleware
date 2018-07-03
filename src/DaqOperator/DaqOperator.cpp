@@ -547,6 +547,14 @@ RTC::ReturnCode_t DaqOperator::run_console_mode()
 			}
 		} //for
 		cerr << '\n';
+		for (auto &da : m_daqservices)
+		{
+			if (da->getHB())
+				cerr << "1";
+			else
+				cerr << "0";
+		}
+		cerr << '\n';
 
 		/* Display Error Console */
 		if (m_state == ERRORED)
@@ -702,7 +710,6 @@ int DaqOperator::clockwork_hb_recv()
 					deadFlag = false;
 					resFlag = true;
 				}
-				daqservice->resetHB();
 				daqservice->reset_send_count();
 			}
 			else
@@ -1240,8 +1247,6 @@ string DaqOperator::getBody()
 
 int DaqOperator::command_configure()
 {
-	//cout << "command_configure: enter" << '\n';
-
 	if (m_state != LOADED)
 	{
 		createDom_ng("Params");

@@ -56,14 +56,11 @@ class DAQServiceSVC_impl
 
 	void setHB();
 	HBMSG getHB();
-	void resetHB();
 
+	// Heartbeat unreachable count
 	void reset_send_count();
 	void inc_send_count();
 	CORBA::Short get_send_count();
-
-	HeartBeatDone hb_checkDone();
-	void hb_setDone();
 
 	// Mesure Time
 	RTC::ReturnCode_t setTime(const TimeVal &now);
@@ -80,10 +77,8 @@ class DAQServiceSVC_impl
 	CORBA::Long m_run_no;
 
 	HBMSG m_hb_msg;
-	bool m_hb_new;
+	short m_hb_new;
 	CORBA::Short m_send_count;
-
-	HeartBeatDone m_hb_done;
 
 	TimeVal m_start;
 };
