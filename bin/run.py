@@ -129,7 +129,7 @@ def file_clean(path):
     automake_flag = False
     current = os.getcwd()
     if re.match('make', path) != None:
-        print('Makefile execution'),
+        print('Makefile execution' ,end='')
         while True:
             automake = input('Automake[y/N]: ').lower()
             if automake in ['y', 'ye', 'yes', '']:
@@ -140,7 +140,7 @@ def file_clean(path):
         for f in find_all_files(current, target_file):
             os.chdir(f.strip(target_file))  # target dir
             if not automake_flag:
-                print(os.getcwd()),
+                print(os.getcwd() ,end='')
                 while True:
                     try:
                         choice = input('[y/N]: ').lower()
@@ -151,7 +151,7 @@ def file_clean(path):
                         elif choice in ['n', 'no']:
                             break
                         else:
-                            print(os.getcwd()),  # one more display
+                            print(os.getcwd() ,end='')  # one more display
                     except KeyboardInterrupt:
                         print('Skip make')
                         sys.exit(0)
@@ -170,11 +170,11 @@ def file_clean(path):
                     os.chdir(current)
                     file_path = ''
 
-        print(''.join(view_result)),
+        print(''.join(view_result) ,end='')
         print('Make finished')
         sys.exit(0)
     elif re.match('rm', path) != None:
-        print('File clean execution'),
+        print('File clean execution' ,end='')
         while True:
             choice = input('[y/N]: ').lower()
             if choice in ['y', 'ye', 'yes']:
@@ -192,7 +192,7 @@ def file_clean(path):
                 if dir == 'autogen':
                     file_path = os.path.join(root)
                     os.chdir(file_path)
-                    print(os.getcwd()),
+                    print(os.getcwd() ,end='')
                     while True:
                         choice = input('[y/N]: ').lower()
                         if choice in ['y', 'ye', 'yes', '']:
@@ -201,7 +201,7 @@ def file_clean(path):
                         elif choice in ['n', 'no']:
                             break
                         else:
-                            print(os.getcwd()),
+                            print(os.getcwd() ,end='')
                     os.chdir(current)
         if len(file_path) == 0:
             print('Not found Makefile')
@@ -213,7 +213,7 @@ def file_clean(path):
                     if re.match('omniname-*', str(file)) != None:
                         file_path = os.path.join(root)
                         os.chdir(file_path)
-                        print(os.getcwd()),
+                        print(os.getcwd() ,end='')
                         while True:
                             choice = input('[y/N]: ').lower()
                             if choice in ['y', 'ye', 'yes', '']:
@@ -222,7 +222,7 @@ def file_clean(path):
                             elif choice in ['n', 'no']:
                                 break
                             else:
-                                print(os.getcwd()),
+                                print(os.getcwd() ,end='')
                         os.chdir(current)
                         flag = True
                         break
@@ -633,7 +633,7 @@ def can_find_all_shared_libs(command_path):
     n_not_found_libs = 0
     for line in p.stdout:
         if re.search(b'not found', line):
-            print(line),
+            print(lineend='')
             n_not_found_libs += 1
 
     if n_not_found_libs > 0:
@@ -1102,7 +1102,7 @@ def main():
     #
     # Boot omni naming service
     #
-    print('start new naming service...'),
+    print('start new naming service...' ,end='')
     remove_omni_logs()
     run_omniNames(operatorAddr)
     print('done')
@@ -1113,12 +1113,12 @@ def main():
 
     # local DAQ-Components booting
     if localBoot:
-        print('Local Comps booting...'),
+        print('Local Comps booting...' ,end='')
         localCompsBooting()
         print('done')
     # remote DAQ-Components booting
     else:
-        print('Remote Comps booting...'),
+        print('Remote Comps booting...' ,end='')
         ret = remoteCompsBooting()
         if ret != True:
             print('Remote Comps booting failed. Check remote hosts')
@@ -1132,7 +1132,7 @@ def main():
     if console == False:
         if operator_log != '/dev/null':
             print('DAQ-Opearot Log: %s' % operator_log)
-        print('Now booting the DAQ-Operator...'),
+        print('Now booting the DAQ-Operator...' ,end='')
     ret = DaqOperatorBooting()
     if ret != True:
         print('DaqOperator booting failed')
