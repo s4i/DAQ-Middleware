@@ -820,7 +820,6 @@ class DaqComponentBase : public RTC::DataFlowComponentBase
         if (hb_timer->checkTimer())
         {
             m_daq_service0.setHB();
-            // set_hb_done();
             hb_timer->resetTimer();
         }
         return 0;
@@ -951,16 +950,6 @@ class DaqComponentBase : public RTC::DataFlowComponentBase
         if (m_debug)
         {
             cerr << "set_done()\n";
-        }
-        return 0;
-    }
-
-    int set_hb_done()
-    {
-        m_daq_service0.hb_setDone();
-        if (m_debug)
-        {
-            cerr << "set_hb_done()\n";
         }
         return 0;
     }
