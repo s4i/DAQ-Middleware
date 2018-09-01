@@ -702,7 +702,6 @@ int DaqOperator::clockwork_hb_recv()
 	{
 		for (auto &daqservice : m_daqservices)
 		{
-			// check_hb_done(daqservice);
 			if (daqservice->getHB())
 			{
 				if (deadFlag == true)
@@ -745,21 +744,6 @@ int DaqOperator::check_done(RTC::CorbaConsumer<DAQService> daqservice)
 	catch (...)
 	{
 		cerr << "### checkDone: failed" << '\n';
-	}
-	return 0;
-}
-int DaqOperator::check_hb_done(RTC::CorbaConsumer<DAQService> daqservice)
-{
-	try
-	{
-		if (daqservice->hb_checkDone() == 0)
-		{
-			usleep(0);
-		}
-	}
-	catch (...)
-	{
-		cerr << "### hb_checkDone: failed" << '\n';
 	}
 	return 0;
 }
