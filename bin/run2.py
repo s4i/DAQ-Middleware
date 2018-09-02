@@ -5,6 +5,8 @@
 #   This script parses config.xml file, gets IP addrese of CPU DAQs and
 #   CPU UI, and starts DAQ-Components on remote/local PCs via network.
 
+from __future__ import print_function
+
 import datetime
 import errno
 import os
@@ -317,22 +319,22 @@ def opt():
     comps_invoke_interval = float(options.comps_invoke_interval)
 
     if os.path.exists(confFile):
-        print 'Use config file ' + confFile
+        print('Use config file ' + confFile)
     else:
-        print 'ERROR: config file ' + confFile + ' not exists. exit.'
+        print('ERROR: config file ' + confFile + ' not exists. exit.')
         sys.exit(-1)
     if os.path.exists(schemaFile):
-        print 'Use ' + schemaFile + ' for XML schema'
+        print('Use ' + schemaFile + ' for XML schema')
     else:
-        print 'ERROR: schema ' + options.schemaFile + ' not exists. exit.'
+        print('ERROR: schema ' + options.schemaFile + ' not exists. exit.')
         sys.exit(-1)
     if os.path.exists(options.operator):
-        print 'Use ' + options.operator + ' for DAQ-Operator'
+        print('Use ' + options.operator + ' for DAQ-Operator')
     else:
-        print 'ERROR: ' + options.operator + ' not exists. exit.'
+        print('ERROR: ' + options.operator + ' not exists. exit.')
         sys.exit(-1)
     if comps_invoke_interval > 0:
-        print "Comps invoke interval: %4.1f sec" % (comps_invoke_interval)
+        print("Comps invoke interval: %4.1f sec" % (comps_invoke_interval))
 
 
 def getVal(confile, path):
@@ -366,11 +368,11 @@ def sendData(addr, port, data):
         s.shutdown(socket.SHUT_WR)
         rdata = s.recv(1024)
         if verbose:
-            print "received data:", rdata
+            print("received data:", rdata)
         s.close()
     except socket.error, msg:
         s.close()
-        print 'socket error occured'
+        print('socket error occured')
     return rdata
 
 
@@ -466,7 +468,7 @@ def getExecPath(confFile):
                 for dat in epathdat:
                     if dat.nodeType == dat.TEXT_NODE:
                         if verbose:
-                            print ' ', dat.nodeValue
+                            print(' ', dat.nodeValue)
                         execPaths.append(dat.nodeValue)
         allExecPaths.append(execPaths)
 
@@ -628,7 +630,7 @@ def can_find_all_shared_libs(command_path):
     n_not_found_libs = 0
     for line in p.stdout:
         if re.search('not found', line):
-            print line,
+            print(line, end='')
             n_not_found_libs += 1
 
     if n_not_found_libs > 0:
@@ -703,7 +705,7 @@ def start_comp(command_line, log='', foreground='no', no_stdin='yes', myenv=None
     try:
         can_find_all_shared_libs(real_program)
     except IOError, e:
-        print e
+        print(e)
         raise
 
     my_stdout = None
@@ -724,7 +726,7 @@ def start_comp(command_line, log='', foreground='no', no_stdin='yes', myenv=None
         try:
             log_fd = open(log, "w")
         except IOError, (errno, strerror):
-            print 'cannot open %s: %s' % (log, strerror)
+            print('cannot open %s: %s' % (log, strerror))
             raise
         else:
             my_stdout = log_fd
@@ -738,10 +740,10 @@ def start_comp(command_line, log='', foreground='no', no_stdin='yes', myenv=None
                              stderr=my_stderr)
 
     except OSError, (errno, strerror):
-        print 'cannot execute %s: %s' % (real_program, strerror)
+        print('cannot execute %s: %s' % (real_program, strerror))
         raise
     except ValueError, strerror:
-        print 'subprocess.Popen value error: %s' % (strerror)
+        print('subprocess.Popen value error: %s' % (strerror))
         raise
 
     # Restore environment variable for next Popen process (if any)
@@ -760,7 +762,7 @@ def start_comp(command_line, log='', foreground='no', no_stdin='yes', myenv=None
         try:
             proc_name = os.path.basename(proc_title_argv[3])
         except IndexError, e:
-            print "path: ", path
+            print("path: ", e)
             sys.exit(e)
     else:
         proc_name = os.path.basename(proc_title_argv[0])
@@ -873,7 +875,7 @@ def boot_comps_or_die(ip_address, portno, execpath, rtc_conf_path, log, env):
     # kill
     command_line = 'kill\t%s\n' % execpath
     if send_and_recv_or_die(ip_address, portno, command_line) != True:
-        print 'ERROR: kill component failed', command_line
+        print('ERROR: kill component failed', command_line)
         return False
 
     # boot
@@ -883,7 +885,7 @@ def boot_comps_or_die(ip_address, portno, execpath, rtc_conf_path, log, env):
 
     # print 'boot_comps_or_die: ', command_line
     if send_and_recv_or_die(ip_address, portno, command_line) != True:
-        print 'ERROR: boot comp failed:', command_line
+        print('ERROR: boot comp failed:', command_line)
         return False
     return True
 
@@ -902,7 +904,7 @@ def send_and_recv_or_die(ip_address, portno, command_line):
     recvline = so.recv(1024)
     if recvline != '':
         #sys.exit('XXX' + ip_address + recvline)
-        print 'ERROR: command failed: %s %s' % (ip_address, recvline)
+        print('ERROR: command failed: %s %s' % (ip_address, recvline))
         return False
     return True
 
@@ -913,7 +915,7 @@ def send_file_content(ip_address, portno, file_path, content):
         so.connect((ip_address, portno))
     except socket.error, e:
         # sys.exit(e)
-        print 'ERROR: Socket connect', socket.error, e
+        print('ERROR: Socket connect', socket.error, e)
         return False
 
     command_line = 'createfile\t%s\n' % (file_path)
@@ -922,7 +924,7 @@ def send_file_content(ip_address, portno, file_path, content):
         so.send(command_line)
     except Exception, e:
         # sys.exit(e)
-        print 'ERROR: Socket send', e
+        print('ERROR: Socket send', e)
         return False
 
     for line in content.split('\n'):
@@ -966,7 +968,7 @@ def localCompsBooting():
             log_file += timestamp
         start_comp(command_line, log=log_file)
         if comps_invoke_interval > 0:
-            print 'sleeping %4.1f sec' % (comps_invoke_interval)
+            print('sleeping %4.1f sec' % (comps_invoke_interval))
             time.sleep(comps_invoke_interval)
 
 
@@ -994,8 +996,8 @@ def remoteCompsBooting():
                                 compInfo['confPath'], conf)
 
         if ret != True:
-            print 'rtc.conf file creation failed:', \
-                  compAddr, xinetdPort, compInfo['confPath'], conf
+            print('rtc.conf file creation failed:',
+                  compAddr, xinetdPort, compInfo['confPath'], conf)
             return False
 
         env = ''
@@ -1007,7 +1009,7 @@ def remoteCompsBooting():
             elif len(mydisp_list) == 2:
                 env = '%s\t%s' % ('DISPLAY', mydisp)
             else:
-                print 'ERROR: Invalid DISPLAY env. val', env
+                print('ERROR: Invalid DISPLAY env. val', env)
                 return False
 
         ret = boot_comps_or_die(compAddr, xinetdPort, compInfo['execPath'],\
@@ -1015,10 +1017,10 @@ def remoteCompsBooting():
                                 compInfo['confPath'], log_file, env)
 
         if ret != True:
-            print 'Remote booting failed:'
-            print ' IP addr  : %s\n Port No  : %s\n Exe Path : %s\n Conf Path: %s\n Log File : %s\n Env Vals : %s\n' % \
+            print('Remote booting failed:')
+            print(' IP addr  : %s\n Port No  : %s\n Exe Path : %s\n Conf Path: %s\n Log File : %s\n Env Vals : %s\n' %
                   (compAddr, xinetdPort,
-                   compInfo['execPath'], compInfo['confPath'], log_file, env)
+                   compInfo['execPath'], compInfo['confPath'], log_file, env))
             return False
         if comps_invoke_interval > 0:
             time.sleep(comps_invoke_interval)
@@ -1027,7 +1029,7 @@ def remoteCompsBooting():
 
 def DaqOperatorBooting():
     if operatorAddr == None:
-        print 'ERROR: not specified IP address of DaqOperator in config file'
+        print('ERROR: not specified IP address of DaqOperator in config file')
         return False
 
     exist_ok_makedirs(daqmw_log_dir)  # create log directory for DaqOperator
@@ -1036,7 +1038,7 @@ def DaqOperatorBooting():
     conf_path_op = '.'
     ret = genConfFileForOperator(conf_path_op, confOperatorPath, operatorAddr)
     if ret == False:
-        print 'ERROR: creation of conf file for DaqOperator failed'
+        print('ERROR: creation of conf file for DaqOperator failed')
         return False
 
     conf_path_op = '.'
@@ -1080,10 +1082,10 @@ def main():
     #
     ret, err = validateConfigFile(confFile, schemaFile)
     if ret:
-        print 'Conf file validated:', confFile
+        print('Conf file validated:', confFile)
     else:
-        print '### ERROR: Conf file validation failed. Check the ', confFile
-        print err
+        print('### ERROR: Conf file validation failed. Check the ', confFile)
+        print(err)
         sys.exit(-1)
 
     # parse config file
@@ -1092,10 +1094,10 @@ def main():
     #
     # Boot omni naming service
     #
-    print 'start new naming service...',
+    print('start new naming service...', end='')
     remove_omni_logs()
     run_omniNames(operatorAddr)
-    print 'done'
+    print('done')
 
     #
     # Boot DAQ-Components
@@ -1103,33 +1105,33 @@ def main():
 
     # local DAQ-Components booting
     if localBoot:
-        print 'Local Comps booting...',
+        print('Local Comps booting...', end='')
         localCompsBooting()
-        print 'done'
+        print('done')
     # remote DAQ-Components booting
     else:
-        print 'Remote Comps booting...',
+        print('Remote Comps booting...', end='')
         ret = remoteCompsBooting()
         if ret != True:
-            print 'Remote Comps booting failed. Check remote hosts'
+            print('Remote Comps booting failed. Check remote hosts')
             sys.exit(-1)
         else:
-            print 'done'
+            print('done')
 
     #
     # Boot DAQ-Operator
     #
     if console == False:
         if operator_log != '/dev/null':
-            print 'DAQ-Opearot Log: %s' % operator_log
-        print 'Now booting the DAQ-Operator...',
+            print('DAQ-Opearot Log: %s' % operator_log)
+        print('Now booting the DAQ-Operator...', end='')
     ret = DaqOperatorBooting()
     if ret != True:
-        print 'DaqOperator booting failed'
+        print('DaqOperator booting failed')
         sys.exit(-1)
     else:
         if console == False:
-            print 'done'
+            print('done')
 
 
 if __name__ == "__main__":

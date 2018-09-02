@@ -4,7 +4,7 @@ prefix  = /usr
 DIR = $(DESTDIR)$(prefix)/share/daqmw/docs
 MODE = 0644
 
-FILES += README
+FILES += README.md
 FILES += DAQ-Middleware-1.1.0-Tech.pdf
 FILES += DAQ-Middleware-1.4.0-DevManual.pdf
 FILES += Changes
