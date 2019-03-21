@@ -127,7 +127,7 @@ def file_clean(path):
     automake_flag = False
     current = os.getcwd()
     if re.match('make', path) != None:
-        print('Makefile execution' ,end='')
+        print('Makefile execution', end='')
         while True:
             automake = input('Automake[y/N]: ').lower()
             if automake in ['y', 'ye', 'yes', '']:
@@ -138,7 +138,7 @@ def file_clean(path):
         for f in find_all_files(current, target_file):
             os.chdir(f.strip(target_file))  # target dir
             if not automake_flag:
-                print(os.getcwd() ,end='')
+                print(os.getcwd(), end='')
                 while True:
                     try:
                         choice = input('[y/N]: ').lower()
@@ -149,7 +149,7 @@ def file_clean(path):
                         elif choice in ['n', 'no']:
                             break
                         else:
-                            print(os.getcwd() ,end='')  # one more display
+                            print(os.getcwd(), end='')  # one more display
                     except KeyboardInterrupt:
                         print('Skip make')
                         sys.exit(0)
@@ -168,11 +168,11 @@ def file_clean(path):
                     os.chdir(current)
                     file_path = ''
 
-        print(''.join(view_result) ,end='')
+        print(''.join(view_result), end='')
         print('Make finished')
         sys.exit(0)
     elif re.match('rm', path) != None:
-        print('File clean execution' ,end='')
+        print('File clean execution', end='')
         while True:
             choice = input('[y/N]: ').lower()
             if choice in ['y', 'ye', 'yes']:
@@ -190,7 +190,7 @@ def file_clean(path):
                 if dir == 'autogen':
                     file_path = os.path.join(root)
                     os.chdir(file_path)
-                    print(os.getcwd() ,end='')
+                    print(os.getcwd(), end='')
                     while True:
                         choice = input('[y/N]: ').lower()
                         if choice in ['y', 'ye', 'yes', '']:
@@ -199,7 +199,7 @@ def file_clean(path):
                         elif choice in ['n', 'no']:
                             break
                         else:
-                            print(os.getcwd() ,end='')
+                            print(os.getcwd(), end='')
                     os.chdir(current)
         if len(file_path) == 0:
             print('Not found Makefile')
@@ -211,7 +211,7 @@ def file_clean(path):
                     if re.match('omniname-*', str(file)) != None:
                         file_path = os.path.join(root)
                         os.chdir(file_path)
-                        print(os.getcwd() ,end='')
+                        print(os.getcwd(), end='')
                         while True:
                             choice = input('[y/N]: ').lower()
                             if choice in ['y', 'ye', 'yes', '']:
@@ -220,7 +220,7 @@ def file_clean(path):
                             elif choice in ['n', 'no']:
                                 break
                             else:
-                                print(os.getcwd() ,end='')
+                                print(os.getcwd(), end='')
                         os.chdir(current)
                         flag = True
                         break
@@ -797,7 +797,7 @@ def remove_omni_logs(omni_log_dir=''):
         omni_log_dir = '.'
     omni_log_path = '%s/omninames-%s.log' % (omni_log_dir, my_hostname)
     omni_log_backup_path = '%s/omninames-%s.bak' % (omni_log_dir, my_hostname)
-    omni_log_data        = '%s/omninames-%s.dat' % (omni_log_dir, my_hostname)
+    omni_log_data = '%s/omninames-%s.dat' % (omni_log_dir, my_hostname)
 
     if os.path.isfile(omni_log_path):
         try:
@@ -808,13 +808,15 @@ def remove_omni_logs(omni_log_dir=''):
     if os.path.isfile(omni_log_backup_path):
         try:
             os.remove(omni_log_backup_path)
-        except OSError, (errno, strerror):
-            sys.exit('%s: cannot remove %s: %s' % progname, omni_log_backup_path, strerror)
+        except OSError as e:
+            sys.exit('%s: cannot remove %s: %s' %
+                     progname, omni_log_backup_path, e.strerror)
     if os.path.isfile(omni_log_data):
         try:
             os.remove(omni_log_data)
-        except OSError, (errno, strerror):
-            sys.exit('%s: cannot remove %s: %s' % progname, omni_log_data, strerror)
+        except OSError as e:
+            sys.exit('%s: cannot remove %s: %s' %
+                     progname, omni_log_data, e.strerror)
 
 
 def run_omniNames(operatorAddr, omni_log_dir='', omni_port=nsport):

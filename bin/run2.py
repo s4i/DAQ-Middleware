@@ -142,7 +142,7 @@ def file_clean(path):
             elif automake in ['n', 'no']:
                 break
         for f in find_all_files(current, target_file):
-            os.chdir(f.strip(target_file)) # target dir
+            os.chdir(f.strip(target_file))  # target dir
             if not automake_flag:
                 print(os.getcwd()),
                 while True:
@@ -154,11 +154,11 @@ def file_clean(path):
                     elif choice in ['n', 'no']:
                         break
                     else:
-                        print(os.getcwd()), # one more display
+                        print(os.getcwd()),  # one more display
             else:
                 view_result += f + '\n'
-                os.system('make') # all make
-            os.chdir(current) # current dir
+                os.system('make')  # all make
+            os.chdir(current)  # current dir
 
         if not automake_flag:
             for f in comp_path:
@@ -718,7 +718,7 @@ def start_comp(command_line, log='', foreground='no', no_stdin='yes', myenv=None
         dir = os.path.dirname(log)
         if dir:
             try:
-                #ExistOkMkdir.exist_ok_makedirs(dir, 0777)
+                # ExistOkMkdir.exist_ok_makedirs(dir, 0777)
                 exist_ok_makedirs(dir, 0777)
             except OSError, (errno, strerror):
                 sys.stderr.write('%s: %s\n' % (dir, strerror))
@@ -798,6 +798,7 @@ def remove_omni_logs(omni_log_dir=''):
         omni_log_dir = '.'
     omni_log_path = '%s/omninames-%s.log' % (omni_log_dir, my_hostname)
     omni_log_backup_path = '%s/omninames-%s.bak' % (omni_log_dir, my_hostname)
+    omni_log_data = '%s/omninames-%s.dat' % (omni_log_dir, my_hostname)
 
     if os.path.isfile(omni_log_path):
         try:
@@ -811,6 +812,12 @@ def remove_omni_logs(omni_log_dir=''):
         except OSError, (errno, strerror):
             sys.exit('%s: cannot remove %s: %s' %
                      progname, omni_log_backup_path, strerror)
+    if os.path.isfile(omni_log_data):
+        try:
+            os.remove(omni_log_data)
+        except OSError, (errno, strerror):
+            sys.exit('%s: cannot remove %s: %s' %
+                     progname, omni_log_data, strerror)
 
 
 def run_omniNames(operatorAddr, omni_log_dir='', omni_port=nsport):
@@ -1070,7 +1077,7 @@ def DaqOperatorBooting():
 
 
 def main():
-    file_clean(sys.argv[1]) # run.py make/clean/rm
+    file_clean(sys.argv[1])  # run.py make/clean/rm
 
     #
     # get command line options
